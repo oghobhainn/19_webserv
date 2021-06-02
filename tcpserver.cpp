@@ -6,7 +6,9 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <cerrno>
 #include <string>
+#include <iostream>
 
 int main()
 {
@@ -28,23 +30,23 @@ int main()
 
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
-		perror("cannot create socket"); //not auth function
-		return (0);
+		std::cout << "Failed to create socket. Errno: " << errno << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
 	/* 2. - Naming the socket*/
 
 	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
 	{
-		perror("bind failed");
-		return (0);
+		std::cout << "Failed to bind. Errno: " << errno << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
 	/* 3. - waiting for an incoming connection*/
 
 	if (listen(server_fd, 3) < 0)
 	{
-		perror("In listen");
+		std::cout << "Failure while listening." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -55,20 +57,21 @@ int main()
 
 		if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
 		{
-			perror("In accept");
+			std::cout << "Failure while accepting connection" << std::endl;
 			exit(EXIT_FAILURE);
 		}
 
 		char buffer[1024] = {0};
 		valread = read( new_socket, buffer, 1024);
-		printf("%s\n", buffer);
+		std::cout << buffer << std::endl;
 		if (valread < 0)
 		{
-			printf("No bytes are there to read");
+			std::cout << "No bytes are there to read" << std::endl;
 		}
 
 		//the response we want when the client calls the server
-		std::string hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+		const char* hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+
 
 		write(new_socket, hello, strlen(hello));
 		
