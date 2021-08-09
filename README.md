@@ -12,6 +12,8 @@
 
 [C++ Web Programming](https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm)
 
+[Transport layer, TCP client/server example. multiplexing](https://notes.shichao.io/unp/ch4/)
+
 ### HTTP 1.1 (standard to follow) :
 
 [HTTP/1.1 (RFC 2616)](https://www.rfc-editor.org/rfc/rfc2616.html)

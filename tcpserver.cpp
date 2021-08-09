@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "parsing.hpp"
+#include "response.hpp"
 
 int main()
 {
@@ -23,6 +24,8 @@ int main()
 	const int			PORT = 8080;
 
 	t_http_request		http_req_struct;
+	t_http_response		http_resp_struct;
+	std::string			http_response_firstline;
 
 	memset((char *)&address, 0, sizeof(address));
 	address.sin_family		= AF_INET;
@@ -74,14 +77,18 @@ int main()
 		}
 
 		http_request_parser(buffer, http_req_struct);
+		print_request_firstline(http_req_struct.firstline);
+		print_request_header(http_req_struct.header);
 		//the response we want when the client calls the server
+		http_response_firstline = (Http_response::build_http_response(http_req_struct)).Http_response::get_firstline();
 
-		const char* hello = "HTTP/1.1 200 OK\r\n\r\nContent-Type: text/plain\nContent-Length: 28\n\nHello world! this is SERVER\n";
+		int response_length = http_response_firstline.length();
+		char response_char[response_length + 1];
+		strcpy(response_char, http_response_firstline.c_str());
 
-		//dummy server always print the same response. This should be changed for each case
-		write(new_socket, hello, strlen(hello));
+		write(new_socket, response_char, strlen(response_char));
 		
-		printf("\n------------- Hello message sent -------------\n\n");
+		printf("\n------------- Response message sent -------------\n\n");
 		fflush(stdout);
 		/* 5. - Closing the socket*/
 		close(new_socket);

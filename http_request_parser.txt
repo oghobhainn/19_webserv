@@ -1,0 +1,4 @@
+REQUEST LINE:
+	1. a METHOD : one-word command that tells the server what it should do with the resource
+	2. the path component of the URL for the request. the path identifies the resource on the server
+	3. the HTTP version number, showing the HTTP specification to which the  client has tried to maje the message comply
