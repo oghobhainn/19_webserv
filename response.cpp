@@ -8,7 +8,7 @@ Http_response::Http_response( Http_response const & src )
 	return ;
 }
 
-void				Http_response::set_firstline(int const status_code)
+void	Http_response::set_firstline		( int const status_code )
 {
 	std::string	status_message;
 
@@ -20,36 +20,12 @@ void				Http_response::set_firstline(int const status_code)
 		case 201:
 			status_message = "201 Created";
 			break;
-		case 202:
-			status_message = "202 Accepted";
-			break;
-		case 203:
-			status_message = "203 Non-Authoritative Information";
-			break;
-		case 204:
-			status_message = "204 No Content";
-			break;
-		case 205:
-			status_message = "205 Reset Content";
-			break;
-		case 206:
-			status_message = "206 Partial Content";
-			break;
 		//redirections
-		case 300:
-			status_message = "300 Multiple Choice";
-			break;
 		case 301:
 			status_message = "301 Moved Permanently";
 			break;
 		case 302:
 			status_message = "302 Found";
-			break;
-		case 303:
-			status_message = "303 See Other";
-			break;
-		case 304:
-			status_message = "304 Not Modified";
 			break;
 		//ERROR client-side
 		case 400:
@@ -58,53 +34,17 @@ void				Http_response::set_firstline(int const status_code)
 		case 401:
 			status_message = "401 Unauthorized";
 			break;
-		case 402:
-			status_message = "402 Payment Required";
-			break;
 		case 403:
 			status_message = "403 Forbidden";
 			break;
-		case 404:
-			status_message = "404 Not Found";
-			break;
+		// case 404:
+			// status_message = "404 Not Found";
+			// break;
 		case 405:
 			status_message = "405 Method not Allowed";
 			break;
-		case 406:
-			status_message = "406 Not Acceptable";
-			break;
-		case 407:
-			status_message = "407 Proxy Authentification Required";
-			break;
 		case 408:
 			status_message = "408 Request Timeout";
-			break;
-		case 409:
-			status_message = "409 Conflict";
-			break;
-		case 410:
-			status_message = "410 Gone";
-			break;
-		case 411:
-			status_message = "411 Length Required";
-			break;
-		case 412:
-			status_message = "412 Precondition Failed";
-			break;
-		case 413:
-			status_message = "413 Payload Too Large";
-			break;
-		case 414:
-			status_message = "414 URL Too Long";
-			break;
-		case 415:
-			status_message = "415 Unsupported Media Type";
-			break;
-		case 416:
-			status_message = "416 Requested Range Not Satisfiable";
-			break;
-		case 417:
-			status_message = "417 Expectation Failed";
 			break;
 		case 418:
 			status_message = "418 I'm a teapot";
@@ -112,9 +52,6 @@ void				Http_response::set_firstline(int const status_code)
 		//ERROR server-side
 		case 500:
 			status_message = "500 Internal Server Error";
-			break;
-		case 501:
-			status_message = "501 Not Implemented";
 			break;
 		case 502:
 			status_message = "502 Bad Gateway";
@@ -127,24 +64,102 @@ void				Http_response::set_firstline(int const status_code)
 			break;
 		case 505:
 			status_message = "505 HTTP Version Not Supported";
-			break;
-		case 506:
-			status_message = "506 Variant Also Negotiates";
-			break;
-		case 507:
-			status_message = "507 Insufficient Storage";
-			break;
+		default:
+			status_message = "404 Not Found";
 	}
 	this->_firstline = ("HTTP/1.1 " + status_message);
 }
-
-std::string const &	Http_response::get_firstline( void ) const { return this->_firstline; }
-
-Http_response		Http_response::build_http_response(t_http_request const http_req_struct)
+void	Http_response::set_allow			( std::string allow ) { this->_allow = allow ;}
+void	Http_response::set_server			( std::string server) { this->_server = server; }
+void	Http_response::set_date				( void )
 {
-	Http_response	http_resp;
-	http_resp.Http_response::set_firstline( 200 );
-	//std::string response = "HTTP/1.1 200 OK\r\nContent-Type: Saluut,Bonsoir\r\nContent-Length: 42\r\n'This is a dope ass server'\r\n\r\n";
+	char		buf[255];
+	time_t		now = time(0);
+	struct tm	timenow = *gmtime(&now);
+	timenow.tm_hour += 2;
+	strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %Z+2", &timenow);
 
-	return http_resp;
+	this->_date = std::string("Date: ") + std::string(buf);
+}
+// void	Http_response::set_content_type 	( std::string content_type ) { this->_content_type = content_type; }
+// void	Http_response::set_content_language	( std::string content_language ) { this->_content_language = content_language; }
+// void	Http_response::set_content_length	( std::string content_length ) { this->_content_length = content_length; }
+// void	Http_response::set_content_location	( std::string content_location ) { this->_content_location = content_location; }
+void	Http_response::set_location			( std::string location ) { this->_location = location; }
+void	Http_response::set_last_modified	( std::string last_modified ) { this->_last_modified = last_modified; }
+void	Http_response::set_retry_after		( std::string retry_after ) { this->_retry_after = retry_after; }
+void	Http_response::set_www_authenticate	( std::string www_authenticate ) { this->_www_authenticate = www_authenticate; }
+
+
+std::string const &	Http_response::get_firstline		( void ) const { return this->_firstline; }
+std::string	const & Http_response::get_allow			( void ) const { return this->_allow; }
+std::string const & Http_response::get_server			( void ) const { return this->_server; }
+std::string const & Http_response::get_http_response	( void ) const { return this->_http_response; }
+std::string const & Http_response::get_date				( void ) const { return this->_date; }
+std::string const & Http_response::get_content_type 	( void ) const { return this->_content_type; }
+std::string const & Http_response::get_content_language ( void ) const { return this->_content_language; }
+std::string const & Http_response::get_content_length 	( void ) const { return this->_content_length; }
+std::string const & Http_response::get_content_location ( void ) const { return this->_content_location; }
+std::string const & Http_response::get_location			( void ) const { return this->_location; }
+std::string const & Http_response::get_last_modified	( void ) const { return this->_last_modified; }
+std::string const & Http_response::get_retry_after		( void ) const { return this->_retry_after; }
+std::string const & Http_response::get_www_authenticate	( void ) const { return this->_www_authenticate; }
+
+
+void	Http_response::init_response( int status_code, t_http_request const http_req )
+{
+	this->Http_response::set_firstline( status_code);
+	if (status_code == 405) // method not allowed
+		this->Http_response::set_allow( std::string("Allow: ") + std::string("GET, POST, DELETE") + "\r\n");
+	this->Http_response::set_date();
+	this->Http_response::set_server(std::string("Server: ") + std::string("Webserv/1.0"));		
+	// this->Http_response::set_content_type( std::string("Content-type: ") + http_req.header.content_type );
+	// this->Http_response::set_content_language( std::string("Content-language: ") + http_req.header.content_language );
+	// this->Http_response::set_content_length( std::string("Content-length: ") + http_req.header.content_length );
+	// this->Http_response::set_content_location( std::string("Content-location: ") + http_req.header.content_location );
+	if (status_code % 300 >= 100 || status_code == 201)
+		this->Http_response::set_location( "Location: " + std::string("TODO") + "\r\n");
+	this->Http_response::set_last_modified(std::string("Last-Modified: ") + std::string("TODO"));		
+	this->Http_response::set_retry_after(std::string("Retry-After: ") + std::string("TODO"));		
+	this->Http_response::set_www_authenticate(std::string("WWW-Authenticate: ") + std::string("TODO"));		
+
+}
+
+std::string			Http_response::GET_method(t_http_request const http_req_struct)
+{
+	std::string		GET_response;
+
+	GET_response = this->Http_response::get_firstline() + "\r\n"
+					+ std::string(this->Http_response::get_allow())
+					+ this->Http_response::get_date() + "\r\n"
+					// + this->Http_response::get_content_type() + "\r\n"
+					// + this->Http_response::get_content_language() + "\r\n"
+					// + this->Http_response::get_content_length() + "\r\n"
+					// + this->Http_response::get_content_location() + "\r\n"
+					+ this->Http_response::get_last_modified() + "\r\n"
+					+ this->Http_response::get_location()
+					+ this->Http_response::get_retry_after() + "\r\n"
+					+ this->Http_response::get_server() + "\r\n"
+					+ this->Http_response::get_www_authenticate() + "\r\n"
+					+ "\r\n";
+
+	return GET_response;
+}
+
+void			Http_response::build_http_response(t_http_request const http_req_struct)
+{
+
+
+	int status_code = 405;
+
+
+	this->init_response( status_code, http_req_struct );
+	if (http_req_struct.firstline.method == std::string("GET"))
+	{
+		this->_http_response = GET_method( http_req_struct );
+	}
+	else
+	{
+		this->_http_response = (std::string("THIS IS THE ELSE #theDoors"));
+	}
 }

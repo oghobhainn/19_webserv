@@ -3,67 +3,73 @@
 
 #include <string>
 #include <iostream>
+#include <sys/time.h>
+
 #include "parsing.hpp"
 
-typedef struct	s_hresp_firstline 
-{
-	std::string	method;
-	int			status_code;
-	std::string	status_message;
-}				t_hresp_firstline;
-
-typedef struct	s_resp_header
-{
-	
-}				t_hresp_header;
-
-typedef struct	s_hresp_body
-{
-	std::string	line;
-}				t_hresp_body;
-
-typedef struct	s_http_response
-{
-	t_hresp_firstline	firstline;
-	t_hresp_header		header;
-	t_hresp_body		body;
-}				t_http_response;
-
-//std::string		build_http_response(t_http_request const http_req_struct);
+//https://fr.wikipedia.org/wiki/Liste_des_codes_HTTP
+//https://stackoverflow.com/questions/7548759/generate-a-date-string-in-http-response-date-format-in-c
 
 class	Http_response{
 
 	public:
 		Http_response();
-		Http_response(Http_response const & src); // constructeur par copie
+		Http_response(Http_response const & src);
 		//Http_response(int const n); // constructeur parametrique
 		~Http_response();
 
-		std::string const & get_firstline( void ) const;
-		void				set_firstline( int const status_code );
+		std::string const & get_firstline		( void ) const;
+		std::string	const & get_allow			( void ) const;
+		std::string const & get_server			( void ) const;
+		std::string const & get_http_response	( void ) const;
+		std::string const & get_date			( void ) const;
+		std::string const & get_content_type	( void ) const;
+		std::string const & get_content_language( void ) const;
+		std::string const & get_content_length 	( void ) const;
+		std::string const & get_content_location( void ) const;
+		std::string const & get_location		( void ) const;
+		std::string const & get_last_modified	( void ) const;
+		std::string const & get_retry_after		( void ) const;
+		std::string const & get_www_authenticate( void ) const;
 
-		Http_response		build_http_response( t_http_request const http_req_struct);
+		void	set_firstline			( int const status_code );
+		void	set_allow				( std::string allow );
+		void	set_server				( std::string server );
+		void	set_date				( void );
+		// void	set_content_language	( std::string content_language );
+		// void	set_content_type		( std::string content_type );
+		// void	set_content_length		( std::string content_length );
+		// void	set_content_location	( std::string content_location );
+		void	set_location			( std::string location );
+		void	set_last_modified		( std::string last_modified );
+		void	set_retry_after			( std::string retry_after );
+		void	set_www_authenticate	( std::string www_authenticate );
+
+		void				init_response( int status_code, t_http_request const http_req );
+		void				build_http_response( t_http_request const http_req_struct);
+		std::string			GET_method( t_http_request const http_req_struct );
+	
 	private:
 		std::string		_firstline;
 		std::string		_fl_method;
 		int				_fl_status_code;
 		std::string		_fl_status_message;
 
-		std::string		_header_user_agent;
-		std::string		_header_host;
-		std::string		_header_accept;
-		std::string		_header_accept_language;
-		std::string		_header_accept_encoding;
-		std::string		_header_referer;
-		std::string		_header_connection;
-		std::string		_header_upgrade_insecure_requests;
-		std::string		_header_if_modified_since;
-		std::string		_header_if_none_match;
-		std::string		_header_content_type;
-		std::string		_header_content_length;
-		std::string		_header_cache_control;
+		std::string		_allow;
+		std::string		_date;
+		std::string		_content_language;
+		std::string		_content_length;
+		std::string		_content_location;
+		std::string		_content_type;
+		std::string		_last_modified;
+		std::string		_location;
+		std::string		_retry_after;
+		std::string		_server;
+		std::string		_www_authenticate;
 
-		std::string		_body_content;
+		std::string		_http_response;
+
+		std::string		_body;
 };
 
 #endif
