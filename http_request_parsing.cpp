@@ -107,8 +107,8 @@ void	http_request_parser(char *buffer, t_http_request &http_req_struct)
 	parse_first_line(firstline_str, http_req_struct.firstline);
 	parse_header(header_vector, http_req_struct.header);
 
-	print_request_firstline(http_req_struct.firstline);
-	print_request_header(http_req_struct.header);
+	//print_request_firstline(http_req_struct.firstline);
+	//print_request_header(http_req_struct.header);
 
     return ;
 }

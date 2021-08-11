@@ -29,8 +29,10 @@ typedef struct	s_hreq_header
 	std::string upgrade_insecure_requests;
 	std::string if_modified_since;
 	std::string if_none_match;
+	std::string content_language;
 	std::string content_type;
 	std::string content_length;
+	std::string content_location;
 	std::string cache_control;
 }				t_hreq_header;
 
