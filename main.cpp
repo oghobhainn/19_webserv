@@ -6,6 +6,8 @@
 #include "Networking/Sockets/ConnectingSocket.hpp"
 #include "Networking/Sockets/BindingSocket.hpp"
 
+#include "main.hpp"
+
 template<class T>
 void show_list_str(T & l)
 {

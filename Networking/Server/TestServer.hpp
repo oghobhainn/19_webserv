@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "SimpleServer.hpp"
+#include "../../main.hpp"
 
 class TestServer : public SimpleServer
 {

@@ -203,10 +203,12 @@ std::string		Http_response::POST_method(t_http_request const http_req_struct)
 {
 	std::string		POST_response;
 
-	POST_response = this->get_firstline() + "\r\n"
+	if (http_req_struct.status_code == 200)
+	{
+		POST_response = this->get_firstline() + "\r\n"
 					+ "\r\n"
 					+ this->get_body() + "\r\n";
-
+	}
 
 	return POST_response;
 }
@@ -215,10 +217,12 @@ std::string		Http_response::DELETE_method(t_http_request const http_req_struct)
 {
 	std::string		DELETE_response;
 
-	DELETE_response = this->get_firstline() + "\r\n"
+	if (http_req_struct.status_code == 200)
+	{
+		DELETE_response = this->get_firstline() + "\r\n"
 						+ "\r\n"
 						+ "THIS IS MY BODYYY\r\n";
-	
+	}
 	return DELETE_response;
 }
 
@@ -247,5 +251,5 @@ void			Http_response::build_http_response(t_http_request const http_req_struct)
 	//else
 	//	build_error_page(http_req_struct.status_code, http_req_struct.firstline.method);
 	
-	P("\t\tResponse: \n", this->_http_response);
+//	P("\t\tResponse: \n", this->_http_response);
 }

@@ -1,4 +1,4 @@
-#include "parsing.hpp"
+#include "../main.hpp"
 
 // https://stackoverflow.com/questions/52635554/when-can-you-have-relative-urls-on-the-request-line-of-get-http-requests
 std::string	get_full_urlpath(std::string url)
@@ -117,8 +117,8 @@ void	http_request_parser(char *buffer, t_http_request &http_req_struct)
 	parse_first_line(firstline_str, http_req_struct.firstline);
 	parse_header(header_vector, http_req_struct.header);
 
-	print_request_firstline(http_req_struct.firstline);
-	print_request_header(http_req_struct.header);
+//	print_request_firstline(http_req_struct.firstline);
+//	print_request_header(http_req_struct.header);
 
 	std::string parser_ok = check_parsed_request(http_req_struct);
 	std::cout << parser_ok << std::endl;

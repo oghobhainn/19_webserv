@@ -1,5 +1,5 @@
-#include "parsing.hpp"
-
+#include "../main.hpp"
+/*
 void	print_request_firstline(t_hreq_firstline const & hreq_firstline_struct)
 {
 	P("My Method: ", hreq_firstline_struct.method);
@@ -22,7 +22,7 @@ void	print_request_header(t_hreq_header const & hreq_header_struct)
 	P("My Content Type: ", hreq_header_struct.content_type);
 	P("My Content Length: ", hreq_header_struct.content_length);
 }
-
+*/
 std::string	remove_whitespaces(std::string str)
 {
 	str.erase(remove_if(str.begin(), str.end(), isspace), str.end());

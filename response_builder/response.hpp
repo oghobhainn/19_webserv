@@ -1,13 +1,7 @@
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 
-#include <string>
-#include <iostream>
-#include <sys/time.h>
-#include <sys/stat.h>
-#include <fstream>
-
-#include "parsing.hpp"
+#include "../main.hpp"
 
 //https://fr.wikipedia.org/wiki/Liste_des_codes_HTTP
 //https://stackoverflow.com/questions/7548759/generate-a-date-string-in-http-response-date-format-in-c
@@ -59,7 +53,7 @@ class	Http_response{
 	private:
 		std::string		_firstline;
 		std::string		_fl_method;
-		int				_fl_status_code;
+		// int				_fl_status_code;
 		std::string		_fl_status_message;
 
 		std::string		_allow;
