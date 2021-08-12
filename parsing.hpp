@@ -14,6 +14,7 @@ typedef struct	s_hreq_firstline
 {
 	std::string	method;
 	std::string	urlpath;
+	std::string	complete_urlpath;
 	std::string	httpversion;
 }				t_hreq_firstline;
 
@@ -46,6 +47,8 @@ typedef struct	s_http_request
 	t_hreq_firstline	firstline;
 	t_hreq_header		header;
 	t_hreq_body			body;
+	int					status_code;
+	bool				error;
 }				t_http_request;
 
 

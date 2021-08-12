@@ -14,7 +14,7 @@ int main(int argc, char const *argv[])
     int sock = 0; long valread;
     struct sockaddr_in serv_addr;
     //char *hello = "Hello from client";
-    char hello[512] = "GET info.html HTTP/1.1\r\nHost: 192.241.213.65:6880\r\nContent-Type: text/plain\r\nContent-Length: 27\r\n\r\nHello world! This is me, CLIENT";
+    char hello[512] = "GET /index.html.en HTTP/1.1\r\nHost: 192.241.213.65:6880\r\nContent-Type: text/plain\r\nContent-Length: 27\r\n\r\nHello world! This is me, CLIENT";
     char buffer[1024] = {0};
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {

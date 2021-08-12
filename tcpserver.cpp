@@ -76,13 +76,13 @@ int main()
 		}
 
 		http_request_parser(buffer, http_req_struct);
-		print_request_firstline(http_req_struct.firstline);
-		print_request_header(http_req_struct.header);
+	//	print_request_firstline(http_req_struct.firstline);
+	//	print_request_header(http_req_struct.header);
 		//the response we want when the client calls the server
 
 		Http_response	test;
 		test.Http_response::build_http_response(http_req_struct);
-		P("RESPONSE:\n", test.Http_response::get_http_response());
+		//P("RESPONSE:\n", test.Http_response::get_http_response());
 		// P("My Response Server :\t", test.Http_response::get_server());
 		// P("My Response Date :\t", test.Http_response::get_date());
 
