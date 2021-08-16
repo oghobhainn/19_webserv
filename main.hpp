@@ -20,5 +20,6 @@
 
 #include "request_parser/request.hpp"
 #include "response_builder/response.hpp"
+#include "utils/utils.hpp"
 
 #endif

@@ -7,7 +7,8 @@ std::string	get_full_urlpath(std::string url)
 	// TODO - not sure it works this way
 	// return (std::string("/Library/Webserver/Documents/Webserv")	+ url);
 
-	return (std::string("/Library/Webserver/Documents") + url);
+	//return (std::string("/Library/Webserver/Documents") + url);
+	return (std::string(".") + url);
 }
 
 std::string	check_parsed_request(t_http_request &http_req_struct)
