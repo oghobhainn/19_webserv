@@ -39,12 +39,32 @@ void TestServer::responder()
 
 void TestServer::launch()
 {
+    fd_set ready_sockets;
+    fd_set current_socket;
+    FD_ZERO(&current_socket);
+	FD_SET(get_socket()->get_sock(), &current_socket);
+    
     while(true)
     {
-        std::cout << "=========== Waiting ==========" << std::endl;
-        accepter();
-        handler();
-        responder();
-        std::cout << "=========== Done ==========" << std::endl;
+        ready_sockets = current_socket;
+		if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0)
+		{
+			std::cout << "Failure whit select " << std::endl;
+			exit(EXIT_FAILURE);
+		}
+        for (int i = 0; i < FD_SETSIZE; i++)
+        {
+            if (FD_ISSET(i, &ready_sockets))
+            {
+                if (i == get_socket()->get_sock())
+                {
+                    std::cout << "=========== Waiting ==========" << std::endl;
+                    accepter();
+                    handler();
+                    responder();
+                    std::cout << "=========== Done ==========" << std::endl;
+                }
+            }
+        }
     }
 }
