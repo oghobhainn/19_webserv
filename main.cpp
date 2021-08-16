@@ -38,16 +38,47 @@ std::vector<std::string> split(std::string s, const char delim)
     return result;
 }
 
-std::list<std::string> split_lst(std::string s, const char delim) 
-{
-    std::list<std::string>      result;
-    std::stringstream			ss(s);
-    std::string					item;
+// std::list<std::string> split_lst(std::string s, const char delim) 
+// {
+//     std::list<std::string>      result;
+//     std::stringstream			ss(s);
+//     std::string					item;
 
-    while (getline(ss, item, delim)) 
-        result.push_back(item);
-    return result;
-}
+//     while (getline(ss, item, delim)) 
+//         result.push_back(item);
+//     return result;
+// }
+
+int len(std::string str)  
+{  
+    int length = 0; 
+
+    for (int i = 0; str[i] != '\0'; i++)  
+        length++;
+    return length;     
+}  
+  
+std::list<std::string> split_lst(std::string str, char seperator)  
+{
+    int i = 0;  
+    int startIndex = 0, endIndex = 0;
+    std::list<std::string>      result;
+
+    while (i <= len(str))  
+    {  
+        if (str[i] == seperator || i == len(str))  
+        {  
+            endIndex = i;  
+            std::string subStr = "";
+            subStr.append(str, startIndex, endIndex - startIndex);
+            if (len(subStr) > 0)
+                result.push_back(subStr);
+            startIndex = endIndex + 1;  
+        }
+        i++;  
+    }
+    return result; 
+}  
 
 std::string trim(std::string str, std::string whitespace)
 {
@@ -176,10 +207,10 @@ std::list<class Server> parseConfig(std::string const path)
             // create the string before {
             found = str_location.find("{");
             file_ext = str_location.substr(0, found);
+            // std::cout << file_ext << std::endl;
             
             // split with the /
             struct_loc.file_extensions = split_lst(file_ext, '/');
-
             lst.push_back(struct_loc);
             i++;
         }
@@ -220,7 +251,6 @@ int main(int argc, char **argv)
     }
     serv_list = parseConfig(argv[1]);
     
-
     ///////////////////// Print results /////////////////////////
     std::string test2;
 

@@ -45,11 +45,15 @@ void Server::getLocations() const
 	// for (it = this->locations.begin(); it! = this->locations.end(); ++it)
     // 	std::cout << it->first << " => " << it->second << '\n';
 
-	std::string test1, test2;
+	std::string test1, test2, test3, test4;
 	test1 = this->locations.front().full_str;
 	test2 = this->locations.back().full_str;
+	test3 = this->locations.front().file_extensions.front();
 	std::cout << "first loc: " << test1 << std::endl;
 	std::cout << "last loc: " << test2 <<  std::endl;
+	std::cout << "-----------" << std::endl;
+	std::cout << "first loc/ first file ext: " << test3 <<  std::endl;
+
 }
 
 void Server::setHost(std::string const str)
