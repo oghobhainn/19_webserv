@@ -29,7 +29,7 @@ void Server::setFullStr(std::string const str)
 	this->full_str = str;
 }
 
-void Server::setLocations(std::list<std::string> const lst)
+void Server::setLocations(std::list<t_location> const lst)
 {
 	this->locations = lst;
 }
@@ -41,11 +41,13 @@ std::string Server::getFullStr() const
 
 void Server::getLocations() const
 {
-	// for (std::list<std::string>::iterator it = this->locations.begin(); it != this->locations.end(); ++it)
-	// 	std::cout << *it << std::endl;
+	// std::list<t_location>::iterator it = this->locations.begin();
+	// for (it = this->locations.begin(); it! = this->locations.end(); ++it)
+    // 	std::cout << it->first << " => " << it->second << '\n';
+
 	std::string test1, test2;
-	test1 = this->locations.front();
-	test2 = this->locations.back();
+	test1 = this->locations.front().full_str;
+	test2 = this->locations.back().full_str;
 	std::cout << "first loc: " << test1 << std::endl;
 	std::cout << "last loc: " << test2 <<  std::endl;
 }

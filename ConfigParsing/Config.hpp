@@ -20,7 +20,23 @@
 
 #define P(x) std::cout << x << std::endl
 
-class Server
+typedef struct s_location
+{
+	std::string				full_str;
+	bool					active;
+	std::list<std::string>	file_extensions;
+	std::string				directory;
+	size_t					max_body;
+	std::string				root;
+	std::list<std::string>	index;
+	// std::string				directory_listing;
+	// std::string				default_file_if_request_directory;
+	// std::string				file_upload_location;
+	// std::string				FOUND_URL;
+	// t_CGI					CGI;
+}				t_location;
+
+class Server : t_location
 {
     private:
         std::string             full_str;
@@ -29,7 +45,7 @@ class Server
         std::string			    port;
         std::string			    server_name;
         size_t				    body_size_limit;
-        std::list<std::string>  locations;
+        std::list<t_location>	locations;
 
     public:
         Server();
@@ -42,7 +58,7 @@ class Server
         void setStrWithoutLoc(std::string const str);
         std::string getStrWithoutLoc() const;
 
-        void setLocations(std::list<std::string> const lst);
+        void setLocations(std::list<t_location> const lst);
         void getLocations() const;
 
         void setHost(std::string const str);
@@ -51,6 +67,7 @@ class Server
         void setPort(std::string const str);
         std::string getPort() const;
 };
+
 
 std::ostream& operator<<(std::ostream& os, const Server& item);
 

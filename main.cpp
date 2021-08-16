@@ -38,6 +38,17 @@ std::vector<std::string> split(std::string s, const char delim)
     return result;
 }
 
+std::list<std::string> split_lst(std::string s, const char delim) 
+{
+    std::list<std::string>      result;
+    std::stringstream			ss(s);
+    std::string					item;
+
+    while (getline(ss, item, delim)) 
+        result.push_back(item);
+    return result;
+}
+
 std::string trim(std::string str, std::string whitespace)
 {
     unsigned long strBegin = str.find_first_not_of(whitespace);
@@ -84,6 +95,17 @@ int nthOccurrence(const std::string& str, const std::string& findMe, int nth)
         cnt++;
     }
     return pos;
+}
+
+void init_struct_loc(t_location str_loc)
+{
+    str_loc.full_str = "";
+    str_loc.active = false;
+    //str_loc.file_extensions = NULL;
+    str_loc.directory = "";
+    str_loc.max_body = 0;
+    str_loc.root = "";
+    //str_loc.index = NULL;
 }
 
 std::list<class Server> parseConfig(std::string const path)
@@ -136,8 +158,11 @@ std::list<class Server> parseConfig(std::string const path)
         i = 1;
         pos = 0;
         pos_next = 0;
-        std::list<std::string> lst;
-        std::string::size_type index = 0;
+        int found = 0;
+        t_location              struct_loc;
+        std::list<t_location>   lst;
+        std::string::size_type  index = 0;
+        std::string             file_ext;
 
         // add each loc to the list
         while (pos_next != -1)
@@ -145,7 +170,17 @@ std::list<class Server> parseConfig(std::string const path)
             pos = nthOccurrence(it->getFullStr(), "location", i);
             pos_next = nthOccurrence(it->getFullStr(), "location", i + 1);
             str_location = it->getFullStr().substr(pos + 8, pos_next - pos - 8);
-            lst.push_back(str_location);
+            init_struct_loc(struct_loc);
+            struct_loc.full_str = str_location;
+        
+            // create the string before {
+            found = str_location.find("{");
+            file_ext = str_location.substr(0, found);
+            
+            // split with the /
+            struct_loc.file_extensions = split_lst(file_ext, '/');
+
+            lst.push_back(struct_loc);
             i++;
         }
 
@@ -199,7 +234,7 @@ int main(int argc, char **argv)
     }
 
     ////////////////////// Server ////////////////////////////////
-    TestServer t(80);
+    // TestServer t(80);
     return 0;
 }
 
