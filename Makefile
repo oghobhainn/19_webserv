@@ -1,5 +1,6 @@
 NAME = webserv
 SRCS = main.cpp \
+		Utils/parsing.cpp \
 		ConfigParsing/Config.cpp \
 		Networking/Server/SimpleServer.cpp \
 		Networking/Server/TestServer.cpp \
@@ -9,7 +10,7 @@ SRCS = main.cpp \
 		Networking/Sockets/SimpleSocket.cpp \
 		request_parser/http_request_parsing.cpp\
 		request_parser/utils_parser.cpp\
-		response_builder/response.cpp
+		response_builder/response.cpp 
 
 CXX = clang++
 CXXFLAGS = -Wall -Wextra -Werror

@@ -17,26 +17,26 @@
 #include <algorithm>
 #include <sstream>
 
-
 #define P(x) std::cout << x << std::endl
 
-typedef struct s_location
+class Location
 {
-	std::string				full_str;
-	bool					active;
-	std::list<std::string>	file_extensions;
-	std::string				directory;
-	size_t					max_body;
-	std::string				root;
-	std::list<std::string>	index;
-	// std::string				directory_listing;
-	// std::string				default_file_if_request_directory;
-	// std::string				file_upload_location;
-	// std::string				FOUND_URL;
-	// t_CGI					CGI;
-}				t_location;
+	public:
+		std::string				full_str;
+		bool					active;
+		std::list<std::string>	file_extensions;
+		std::string				directory;
+		size_t					max_body;
+		std::string				root;
+		std::list<std::string>	index;
+		bool                    get_method;
+		bool					post_method;
+		bool					delete_method;
+		// Location();
+		// ~Location();
+};
 
-class Server : t_location
+class Server : public Location
 {
     private:
         std::string             full_str;
@@ -46,9 +46,11 @@ class Server : t_location
 		std::string				root;
         std::string			    server_name;
         size_t				    body_size_limit;
-        std::list<t_location>	locations;
+        // std::list<Location>		locations;
 
     public:
+		Location *locations;
+		int nb_loc;
         Server();
         ~Server();
         Server& operator=(Server const& copy);
@@ -59,7 +61,7 @@ class Server : t_location
         void setStrWithoutLoc(std::string const str);
         std::string getStrWithoutLoc() const;
 
-        void setLocations(std::list<t_location> const lst);
+        void setLocations(std::list<Location> const lst);
         void getLocations() const;
 
         void setHost(std::string const str);

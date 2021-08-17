@@ -21,4 +21,16 @@
 #include "request_parser/request.hpp"
 #include "response_builder/response.hpp"
 
+
+/*
+*** Utils
+*/
+
+std::vector<std::string> split(std::string s, const char delim);
+int len(std::string str);
+std::list<std::string> split_lst(std::string str, char seperator);
+std::string trim(std::string str, std::string whitespace);
+int countFreq(std::string pat, std::string txt);
+int nthOccurrence(const std::string& str, const std::string& findMe, int nth);
+
 #endif

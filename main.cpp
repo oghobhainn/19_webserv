@@ -6,126 +6,110 @@
 #include "Networking/Sockets/ConnectingSocket.hpp"
 #include "Networking/Sockets/BindingSocket.hpp"
 
-#include "main.hpp"
+#include "main.hpp" 
 
-template<class T>
-void show_list_str(T & l)
+// void init_struct_loc(t_location str_loc)
+// {
+//     str_loc.full_str = "";
+//     str_loc.active = false;
+//     str_loc.directory = "";
+//     str_loc.max_body = 0;
+//     str_loc.root = "";
+//     str_loc.get_method = false;
+//     str_loc.post_method = false;
+//     str_loc.delete_method = false;
+// }
+
+std::list<class Server> get_serv_list(std::string full_str)
 {
-	std::cout << "--List string : " << std::endl;
+    std::string					str_serv;
+    std::list<class Server> 	serv_list;
+    int							nbr_serv;
+    int							i = 0;
+    int							pos;
+    int							pos_next;
+    Server *serv = NULL;
 
-	for (typename T::iterator it = l.begin(); it != l.end(); it++)
-		std::cout << *it << std::endl;;
-	std::cout << "--END" << std::endl;
-}
-
-template<class T>
-void show_list(T & l)
-{
-	std::cout << "--List class : " << std::endl;;
-	for (typename T::iterator it = l.begin(); it != l.end(); it++)
-		std::cout << *it << std::endl;
-	std::cout << "--END" << std::endl;
-}
-
-std::vector<std::string> split(std::string s, const char delim) 
-{
-    std::vector<std::string>	result;
-    std::stringstream			ss(s);
-    std::string					item;
-
-    while (getline(ss, item, delim)) 
-        result.push_back(item);
-    return result;
-}
-
-int len(std::string str)  
-{  
-    int length = 0; 
-
-    for (int i = 0; str[i] != '\0'; i++)  
-        length++;
-    return length;     
-}  
-  
-std::list<std::string> split_lst(std::string str, char seperator)  
-{
-    int i = 0;  
-    int startIndex = 0, endIndex = 0;
-    std::list<std::string>      result;
-
-    while (i <= len(str))  
-    {  
-        if (str[i] == seperator || i == len(str))  
-        {  
-            endIndex = i;  
-            std::string subStr = "";
-            subStr.append(str, startIndex, endIndex - startIndex);
-            if (len(subStr) > 0)
-                result.push_back(subStr);
-            startIndex = endIndex + 1;  
-        }
-        i++;  
-    }
-    return result; 
-}  
-
-std::string trim(std::string str, std::string whitespace)
-{
-    unsigned long strBegin = str.find_first_not_of(whitespace);
-    unsigned long strEnd = str.find_last_not_of(whitespace);
-    unsigned long strRange = strEnd - strBegin + 1;
-
-    if (strBegin == std::string::npos)
-        return "";
-    return str.substr(strBegin, strRange);
-}
-
-int countFreq(std::string pat, std::string txt)
-{
-    int M = pat.length();
-    int N = txt.length();
-    int res = 0;
-   
-    for (int i = 0; i <= N - M; i++)
+    nbr_serv = countFreq("server", full_str);
+    while (i < nbr_serv)
     {
-        int j;
-        for (j = 0; j < M; j++)
-            if (txt[i + j] != pat[j])
-                break;
-        if (j == M) 
+        serv = new Server;
+        pos = nthOccurrence(full_str, "server", i);
+        pos_next = nthOccurrence(full_str, "server", i + 1);
+        str_serv = full_str.substr(pos + 7, pos_next - pos - 7);
+        // std::cout << "--------------------" << std::endl;
+        // std::cout << str_serv << std::endl;
+        // std::cout << "--------------------" << std::endl;
+        serv->setFullStr(str_serv);
+        serv_list.push_back(*serv);
+        i++;
+    }
+    return serv_list;
+}
+
+void parse_loc(std::list<class Server> &serv_list)
+{
+    int found = 0;
+    int root_pos = 0;
+    int root_end = 0;
+    std::string             str_methods;
+    // std::list<Location>     lst;
+    std::string::size_type  index = 0;
+    std::string             file_ext;
+    std::string             	str_location;
+    int i = 0;
+    int j = 0;
+    int							pos;
+    int							pos_next;
+    Location *struct_loc = NULL;
+
+    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    {
+        i = 1;
+        pos = 0;
+        pos_next = 0;
+        found = 0;
+        root_pos = 0;
+        root_end = 0;
+        index = 0;
+
+        // std::cout << it->getFullStr() << std::endl;
+        j = countFreq("location", it->getFullStr());
+        it->nb_loc = j;
+
+        it->locations = new Location[j];
+        j = 0;
+        while (pos_next != -1)
         {
-           res++;
-           j = 0;
+            struct_loc = new Location;
+            pos = nthOccurrence(it->getFullStr(), "location", i);
+            pos_next = nthOccurrence(it->getFullStr(), "location", i + 1);
+            str_location = it->getFullStr().substr(pos + 8, pos_next - pos - 8);
+            // std::cout << "--------------------" << std::endl;
+            // std::cout << str_location << std::endl;
+            // std::cout << "--------------------" << std::endl;
+            // init_struct_loc(struct_loc);
+            it->locations[j].full_str = str_location;
+            
+            found = str_location.find("{");
+            file_ext = str_location.substr(0, found);
+            it->locations[j].file_extensions = split_lst(file_ext, '/');
+            if (str_location.find("root") != std::string::npos)
+            {
+                root_pos = str_location.find("root");
+                root_end = str_location.find(";", root_pos);
+                it->locations[j].root = str_location.substr(root_pos + 4, len(str_location) - root_pos - 4 - (len(str_location) - root_end));
+            }
+            // lst.push_back(locations[j]);
+            i++;
+            j++;
         }
+        if ((index = it->getFullStr().find("location")) != std::string::npos)
+            it->setStrWithoutLoc(it->getFullStr().substr(0, index));
+		else
+			it->setStrWithoutLoc(it->getFullStr());
+        // it->setLocations(lst);
     }
-    return res;
-}
-
-int nthOccurrence(const std::string& str, const std::string& findMe, int nth)
-{
-    size_t  pos = 0;
-    int     cnt = 0;
-
-    while (cnt != nth)
-    {
-        pos += 1;
-        pos = str.find(findMe, pos);
-        if ( pos == std::string::npos )
-            return -1;
-        cnt++;
-    }
-    return pos;
-}
-
-void init_struct_loc(t_location str_loc)
-{
-    str_loc.full_str = "";
-    str_loc.active = false;
-    //str_loc.file_extensions = NULL;
-    str_loc.directory = "";
-    str_loc.max_body = 0;
-    str_loc.root = "";
-    //str_loc.index = NULL;
 }
 
 std::list<class Server> parseConfig(std::string const path)
@@ -133,96 +117,21 @@ std::list<class Server> parseConfig(std::string const path)
 	std::ifstream				file(path);
     std::string					input;
     std::string					full_str;
-    std::string					str_serv;
     std::string             	str_location;
     std::string             	str_without_loc;
     std::list<class Server> 	serv_list;
 	std::vector<std::string>	data;
-    int							nbr_serv;
-    int							pos;
-    int							pos_next;
-    int							i = 0;
 
-    // protect if file can't open
 	if (!file.is_open())
 	{
         std::cerr << "Error with the config file path\n";
 		exit(1);
 	}
-
-    // create a big string
     while (std::getline(file, input))
         full_str += input;
     full_str.erase(remove_if(full_str.begin(), full_str.end(), isspace), full_str.end());
-
-    // create a string for each server
-    nbr_serv = countFreq("server", full_str);
-    while (i < nbr_serv)
-    {
-        // create the string for each server // note: 7 = size of str server + {
-        pos = nthOccurrence(full_str, "server", i);
-        pos_next = nthOccurrence(full_str, "server", i + 1);
-        str_serv = full_str.substr(pos + 7, pos_next - pos - 7);
-
-        // create a class for each node and fill it with the string
-        Server serv;
-        serv.setFullStr(str_serv);
-        serv_list.push_back(serv);
-
-        i++;
-    }
-
-    // store in a list the locations's strings for each node and remove them for the string
-    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    {
-        i = 1;
-        pos = 0;
-        pos_next = 0;
-        int found = 0;
-        int root_pos = 0;
-        int root_end = 0;
-        t_location              struct_loc;
-        std::list<t_location>   lst;
-        std::string::size_type  index = 0;
-        std::string             file_ext;
-
-        // add each loc to the list
-        while (pos_next != -1)
-        {
-            pos = nthOccurrence(it->getFullStr(), "location", i);
-            pos_next = nthOccurrence(it->getFullStr(), "location", i + 1);
-            str_location = it->getFullStr().substr(pos + 8, pos_next - pos - 8);
-            init_struct_loc(struct_loc);
-            struct_loc.full_str = str_location;
-        
-            // get a list of file extentions
-            found = str_location.find("{");
-            file_ext = str_location.substr(0, found);
-            struct_loc.file_extensions = split_lst(file_ext, '/');
-
-            // get the root
-            if (str_location.find("root") != std::string::npos)
-            {
-                root_pos = str_location.find("root");
-                root_end = str_location.find(";", root_pos);
-                struct_loc.root = str_location.substr(root_pos + 4, len(str_location) - root_pos - 4 - (len(str_location) - root_end));
-                std::cout << struct_loc.root << std::endl;
-            }
-            lst.push_back(struct_loc);
-            i++;
-        }
-
-		// create a string without the locations (host, port, etc)
-        if ((index = it->getFullStr().find("location")) != std::string::npos)
-            it->setStrWithoutLoc(it->getFullStr().substr(0, index));
-		else
-			it->setStrWithoutLoc(it->getFullStr());
-
-        // add list to the node
-        it->setLocations(lst);
-    }
-
-    // split with the ; and get the port, the host and the index
+    serv_list = get_serv_list(full_str);
+    parse_loc(serv_list);
     for (std::list<Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
     {
         data = split(it2->getStrWithoutLoc(), ';');
@@ -241,7 +150,7 @@ std::list<class Server> parseConfig(std::string const path)
 
 int main(int argc, char **argv)
 {
-    std::list<class Server> serv_list;
+    std::list<Server> serv_list;
 
     if (argc != 2)
     {

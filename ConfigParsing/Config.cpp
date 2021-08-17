@@ -1,6 +1,6 @@
 #include "Config.hpp"
 
-Server::Server()
+Server::Server() 
 {
 	this->full_str = "";
 	this->str_without_loc = "";
@@ -8,6 +8,7 @@ Server::Server()
     this->port = "";
 	this->server_name = "None";
 	this->body_size_limit = sizeof(size_t);
+	
 }
 
 Server::~Server()
@@ -29,10 +30,10 @@ void Server::setFullStr(std::string const str)
 	this->full_str = str;
 }
 
-void Server::setLocations(std::list<t_location> const lst)
-{
-	this->locations = lst;
-}
+// void Server::setLocations(std::list<Location> const lst)
+// {
+// 	this->locations = lst;
+// }
 
 std::string Server::getFullStr() const
 {
@@ -42,25 +43,32 @@ std::string Server::getFullStr() const
 void Server::getLocations() const
 {
 	// std::list<t_location>::iterator it = this->locations.begin();
-	// for (it = this->locations.begin(); it! = this->locations.end(); ++it)
-    // 	std::cout << it->first << " => " << it->second << '\n';
 
-	std::string test1, test2, test3, test4, test5, test6;
-	test1 = this->locations.front().full_str;
-	test2 = this->locations.back().full_str;
-	test3 = this->locations.front().file_extensions.front();
-	test4 = this->locations.front().file_extensions.back();
-	test5 = this->locations.back().file_extensions.front();
-	test6 = this->locations.back().file_extensions.back();
-	std::cout << "--------------- IN LOCATIONS -----------------" << std::endl;
-	std::cout << "first loc: " << test1 << std::endl;
-	std::cout << "last loc: " << test2 <<  std::endl;
-	std::cout << "-----------" << std::endl;
-	std::cout << "first loc - first file ext: " << test3 <<  std::endl;
-	std::cout << "first loc - last file ext: " << test4 <<  std::endl;
-	std::cout << "-----------" << std::endl;
-	std::cout << "last loc - first file ext: " << test5 <<  std::endl;
-	std::cout << "last loc - last file ext: " << test6 <<  std::endl;
+	// for (std::list<Location>::iterator it = this->locations.begin(); it! = this->locations.end(); ++it)
+	// 	std::cout << it->getFullStr << '\n';
+
+	for(int i = 0; i < nb_loc; ++i)
+		std::cout << locations[i].full_str << std::endl;
+	
+
+	// std::string test1, test2, test3, test4, test5, test6;
+	// test1 = this->locations.front().full_str;
+	// test2 = this->locations.back().full_str;
+
+	// test3 = this->locations.front().file_extensions.front();
+	// test4 = this->locations.front().file_extensions.back();
+
+	// test5 = this->locations.back().file_extensions.front();
+	// test6 = this->locations.back().file_extensions.back();
+	// std::cout << "--------------- IN LOCATIONS -----------------" << std::endl;
+	// std::cout << "first loc: " << test1 << std::endl;
+	// std::cout << "last loc: " << test2 <<  std::endl;
+	// std::cout << "-----------" << std::endl;
+	// std::cout << "first loc - first file ext: " << test3 <<  std::endl;
+	// std::cout << "first loc - last file ext: " << test4 <<  std::endl;
+	// std::cout << "-----------" << std::endl;
+	// std::cout << "last loc - first file ext: " << test5 <<  std::endl;
+	// std::cout << "last loc - last file ext: " << test6 <<  std::endl;
 }
 
 void Server::setHost(std::string const str)
