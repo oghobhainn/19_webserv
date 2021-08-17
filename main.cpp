@@ -38,17 +38,6 @@ std::vector<std::string> split(std::string s, const char delim)
     return result;
 }
 
-// std::list<std::string> split_lst(std::string s, const char delim) 
-// {
-//     std::list<std::string>      result;
-//     std::stringstream			ss(s);
-//     std::string					item;
-
-//     while (getline(ss, item, delim)) 
-//         result.push_back(item);
-//     return result;
-// }
-
 int len(std::string str)  
 {  
     int length = 0; 
@@ -190,6 +179,8 @@ std::list<class Server> parseConfig(std::string const path)
         pos = 0;
         pos_next = 0;
         int found = 0;
+        int root_pos = 0;
+        int root_end = 0;
         t_location              struct_loc;
         std::list<t_location>   lst;
         std::string::size_type  index = 0;
@@ -204,13 +195,19 @@ std::list<class Server> parseConfig(std::string const path)
             init_struct_loc(struct_loc);
             struct_loc.full_str = str_location;
         
-            // create the string before {
+            // get a list of file extentions
             found = str_location.find("{");
             file_ext = str_location.substr(0, found);
-            // std::cout << file_ext << std::endl;
-            
-            // split with the /
             struct_loc.file_extensions = split_lst(file_ext, '/');
+
+            // get the root
+            if (str_location.find("root") != std::string::npos)
+            {
+                root_pos = str_location.find("root");
+                root_end = str_location.find(";", root_pos);
+                struct_loc.root = str_location.substr(root_pos + 4, len(str_location) - root_pos - 4 - (len(str_location) - root_end));
+                std::cout << struct_loc.root << std::endl;
+            }
             lst.push_back(struct_loc);
             i++;
         }
@@ -235,6 +232,8 @@ std::list<class Server> parseConfig(std::string const path)
                 it2->setHost(it3->substr(4, it3->size() - 4));
             else if (it3->find("port") != std::string::npos)
                 it2->setPort(it3->substr(4, it3->size() - 4));
+            else if (it3->find("root") != std::string::npos)
+                it2->setRoot(it3->substr(4, it3->size() - 4));
         }
     }
     return serv_list;
@@ -256,11 +255,13 @@ int main(int argc, char **argv)
 
     for (std::list<class Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
     {
-        std::cout << it->getPort() << std::endl;
-        std::cout << it->getHost() << std::endl;
+        std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
+        std::cout << "Port: " << it->getPort() << std::endl;
+        std::cout << "Host: "<< it->getHost() << std::endl;
+        std::cout << "Root: "<< it->getRoot() << std::endl;
         
 		it->getLocations();
-        std::cout << "-----------" << std::endl;
+        std::cout << "---------------------- END --------------------------------" << std::endl;
     }
 
     ////////////////////// Server ////////////////////////////////

@@ -43,6 +43,7 @@ class Server : t_location
         std::string             str_without_loc;
         std::string			    host;
         std::string			    port;
+		std::string				root;
         std::string			    server_name;
         size_t				    body_size_limit;
         std::list<t_location>	locations;
@@ -66,6 +67,9 @@ class Server : t_location
 
         void setPort(std::string const str);
         std::string getPort() const;
+
+		void setRoot(std::string const str);
+        std::string getRoot() const;
 };
 
 
