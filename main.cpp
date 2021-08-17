@@ -26,6 +26,7 @@ std::list<class Server> get_serv_list(std::string full_str)
         pos_next = nthOccurrence(full_str, "server", i + 1);
         str_serv = full_str.substr(pos + 7, pos_next - pos - 7);
         serv->setFullStr(str_serv);
+        serv->setServerName(i);
         serv_list.push_back(*serv);
         i++;
     }
@@ -58,8 +59,8 @@ void parse_loc(std::list<class Server> &serv_list)
         end = 0;
         index = 0;
 
-        it->nb_loc = countFreq("location", it->getFullStr());
-        it->locations = new Location[it->nb_loc];
+        it->setNbLoc(countFreq("location", it->getFullStr()));
+        it->locations = new Location[it->getNbLoc()];
         while (pos_next != -1)
         {
             struct_loc = new Location;
@@ -160,6 +161,7 @@ int main(int argc, char **argv)
         std::cout << "Port: " << it->getPort() << std::endl;
         std::cout << "Host: "<< it->getHost() << std::endl;
         std::cout << "Root: "<< it->getRoot() << std::endl;
+        std::cout << "Ser Name: "<< it->getServerName() << std::endl;
         
 		it->getLocations();
         std::cout << "---------------------- END --------------------------------" << std::endl;

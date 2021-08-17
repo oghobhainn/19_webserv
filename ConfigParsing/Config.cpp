@@ -69,6 +69,19 @@ void Server::getLocations() const
 	}
 }
 
+void Server::setServerName(int const i)
+{
+	std::string serv_name = "Server";
+	std::string nb = std::to_string(i);
+
+	this->server_name = serv_name + nb;
+}
+
+std::string Server::getServerName() const
+{
+	return this->server_name;
+}
+
 void Server::setHost(std::string const str)
 {
 	this->host = str;
@@ -99,6 +112,16 @@ std::string Server::getRoot() const
 	return this->root;
 }
 
+void Server::setNbLoc(int const i)
+{
+	this->nb_loc = i;
+}
+
+int Server::getNbLoc() const
+{
+	return this->nb_loc;
+}
+
 void Server::setStrWithoutLoc(std::string const str)
 {
 	this->str_without_loc = str;
@@ -114,6 +137,6 @@ std::string Server::getStrWithoutLoc() const
 
 std::ostream& operator<<(std::ostream& os, const Server& item)
 {
-	// item.getLocations();
+	item.getLocations();
     return os << "NODE \n" << "full_str : " << item.getFullStr();
 }

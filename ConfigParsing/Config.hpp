@@ -22,6 +22,9 @@
 class Location
 {
 	public:
+		Location();
+		~Location();
+
 		std::string				full_str;
 		bool					active;
 		std::list<std::string>	file_extensions;
@@ -32,8 +35,6 @@ class Location
 		bool                    get_method;
 		bool					post_method;
 		bool					delete_method;
-		Location();
-		~Location();
 };
 
 class Server : public Location
@@ -46,10 +47,10 @@ class Server : public Location
 		std::string				root;
         std::string			    server_name;
         size_t				    body_size_limit;
+		int 					nb_loc;
 
     public:
 		Location *locations;
-		int nb_loc;
         Server();
         ~Server();
         Server& operator=(Server const& copy);
@@ -59,6 +60,9 @@ class Server : public Location
 
         void setStrWithoutLoc(std::string const str);
         std::string getStrWithoutLoc() const;
+
+		void setServerName(int const i);
+		std::string getServerName() const;
 
         void setLocations(std::list<Location> const lst);
         void getLocations() const;
@@ -71,6 +75,9 @@ class Server : public Location
 
 		void setRoot(std::string const str);
         std::string getRoot() const;
+
+		void setNbLoc(int const i);
+        int getNbLoc() const;
 };
 
 
