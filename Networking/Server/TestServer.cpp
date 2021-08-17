@@ -102,25 +102,21 @@ void TestServer::launch()
                 if (i == get_socket()->get_sock())
                 {
                     // this is a new connection
-                    std::cout << "=========== New connection ==========" << std::endl;
                     accepter();
                     FD_SET(get_new_socket(), &current_socket);
                 }
                 else
                 {
                     // do whatever we do with the connection
-                    // std::cout << "socket after connection and before doing something: " << get_new_socket() << "\n";
-                    std::cout << "=========== doing somethings ==========" << std::endl;
-                    // std::cout << " step 0" << std::endl;
+                    std::cout << " step 0" << std::endl;
                     readsocket();
-                    // std::cout << " step 1" << std::endl;
+                    std::cout << " step 1" << std::endl;
                     handler();
-                    // std::cout << " step 2" << std::endl;
+                    std::cout << " step 2" << std::endl;
                     responder();
-                    // std::cout << " step 3" << std::endl;
+                    std::cout << " step 3" << std::endl;
                     FD_CLR(i, &current_socket);
                 }
-                std::cout << "=========== Done ==========" << std::endl;
             }
         }
     }
