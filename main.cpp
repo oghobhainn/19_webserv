@@ -8,18 +8,6 @@
 
 #include "main.hpp" 
 
-// void init_struct_loc(t_location str_loc)
-// {
-//     str_loc.full_str = "";
-//     str_loc.active = false;
-//     str_loc.directory = "";
-//     str_loc.max_body = 0;
-//     str_loc.root = "";
-//     str_loc.get_method = false;
-//     str_loc.post_method = false;
-//     str_loc.delete_method = false;
-// }
-
 std::list<class Server> get_serv_list(std::string full_str)
 {
     std::string					str_serv;
@@ -37,9 +25,6 @@ std::list<class Server> get_serv_list(std::string full_str)
         pos = nthOccurrence(full_str, "server", i);
         pos_next = nthOccurrence(full_str, "server", i + 1);
         str_serv = full_str.substr(pos + 7, pos_next - pos - 7);
-        // std::cout << "--------------------" << std::endl;
-        // std::cout << str_serv << std::endl;
-        // std::cout << "--------------------" << std::endl;
         serv->setFullStr(str_serv);
         serv_list.push_back(*serv);
         i++;
@@ -49,58 +34,66 @@ std::list<class Server> get_serv_list(std::string full_str)
 
 void parse_loc(std::list<class Server> &serv_list)
 {
-    int found = 0;
-    int root_pos = 0;
-    int root_end = 0;
     std::string             str_methods;
-    // std::list<Location>     lst;
     std::string::size_type  index = 0;
     std::string             file_ext;
-    std::string             	str_location;
-    int i = 0;
-    int j = 0;
-    int							pos;
-    int							pos_next;
+    std::string             str_location;
     Location *struct_loc = NULL;
+    int found = 0;
+    int pos;
+    int	pos_next;
+    int beg = 0;
+    int end = 0;
+    int i = 1;
+    int j = 0;
 
     for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
     {
         i = 1;
+        j = 0;
         pos = 0;
         pos_next = 0;
         found = 0;
-        root_pos = 0;
-        root_end = 0;
+        beg = 0;
+        end = 0;
         index = 0;
 
-        // std::cout << it->getFullStr() << std::endl;
-        j = countFreq("location", it->getFullStr());
-        it->nb_loc = j;
-
-        it->locations = new Location[j];
-        j = 0;
+        it->nb_loc = countFreq("location", it->getFullStr());
+        it->locations = new Location[it->nb_loc];
         while (pos_next != -1)
         {
             struct_loc = new Location;
             pos = nthOccurrence(it->getFullStr(), "location", i);
             pos_next = nthOccurrence(it->getFullStr(), "location", i + 1);
             str_location = it->getFullStr().substr(pos + 8, pos_next - pos - 8);
-            // std::cout << "--------------------" << std::endl;
-            // std::cout << str_location << std::endl;
-            // std::cout << "--------------------" << std::endl;
-            // init_struct_loc(struct_loc);
-            it->locations[j].full_str = str_location;
-            
+            it->locations[j].full_str = str_location; 
             found = str_location.find("{");
             file_ext = str_location.substr(0, found);
             it->locations[j].file_extensions = split_lst(file_ext, '/');
             if (str_location.find("root") != std::string::npos)
             {
-                root_pos = str_location.find("root");
-                root_end = str_location.find(";", root_pos);
-                it->locations[j].root = str_location.substr(root_pos + 4, len(str_location) - root_pos - 4 - (len(str_location) - root_end));
+                beg = str_location.find("root");
+                end = str_location.find(";", beg);
+                it->locations[j].root = str_location.substr(beg + 4, len(str_location) - beg - 4 - (len(str_location) - end));
             }
-            // lst.push_back(locations[j]);
+            if (str_location.find("http_methods") != std::string::npos)
+            {
+                beg = str_location.find("http_methods");
+                end = str_location.find(";", beg);
+                str_methods = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
+                if (str_methods.find("GET") != std::string::npos)
+                    it->locations[j].get_method = true;
+                if (str_methods.find("POST") != std::string::npos)
+                    it->locations[j].post_method = true;
+                if (str_methods.find("DELETE") != std::string::npos)
+                    it->locations[j].delete_method = true;
+            }
+            if (str_location.find("index") != std::string::npos)
+            {
+                beg = str_location.find("index");
+                end = str_location.find(";", beg);
+                it->locations[j].index = str_location.substr(beg + 5, len(str_location) - beg - 5 - (len(str_location) - end));
+            }
             i++;
             j++;
         }
@@ -108,7 +101,6 @@ void parse_loc(std::list<class Server> &serv_list)
             it->setStrWithoutLoc(it->getFullStr().substr(0, index));
 		else
 			it->setStrWithoutLoc(it->getFullStr());
-        // it->setLocations(lst);
     }
 }
 

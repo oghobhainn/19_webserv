@@ -28,12 +28,12 @@ class Location
 		std::string				directory;
 		size_t					max_body;
 		std::string				root;
-		std::list<std::string>	index;
+		std::string				index;
 		bool                    get_method;
 		bool					post_method;
 		bool					delete_method;
-		// Location();
-		// ~Location();
+		Location();
+		~Location();
 };
 
 class Server : public Location
@@ -46,7 +46,6 @@ class Server : public Location
 		std::string				root;
         std::string			    server_name;
         size_t				    body_size_limit;
-        // std::list<Location>		locations;
 
     public:
 		Location *locations;

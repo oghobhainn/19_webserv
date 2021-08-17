@@ -1,5 +1,19 @@
 #include "Config.hpp"
 
+Location::Location()
+{
+	this->get_method = false;
+	this->post_method = false;
+	this->delete_method = false;
+}
+
+Location::~Location()
+{
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 Server::Server() 
 {
 	this->full_str = "";
@@ -42,33 +56,17 @@ std::string Server::getFullStr() const
 
 void Server::getLocations() const
 {
-	// std::list<t_location>::iterator it = this->locations.begin();
-
-	// for (std::list<Location>::iterator it = this->locations.begin(); it! = this->locations.end(); ++it)
-	// 	std::cout << it->getFullStr << '\n';
-
 	for(int i = 0; i < nb_loc; ++i)
-		std::cout << locations[i].full_str << std::endl;
-	
-
-	// std::string test1, test2, test3, test4, test5, test6;
-	// test1 = this->locations.front().full_str;
-	// test2 = this->locations.back().full_str;
-
-	// test3 = this->locations.front().file_extensions.front();
-	// test4 = this->locations.front().file_extensions.back();
-
-	// test5 = this->locations.back().file_extensions.front();
-	// test6 = this->locations.back().file_extensions.back();
-	// std::cout << "--------------- IN LOCATIONS -----------------" << std::endl;
-	// std::cout << "first loc: " << test1 << std::endl;
-	// std::cout << "last loc: " << test2 <<  std::endl;
-	// std::cout << "-----------" << std::endl;
-	// std::cout << "first loc - first file ext: " << test3 <<  std::endl;
-	// std::cout << "first loc - last file ext: " << test4 <<  std::endl;
-	// std::cout << "-----------" << std::endl;
-	// std::cout << "last loc - first file ext: " << test5 <<  std::endl;
-	// std::cout << "last loc - last file ext: " << test6 <<  std::endl;
+	{
+		std::cout << "---IN ONE LOC---" << std::endl;
+		std::cout << "Full_str_loc: " << locations[i].full_str << std::endl;
+		std::cout << "Root:         " << locations[i].root << std::endl;
+		std::cout << "Index:        " << locations[i].index << std::endl;
+		std::cout << "GET:         	" << locations[i].get_method << std::endl;
+		std::cout << "POST:         " << locations[i].post_method << std::endl;
+		std::cout << "DELETE:       " << locations[i].delete_method << std::endl;
+		std::cout << "---" << std::endl;
+	}
 }
 
 void Server::setHost(std::string const str)
