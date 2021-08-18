@@ -32,9 +32,6 @@ void	Http_response::set_firstline		( int const & status_code )
 		case 403:
 			status_message = "403 Forbidden";
 			break;
-		// case 404:
-			// status_message = "404 Not Found";
-			// break;
 		case 405:
 			status_message = "405 Method not Allowed";
 			break;
@@ -146,7 +143,7 @@ std::string const & Http_response::get_last_modified	( void ) const { return thi
 std::string const & Http_response::get_body				( void ) const { return this->_body; }
 
 
-std::string			Http_response::ERROR_method( t_http_request const & http_req_struct )
+std::string		Http_response::ERROR_method( t_http_request const & http_req_struct )
 {
 	std::string		ERROR_response;
 
@@ -162,7 +159,7 @@ std::string			Http_response::ERROR_method( t_http_request const & http_req_struc
 	return ERROR_response;
 }
 
-std::string			Http_response::error_page(int error_nbr, t_http_request const & http_req_struct )
+std::string		Http_response::error_page(int error_nbr, t_http_request const & http_req_struct )
 {
 	std::string		path;
 	std::ifstream	fd;
@@ -182,7 +179,7 @@ std::string			Http_response::error_page(int error_nbr, t_http_request const & ht
 	return ERROR_method(http_req_struct);
 }
 
-void	Http_response::init_response( int status_code, t_http_request const & http_req )
+void			Http_response::init_response( int status_code, t_http_request const & http_req )
 {
 	this->Http_response::set_firstline( status_code);
 	if (status_code == 405) // method not allowed
@@ -201,7 +198,7 @@ void	Http_response::init_response( int status_code, t_http_request const & http_
 
 }
 
-std::string			Http_response::GET_method(t_http_request const & http_req_struct)
+std::string		Http_response::GET_method(t_http_request const & http_req_struct)
 {
 	std::ifstream	fd;
 	std::string		GET_response;
