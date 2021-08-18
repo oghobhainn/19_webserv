@@ -25,8 +25,8 @@ class Location
 		Location();
 		~Location();
 
-		std::string				full_str;
 		bool					active;
+		std::string				full_str;
 		std::list<std::string>	file_extensions;
 		std::string				directory;
 		size_t					max_body;
@@ -35,6 +35,7 @@ class Location
 		bool                    get_method;
 		bool					post_method;
 		bool					delete_method;
+        std::string             redirection;
 };
 
 class Server : public Location
@@ -46,13 +47,14 @@ class Server : public Location
         std::string			    port;
 		std::string				root;
         std::string			    server_name;
-        size_t				    body_size_limit;
+        std::string             default_error_page;
+        int				        client_body_size;
 		int 					nb_loc;
 
     public:
-		Location *locations;
         Server();
         ~Server();
+		Location *locations;
         Server& operator=(Server const& copy);
         
         void setFullStr(std::string const str);
@@ -78,6 +80,12 @@ class Server : public Location
 
 		void setNbLoc(int const i);
         int getNbLoc() const;
+
+        void setDefaultErrorPage(std::string const str);
+        std::string getDefaultErrorPage() const;
+
+        void setClientBodySize(std::string const str);
+        int getClientBodySize() const;
 };
 
 

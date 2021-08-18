@@ -5,6 +5,7 @@ Location::Location()
 	this->get_method = false;
 	this->post_method = false;
 	this->delete_method = false;
+	this->active = false;
 }
 
 Location::~Location()
@@ -21,8 +22,7 @@ Server::Server()
     this->host = "None";
     this->port = "";
 	this->server_name = "None";
-	this->body_size_limit = sizeof(size_t);
-	
+	this->client_body_size = 30000;
 }
 
 Server::~Server()
@@ -44,11 +44,6 @@ void Server::setFullStr(std::string const str)
 	this->full_str = str;
 }
 
-// void Server::setLocations(std::list<Location> const lst)
-// {
-// 	this->locations = lst;
-// }
-
 std::string Server::getFullStr() const
 {
 	return this->full_str;
@@ -62,9 +57,13 @@ void Server::getLocations() const
 		std::cout << "Full_str_loc: " << locations[i].full_str << std::endl;
 		std::cout << "Root:         " << locations[i].root << std::endl;
 		std::cout << "Index:        " << locations[i].index << std::endl;
+		std::cout << "Redir:        " << locations[i].redirection << std::endl;
 		std::cout << "GET:         	" << locations[i].get_method << std::endl;
 		std::cout << "POST:         " << locations[i].post_method << std::endl;
 		std::cout << "DELETE:       " << locations[i].delete_method << std::endl;
+
+		std::cout << "FILES front:       " << locations[i].file_extensions.front() << std::endl;
+		std::cout << "FILES back:       " << locations[i].file_extensions.back() << std::endl;
 		std::cout << "---" << std::endl;
 	}
 }
@@ -120,6 +119,27 @@ void Server::setNbLoc(int const i)
 int Server::getNbLoc() const
 {
 	return this->nb_loc;
+}
+
+void Server::setDefaultErrorPage(std::string const str)
+{
+	this->default_error_page = str;
+}
+
+std::string Server::getDefaultErrorPage() const
+{
+	return this->default_error_page;
+}
+
+void Server::setClientBodySize(std::string const str)
+{
+	int nb = std::stoi(str);
+	this->client_body_size = nb;
+}
+
+int Server::getClientBodySize() const
+{
+	return this->client_body_size;
 }
 
 void Server::setStrWithoutLoc(std::string const str)
