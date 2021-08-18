@@ -1,6 +1,20 @@
 #include "Config.hpp"
 
-Server::Server()
+Location::Location()
+{
+	this->get_method = false;
+	this->post_method = false;
+	this->delete_method = false;
+}
+
+Location::~Location()
+{
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+Server::Server() 
 {
 	this->full_str = "";
 	this->str_without_loc = "";
@@ -8,6 +22,7 @@ Server::Server()
     this->port = "";
 	this->server_name = "None";
 	this->body_size_limit = sizeof(size_t);
+	
 }
 
 Server::~Server()
@@ -29,10 +44,10 @@ void Server::setFullStr(std::string const str)
 	this->full_str = str;
 }
 
-void Server::setLocations(std::list<std::string> const lst)
-{
-	this->locations = lst;
-}
+// void Server::setLocations(std::list<Location> const lst)
+// {
+// 	this->locations = lst;
+// }
 
 std::string Server::getFullStr() const
 {
@@ -41,13 +56,30 @@ std::string Server::getFullStr() const
 
 void Server::getLocations() const
 {
-	// for (std::list<std::string>::iterator it = this->locations.begin(); it != this->locations.end(); ++it)
-	// 	std::cout << *it << std::endl;
-	std::string test1, test2;
-	test1 = this->locations.front();
-	test2 = this->locations.back();
-	std::cout << "first loc: " << test1 << std::endl;
-	std::cout << "last loc: " << test2 <<  std::endl;
+	for(int i = 0; i < nb_loc; ++i)
+	{
+		std::cout << "---IN ONE LOC---" << std::endl;
+		std::cout << "Full_str_loc: " << locations[i].full_str << std::endl;
+		std::cout << "Root:         " << locations[i].root << std::endl;
+		std::cout << "Index:        " << locations[i].index << std::endl;
+		std::cout << "GET:         	" << locations[i].get_method << std::endl;
+		std::cout << "POST:         " << locations[i].post_method << std::endl;
+		std::cout << "DELETE:       " << locations[i].delete_method << std::endl;
+		std::cout << "---" << std::endl;
+	}
+}
+
+void Server::setServerName(int const i)
+{
+	std::string serv_name = "Server";
+	std::string nb = std::to_string(i);
+
+	this->server_name = serv_name + nb;
+}
+
+std::string Server::getServerName() const
+{
+	return this->server_name;
 }
 
 void Server::setHost(std::string const str)
@@ -70,6 +102,26 @@ std::string Server::getPort() const
 	return this->port;
 }
 
+void Server::setRoot(std::string const str)
+{
+	this->root = str;
+}
+
+std::string Server::getRoot() const
+{
+	return this->root;
+}
+
+void Server::setNbLoc(int const i)
+{
+	this->nb_loc = i;
+}
+
+int Server::getNbLoc() const
+{
+	return this->nb_loc;
+}
+
 void Server::setStrWithoutLoc(std::string const str)
 {
 	this->str_without_loc = str;
@@ -85,6 +137,6 @@ std::string Server::getStrWithoutLoc() const
 
 std::ostream& operator<<(std::ostream& os, const Server& item)
 {
-	// item.getLocations();
+	item.getLocations();
     return os << "NODE \n" << "full_str : " << item.getFullStr();
 }
