@@ -52,7 +52,6 @@ void TestServer::readsocket()
     if ((ret = recv(get_new_socket(), _buffer, 2048, 0)) == -1)
     {
         std::cout << "Error with recv" << std::endl;
-
     }
     else if (ret == 0)
     {
@@ -62,7 +61,6 @@ void TestServer::readsocket()
     else
     {
         _buffer[msgsize - 1] = 0;
-        std::cout << _buffer << std::endl;
     }
 }
 
@@ -108,13 +106,13 @@ void TestServer::launch()
                 else
                 {
                     // do whatever we do with the connection
-                    std::cout << " step 0" << std::endl;
+                    // std::cout << " step 0" << std::endl;
                     readsocket();
-                    std::cout << " step 1" << std::endl;
+                    // std::cout << " step 1" << std::endl;
                     handler();
-                    std::cout << " step 2" << std::endl;
+                    // std::cout << " step 2" << std::endl;
                     responder();
-                    std::cout << " step 3" << std::endl;
+                    // std::cout << " step 3" << std::endl;
                     FD_CLR(i, &current_socket);
                 }
             }
