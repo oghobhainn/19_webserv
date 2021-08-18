@@ -95,6 +95,24 @@ void parse_loc(std::list<class Server> &serv_list)
                 end = str_location.find(";", beg);
                 it->locations[j].index = str_location.substr(beg + 5, len(str_location) - beg - 5 - (len(str_location) - end));
             }
+            if (str_location.find("redirection") != std::string::npos)
+            {
+                beg = str_location.find("redirection");
+                end = str_location.find(";", beg);
+                it->locations[j].redirection = str_location.substr(beg + 11, len(str_location) - beg - 11 - (len(str_location) - end));
+            }
+            if (str_location.find("directory_list") != std::string::npos)
+            {
+                beg = str_location.find("directory_list");
+                end = str_location.find(";", beg);
+                it->locations[j].directory_listing = str_location.substr(beg + 14, len(str_location) - beg - 14 - (len(str_location) - end));
+            }
+            if (str_location.find("default_file") != std::string::npos)
+            {
+                beg = str_location.find("default_file");
+                end = str_location.find(";", beg);
+                it->locations[j].default_file_if_request_directory = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
+            }
             i++;
             j++;
         }
@@ -136,6 +154,10 @@ std::list<class Server> parseConfig(std::string const path)
                 it2->setPort(it3->substr(4, it3->size() - 4));
             else if (it3->find("root") != std::string::npos)
                 it2->setRoot(it3->substr(4, it3->size() - 4));
+            else if (it3->find("default_error_page") != std::string::npos)
+                it2->setDefaultErrorPage(it3->substr(18, it3->size() - 18));
+            else if (it3->find("client_body_size") != std::string::npos)
+                it2->setClientBodySize(it3->substr(16, it3->size() - 16));
         }
     }
     return serv_list;
@@ -155,29 +177,27 @@ int main(int argc, char **argv)
     ///////////////////// Print results /////////////////////////
     std::string test2;
 
-    for (std::list<class Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
     {
         std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
         std::cout << "Port: " << it->getPort() << std::endl;
-        std::cout << "Host: "<< it->getHost() << std::endl;
-        std::cout << "Root: "<< it->getRoot() << std::endl;
-        std::cout << "Ser Name: "<< it->getServerName() << std::endl;
+        std::cout << "Host: " << it->getHost() << std::endl;
+        std::cout << "Root: " << it->getRoot() << std::endl;
+        std::cout << "Ser Name: " << it->getServerName() << std::endl;
+        std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
+        std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
         
 		it->getLocations();
         std::cout << "---------------------- END --------------------------------" << std::endl;
     }
 
     //// TO DO
-    
-    // - default error pages
-    // - limit client body size
-    // - in the roots : 
-    //      - one HTTP redirection
+   
+    // - in the roots :
     //      - define a directory or a file from where the file should be search (for example
     //        if url /kapouet is rooted to /tmp/www, url /kapouet/pouic/toto/pouet is
     //        /tmp/www/pouic/toto/pouet)
     //      - turn on or off directory listing
-    //      - default file to answer if the request is a directory
     //      - CGI
     //      - make the route able to accept uploaded files and configure where it should be saved
 
@@ -246,15 +266,4 @@ int main(int argc, char **argv)
 // NGINX lit les blocs d'emplacement listés et recherche l'emplacement qui correspond le mieux à la requête URI. 
 // Chaque bloc d'emplacement contient des instructions spécifiques qui montrent à NGINX comment traiter la requête correspondante.
 
-
-// -----Configuration
-// NGINX est centralise sur un seul fichier .conf
-
-/////////////////////////////////////////////////////////////////////////////////////
-
 // https://www.youtube.com/watch?v=N49UyTlUXp4&t=19s&ab_channel=EricOMeehan
-
-
-
-
-
