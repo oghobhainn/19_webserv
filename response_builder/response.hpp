@@ -75,4 +75,6 @@ class	Http_response{
 		std::string		_body;
 };
 
+void	print_response(Http_response const & resp);
+
 #endif

@@ -1,28 +1,46 @@
 #include "../main.hpp"
-/*
+
 void	print_request_firstline(t_hreq_firstline const & hreq_firstline_struct)
 {
-	P("My Method: ", hreq_firstline_struct.method);
-	P("My URL: ", hreq_firstline_struct.urlpath);
-	P("My HTTP Version: ", hreq_firstline_struct.httpversion);
+	P("==================REQUEST-FIRSTLINE================");
+	PC("My Method: \t\t", hreq_firstline_struct.method);
+	PC("My URL: \t\t", hreq_firstline_struct.urlpath);
+	PC("My HTTP Version: \t", hreq_firstline_struct.httpversion);
+	P("---------------------------------------------------");
 }
 
 void	print_request_header(t_hreq_header const & hreq_header_struct)
 {
-	P("My User agent: ", hreq_header_struct.user_agent);
-	P("My Host: ", hreq_header_struct.host);
-	P("My Accept: ", hreq_header_struct.accept);
-	P("My Accept encoding: ", hreq_header_struct.accept_encoding);
-	P("My Accept Language: ", hreq_header_struct.accept_language);
-	P("My Referer: ", hreq_header_struct.referer);
-	P("My Connection: ", hreq_header_struct.connection);
-	P("My Upgrade insecure request: ", hreq_header_struct.upgrade_insecure_requests);
-	P("My If Modified Since: ", hreq_header_struct.if_modified_since);
-	P("My If None Match: ", hreq_header_struct.if_none_match);
-	P("My Content Type: ", hreq_header_struct.content_type);
-	P("My Content Length: ", hreq_header_struct.content_length);
+	P("==================REQUEST-HEADER================");
+	PC("My User agent: \t\t", hreq_header_struct.user_agent);
+	PC("My Host: \t\t\t", hreq_header_struct.host);
+	PC("My Accept: \t\t", hreq_header_struct.accept);
+	PC("My Accept encoding: \t\t", hreq_header_struct.accept_encoding);
+	PC("My Accept Language: \t\t", hreq_header_struct.accept_language);
+	PC("My Referer: \t\t", hreq_header_struct.referer);
+	PC("My Connection: \t\t", hreq_header_struct.connection);
+	PC("My Upgrade insecure request: \t", hreq_header_struct.upgrade_insecure_requests);
+	PC("My If Modified Since: \t\t", hreq_header_struct.if_modified_since);
+	PC("My If None Match: \t\t", hreq_header_struct.if_none_match);
+	PC("My Content Type: \t\t", hreq_header_struct.content_type);
+	PC("My Content Length: \t\t", hreq_header_struct.content_length);
+	P("-------------------------------------------------");
 }
-*/
+
+void	print_request_body(std::string body)
+{
+	P("==================REQUEST-BODY================");
+	P(body);
+	P("----------------------------------------------");
+}
+
+void	print_request(t_http_request const & req)
+{
+	print_request_firstline(req.firstline);
+	print_request_header(req.header);
+	print_request_body(req.body);
+}
+
 std::string	remove_whitespaces(std::string str)
 {
 	str.erase(remove_if(str.begin(), str.end(), isspace), str.end());

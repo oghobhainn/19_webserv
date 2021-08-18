@@ -203,8 +203,10 @@ std::string		Http_response::GET_method(t_http_request const & http_req_struct)
 	std::ifstream	fd;
 	std::string		GET_response;
 
-	fd.open(http_req_struct.firstline.complete_urlpath);
-	P(http_req_struct.firstline.complete_urlpath);
+	// fd.open(http_req_struct.firstline.complete_urlpath);
+	fd.open("./frontend/index.html");//TODO
+	PC("complete urlpath:" ,http_req_struct.firstline.complete_urlpath);
+
 	if (!fd.is_open())
 	{
 		fd.close();

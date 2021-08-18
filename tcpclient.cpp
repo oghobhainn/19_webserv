@@ -13,9 +13,10 @@ int main(int argc, char const *argv[])
 {
     int sock = 0; long valread;
     struct sockaddr_in serv_addr;
-    //char *hello = "Hello from client";
-    char hello[512] = "GET /index.html HTTP/1.1\r\nHost: 192.241.213.65:6880\r\nContent-Type: text/plain\r\nContent-Length: 27\r\n\r\nHello world! This is me, CLIENT";
+
+    char hello[512] = "GET /index.html HTTP/1.1\r\nHost: 192.241.213.65:6880\r\nContent-Type: text/plain\r\nContent-Length: 27\r\n\r\nDeep down the rabbit hole,\nThere lies him, the CLIENT\r\n";
     char buffer[1024] = {0};
+    
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         printf("\n Socket creation error \n");
@@ -27,19 +28,6 @@ int main(int argc, char const *argv[])
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
     
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    //if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
-    //if(inet_pton(AF_INET, argv[1], &serv_addr.sin_addr)<=0)
-
-    // //       int inet_pton(int af, const char *restrict src, void *restrict dst);
-    // //This function converts the character string src into a network
-    //    address structure in the af address family, then copies the
-    //    network address structure to dst.
-    // //src points to a character string containing an IPv4
-    //           network address in dotted-decimal format,
-    //           "ddd.ddd.ddd.ddd", where ddd is a decimal number of up to
-    //           three digits in the range 0 to 255.
-
     if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
     {
         printf("\nInvalid address/ Address not supported \n");
@@ -55,7 +43,7 @@ int main(int argc, char const *argv[])
     printf("-- Hello message sent --\n");
     printf("Answer from server : \n");
     fflush(stdout);
-    valread = read( sock , buffer, 1024);
+    valread = read( sock , buffer, 4096);
     printf("%s\n",buffer );
     fflush(stdout);
     return 0;
