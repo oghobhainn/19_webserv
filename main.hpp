@@ -9,6 +9,7 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <fstream>
+#include <sys/select.h>
 
 #include "ConfigParsing/Config.hpp"
 #include "Networking/Server/SimpleServer.hpp"
@@ -20,6 +21,7 @@
 
 #include "request_parser/request.hpp"
 #include "response_builder/response.hpp"
+#include "utils/utils.hpp"
 
 
 /*

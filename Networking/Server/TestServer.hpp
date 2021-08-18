@@ -10,18 +10,24 @@
 class TestServer : public SimpleServer
 {
     private:
-        char _buffer[30000];
         int _new_socket;
+        char _buffer[300000];
+        // fd_set writing_socket;
+        // fd_set reading_socket;
         
-        void accepter();
-        void handler();
-        void responder();
 
     public:
         TestServer();
         TestServer(int port);
+        
         void launch();
+        void accepter();
+        void readsocket();
+        void handler();
+        void responder();
 
+        int get_new_socket();
+        void set_socket(int new_socket);
 };
 
 
