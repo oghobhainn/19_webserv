@@ -167,6 +167,23 @@ int main(int argc, char **argv)
         std::cout << "---------------------- END --------------------------------" << std::endl;
     }
 
+    //// TO DO
+    
+    // - default error pages
+    // - limit client body size
+    // - in the roots : 
+    //      - one HTTP redirection
+    //      - define a directory or a file from where the file should be search (for example
+    //        if url /kapouet is rooted to /tmp/www, url /kapouet/pouic/toto/pouet is
+    //        /tmp/www/pouic/toto/pouet)
+    //      - turn on or off directory listing
+    //      - default file to answer if the request is a directory
+    //      - CGI
+    //      - make the route able to accept uploaded files and configure where it should be saved
+
+
+
+
     ////////////////////// Server ////////////////////////////////
     // TestServer t(80);
     return 0;
