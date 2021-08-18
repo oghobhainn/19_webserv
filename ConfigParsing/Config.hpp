@@ -28,7 +28,6 @@ class Location
 		bool					active;
 		std::string				full_str;
 		std::list<std::string>	file_extensions;
-		std::string				directory;
 		size_t					max_body;
 		std::string				root;
 		std::string				index;
@@ -36,6 +35,10 @@ class Location
 		bool					post_method;
 		bool					delete_method;
         std::string             redirection;
+
+        std::string             directory_listing;
+        std::string             default_file_if_request_directory;
+        // t_CGI CGI; //If equal to NULL no CGI server, but http static content server
 };
 
 class Server : public Location

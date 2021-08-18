@@ -101,6 +101,18 @@ void parse_loc(std::list<class Server> &serv_list)
                 end = str_location.find(";", beg);
                 it->locations[j].redirection = str_location.substr(beg + 11, len(str_location) - beg - 11 - (len(str_location) - end));
             }
+            if (str_location.find("directory_list") != std::string::npos)
+            {
+                beg = str_location.find("directory_list");
+                end = str_location.find(";", beg);
+                it->locations[j].directory_listing = str_location.substr(beg + 14, len(str_location) - beg - 14 - (len(str_location) - end));
+            }
+            if (str_location.find("default_file") != std::string::npos)
+            {
+                beg = str_location.find("default_file");
+                end = str_location.find(";", beg);
+                it->locations[j].default_file_if_request_directory = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
+            }
             i++;
             j++;
         }
@@ -186,7 +198,6 @@ int main(int argc, char **argv)
     //        if url /kapouet is rooted to /tmp/www, url /kapouet/pouic/toto/pouet is
     //        /tmp/www/pouic/toto/pouet)
     //      - turn on or off directory listing
-    //      - default file to answer if the request is a directory
     //      - CGI
     //      - make the route able to accept uploaded files and configure where it should be saved
 

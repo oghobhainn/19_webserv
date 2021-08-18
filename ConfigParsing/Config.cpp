@@ -61,9 +61,10 @@ void Server::getLocations() const
 		std::cout << "GET:         	" << locations[i].get_method << std::endl;
 		std::cout << "POST:         " << locations[i].post_method << std::endl;
 		std::cout << "DELETE:       " << locations[i].delete_method << std::endl;
-
-		std::cout << "FILES front:       " << locations[i].file_extensions.front() << std::endl;
-		std::cout << "FILES back:       " << locations[i].file_extensions.back() << std::endl;
+		std::cout << "Dir list:     " << locations[i].directory_listing << std::endl;
+		std::cout << "Default file: " << locations[i].default_file_if_request_directory << std::endl;
+		std::cout << "FILES front:  " << locations[i].file_extensions.front() << std::endl;
+		std::cout << "FILES back:   " << locations[i].file_extensions.back() << std::endl;
 		std::cout << "---" << std::endl;
 	}
 }
