@@ -34,14 +34,15 @@ void TestServer::accepter()
 
 void TestServer::handler()
 {
-    std::cout << _buffer << std::endl;
-
     t_http_request  http_req_struct;
     std::string     http_response_firstline;
     http_request_parser(_buffer, http_req_struct);
 
     Http_response test;
     test.Http_response::build_http_response(http_req_struct);
+
+    print_response(test);
+
 }
 
 void TestServer::readsocket()

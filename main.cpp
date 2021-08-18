@@ -205,7 +205,7 @@ int main(int argc, char **argv)
 
 
     ////////////////////// Server ////////////////////////////////
-    // TestServer t(8000);
+    TestServer t(80);
     return 0;
 }
 

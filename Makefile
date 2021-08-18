@@ -11,6 +11,7 @@ SRCS = main.cpp \
 		request_parser/http_request_parsing.cpp \
 		request_parser/utils_parser.cpp \
 		response_builder/response.cpp \
+		response_builder/utils_response.cpp \
 		utils/utils.cpp
 
 CXX = clang++
