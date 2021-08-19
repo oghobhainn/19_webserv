@@ -153,6 +153,36 @@ std::string Server::getStrWithoutLoc() const
 	return this->str_without_loc;
 }
 
+void Server::setSocket(ListeningSocket *socket)
+{
+	_socket = socket;
+}
+
+ListeningSocket *Server::getSocket()
+{
+	return (_socket);
+}
+
+void Server::addSocketClient(int socket)
+{
+	fd_set tmp;
+
+	tmp = getSocketClient();
+	FD_SET(socket, &tmp);
+}
+
+void Server::removeSocketClient(int socket)
+{
+	fd_set tmp;
+
+	tmp = getSocketClient();
+	FD_CLR(socket, &tmp);
+}
+
+fd_set Server::getSocketClient()
+{
+	return (socket_client);
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 

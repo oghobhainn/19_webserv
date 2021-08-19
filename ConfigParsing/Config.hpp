@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <sstream>
 
+#include "../Networking/Sockets/ListeningSocket.hpp"
+
 #define P(x) std::cout << x << std::endl
 
 class Location
@@ -50,9 +52,16 @@ class Server : public Location
         std::string			    port;
 		std::string				root;
         std::string			    server_name;
+        
+        size_t				    body_size_limit;
+        std::list<std::string>  locations;
+        ListeningSocket         *_socket; ////////////////////////////
+        fd_set                  socket_client; //////////////////////
+
         std::string             default_error_page;
         int				        client_body_size;
 		int 					nb_loc;
+
 
     public:
         Server();
@@ -78,6 +87,14 @@ class Server : public Location
         void setPort(std::string const str);
         std::string getPort() const;
 
+
+        void setSocket(ListeningSocket *socket); //////////////////////////
+        ListeningSocket *getSocket(); ////////////////////////////////////
+
+        void addSocketClient(int socket); //////////////////////////////
+        void removeSocketClient(int socket); //////////////////////////
+        fd_set getSocketClient(); ////////////////////////////////////
+
 		void setRoot(std::string const str);
         std::string getRoot() const;
 
@@ -89,6 +106,7 @@ class Server : public Location
 
         void setClientBodySize(std::string const str);
         int getClientBodySize() const;
+
 };
 
 

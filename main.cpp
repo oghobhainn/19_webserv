@@ -165,7 +165,12 @@ std::list<class Server> parseConfig(std::string const path)
 
 int main(int argc, char **argv)
 {
-    std::list<Server> serv_list;
+
+    std::list<class Server> serv_list;
+    std::vector<int> set_of_port;
+
+    //std::list<Server> serv_list;
+
 
     if (argc != 2)
     {
@@ -187,9 +192,15 @@ int main(int argc, char **argv)
         std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
         std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
         
+
+
 		it->getLocations();
         std::cout << "---------------------- END --------------------------------" << std::endl;
     }
+
+
+    for (std::list<class Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
+        set_of_port.push_back(stoi(it2->getPort()));
 
     //// TO DO
    
@@ -204,8 +215,9 @@ int main(int argc, char **argv)
 
 
 
+
     ////////////////////// Server ////////////////////////////////
-    TestServer t(80);
+    TestServer t(serv_list);
     return 0;
 }
 
