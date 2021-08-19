@@ -54,7 +54,7 @@ class Server : public Location
         std::string			    server_name;
         
         size_t				    body_size_limit;
-        std::list<std::string>  locations;
+        // std::list<std::string>  locations;
         ListeningSocket         *_socket; ////////////////////////////
         fd_set                  socket_client; //////////////////////
 

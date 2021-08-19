@@ -182,21 +182,21 @@ int main(int argc, char **argv)
     ///////////////////// Print results /////////////////////////
     std::string test2;
 
-    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    {
-        std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
-        std::cout << "Port: " << it->getPort() << std::endl;
-        std::cout << "Host: " << it->getHost() << std::endl;
-        std::cout << "Root: " << it->getRoot() << std::endl;
-        std::cout << "Ser Name: " << it->getServerName() << std::endl;
-        std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
-        std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
+    // for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    // {
+    //     std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
+    //     std::cout << "Port: " << it->getPort() << std::endl;
+    //     std::cout << "Host: " << it->getHost() << std::endl;
+    //     std::cout << "Root: " << it->getRoot() << std::endl;
+    //     std::cout << "Ser Name: " << it->getServerName() << std::endl;
+    //     std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
+    //     std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
         
 
 
-		it->getLocations();
-        std::cout << "---------------------- END --------------------------------" << std::endl;
-    }
+	// 	it->getLocations();
+    //     std::cout << "---------------------- END --------------------------------" << std::endl;
+    // }
 
 
     for (std::list<class Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
