@@ -1,7 +1,6 @@
 NAME = webserv
 SRCS = main.cpp \
 		ConfigParsing/Config.cpp \
-		Networking/Server/SimpleServer.cpp \
 		Networking/Server/TestServer.cpp \
 		Networking/Sockets/BindingSocket.cpp \
 		Networking/Sockets/ConnectingSocket.cpp \

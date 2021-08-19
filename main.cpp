@@ -177,6 +177,7 @@ std::list<class Server> parseConfig(std::string const path)
 int main(int argc, char **argv)
 {
     std::list<class Server> serv_list;
+    std::vector<int> set_of_port;
 
     if (argc != 2)
     {
@@ -194,12 +195,17 @@ int main(int argc, char **argv)
         std::cout << it->getPort() << std::endl;
         std::cout << it->getHost() << std::endl;
         
+
+
 		it->getLocations();
         std::cout << "-----------" << std::endl;
     }
 
+    for (std::list<class Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
+        set_of_port.push_back(stoi(it2->getPort()));
+
     ////////////////////// Server ////////////////////////////////
-    TestServer t(80);
+    TestServer t(serv_list);
     return 0;
 }
 
