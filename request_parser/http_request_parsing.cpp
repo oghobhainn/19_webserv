@@ -7,7 +7,8 @@ std::string	get_full_urlpath(std::string url)
 	// TODO - not sure it works this way
 	// return (std::string("/Library/Webserver/Documents/Webserv")	+ url);
 
-	return (std::string("/Library/Webserver/Documents") + url);
+	//return (std::string("/Library/Webserver/Documents") + url);
+	return (std::string(".") + url);
 }
 
 std::string	check_parsed_request(t_http_request &http_req_struct)
@@ -18,7 +19,7 @@ std::string	check_parsed_request(t_http_request &http_req_struct)
 		http_req_struct.error = true;
 		return std::string("url invalide, non absolute");
 	}
-	else if (http_req_struct.firstline.method != "GET"
+	else if (http_req_struct.firstline.method != "GET" //TODO - check le booleen du .conf si GET est authorised
 		&& http_req_struct.firstline.method != "POST"
 		&& http_req_struct.firstline.method != "DELETE") // TODO - fonction qui checke si ca fait partie d'un vecteur authorise, plus modulable
 	{
@@ -26,8 +27,11 @@ std::string	check_parsed_request(t_http_request &http_req_struct)
 			http_req_struct.error = true;
 		return std::string("method not allowed");
 	}
+	// else if{
+		// 
+	// }
 	http_req_struct.status_code = 200;
-	return std::string("tout est ok!");
+	return std::string("check parsing ok!");
 }
 
 void	parse_first_line(std::string firstline, t_hreq_firstline &hreq_firstline)
@@ -81,6 +85,13 @@ void	parse_header(std::vector<std::string> header_vector, t_hreq_header &hreq_he
 	}
 }
 
+void	parse_body(std::vector<std::string> body_vector, std::string &body)
+{
+	for(std::vector<std::string>::iterator it = body_vector.begin(); it != body_vector.end(); ++it) {
+		body += *it + '\n';
+	}
+}
+
 void	init_http_req(t_http_request & hrs)
 {
 	hrs.status_code = -1;
@@ -116,11 +127,10 @@ void	http_request_parser(char *buffer, t_http_request &http_req_struct)
 
 	parse_first_line(firstline_str, http_req_struct.firstline);
 	parse_header(header_vector, http_req_struct.header);
+	parse_body(body_vector, http_req_struct.body);
 
-//	print_request_firstline(http_req_struct.firstline);
-//	print_request_header(http_req_struct.header);
+	print_request(http_req_struct);
 
-	std::string parser_ok = check_parsed_request(http_req_struct);
-	std::cout << parser_ok << std::endl;
+	std::cout << check_parsed_request(http_req_struct) << std::endl;
     return ;
 }

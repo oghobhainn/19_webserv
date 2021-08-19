@@ -6,84 +6,121 @@
 #include "Networking/Sockets/ConnectingSocket.hpp"
 #include "Networking/Sockets/BindingSocket.hpp"
 
-#include "main.hpp"
+#include "main.hpp" 
 
-template<class T>
-void show_list_str(T & l)
+std::list<class Server> get_serv_list(std::string full_str)
 {
-	std::cout << "--List string : " << std::endl;
+    std::string					str_serv;
+    std::list<class Server> 	serv_list;
+    int							nbr_serv;
+    int							i = 0;
+    int							pos;
+    int							pos_next;
+    Server *serv = NULL;
 
-	for (typename T::iterator it = l.begin(); it != l.end(); it++)
-		std::cout << *it << std::endl;;
-	std::cout << "--END" << std::endl;
-}
-
-template<class T>
-void show_list(T & l)
-{
-	std::cout << "--List class : " << std::endl;;
-	for (typename T::iterator it = l.begin(); it != l.end(); it++)
-		std::cout << *it << std::endl;
-	std::cout << "--END" << std::endl;
-}
-
-std::vector<std::string> split(std::string s, const char delim) 
-{
-    std::vector<std::string>	result;
-    std::stringstream			ss(s);
-    std::string					item;
-
-    while (getline(ss, item, delim)) 
-        result.push_back(item);
-    return result;
-}
-
-std::string trim(std::string str, std::string whitespace)
-{
-    unsigned long strBegin = str.find_first_not_of(whitespace);
-    unsigned long strEnd = str.find_last_not_of(whitespace);
-    unsigned long strRange = strEnd - strBegin + 1;
-
-    if (strBegin == std::string::npos)
-        return "";
-    return str.substr(strBegin, strRange);
-}
-
-int countFreq(std::string pat, std::string txt)
-{
-    int M = pat.length();
-    int N = txt.length();
-    int res = 0;
-   
-    for (int i = 0; i <= N - M; i++)
+    nbr_serv = countFreq("server", full_str);
+    while (i < nbr_serv)
     {
-        int j;
-        for (j = 0; j < M; j++)
-            if (txt[i + j] != pat[j])
-                break;
-        if (j == M) 
+        serv = new Server;
+        pos = nthOccurrence(full_str, "server", i);
+        pos_next = nthOccurrence(full_str, "server", i + 1);
+        str_serv = full_str.substr(pos + 7, pos_next - pos - 7);
+        serv->setFullStr(str_serv);
+        serv->setServerName(i);
+        serv_list.push_back(*serv);
+        i++;
+    }
+    return serv_list;
+}
+
+void parse_loc(std::list<class Server> &serv_list)
+{
+    std::string             str_methods;
+    std::string::size_type  index = 0;
+    std::string             file_ext;
+    std::string             str_location;
+    Location *struct_loc = NULL;
+    int found = 0;
+    int pos;
+    int	pos_next;
+    int beg = 0;
+    int end = 0;
+    int i = 1;
+    int j = 0;
+
+    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    {
+        i = 1;
+        j = 0;
+        pos = 0;
+        pos_next = 0;
+        found = 0;
+        beg = 0;
+        end = 0;
+        index = 0;
+
+        it->setNbLoc(countFreq("location", it->getFullStr()));
+        it->locations = new Location[it->getNbLoc()];
+        while (pos_next != -1)
         {
-           res++;
-           j = 0;
+            struct_loc = new Location;
+            pos = nthOccurrence(it->getFullStr(), "location", i);
+            pos_next = nthOccurrence(it->getFullStr(), "location", i + 1);
+            str_location = it->getFullStr().substr(pos + 8, pos_next - pos - 8);
+            it->locations[j].full_str = str_location; 
+            found = str_location.find("{");
+            file_ext = str_location.substr(0, found);
+            it->locations[j].file_extensions = split_lst(file_ext, '/');
+            if (str_location.find("root") != std::string::npos)
+            {
+                beg = str_location.find("root");
+                end = str_location.find(";", beg);
+                it->locations[j].root = str_location.substr(beg + 4, len(str_location) - beg - 4 - (len(str_location) - end));
+            }
+            if (str_location.find("http_methods") != std::string::npos)
+            {
+                beg = str_location.find("http_methods");
+                end = str_location.find(";", beg);
+                str_methods = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
+                if (str_methods.find("GET") != std::string::npos)
+                    it->locations[j].get_method = true;
+                if (str_methods.find("POST") != std::string::npos)
+                    it->locations[j].post_method = true;
+                if (str_methods.find("DELETE") != std::string::npos)
+                    it->locations[j].delete_method = true;
+            }
+            if (str_location.find("index") != std::string::npos)
+            {
+                beg = str_location.find("index");
+                end = str_location.find(";", beg);
+                it->locations[j].index = str_location.substr(beg + 5, len(str_location) - beg - 5 - (len(str_location) - end));
+            }
+            if (str_location.find("redirection") != std::string::npos)
+            {
+                beg = str_location.find("redirection");
+                end = str_location.find(";", beg);
+                it->locations[j].redirection = str_location.substr(beg + 11, len(str_location) - beg - 11 - (len(str_location) - end));
+            }
+            if (str_location.find("directory_list") != std::string::npos)
+            {
+                beg = str_location.find("directory_list");
+                end = str_location.find(";", beg);
+                it->locations[j].directory_listing = str_location.substr(beg + 14, len(str_location) - beg - 14 - (len(str_location) - end));
+            }
+            if (str_location.find("default_file") != std::string::npos)
+            {
+                beg = str_location.find("default_file");
+                end = str_location.find(";", beg);
+                it->locations[j].default_file_if_request_directory = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
+            }
+            i++;
+            j++;
         }
+        if ((index = it->getFullStr().find("location")) != std::string::npos)
+            it->setStrWithoutLoc(it->getFullStr().substr(0, index));
+		else
+			it->setStrWithoutLoc(it->getFullStr());
     }
-    return res;
-}
-
-int nthOccurrence(const std::string& str, const std::string& findMe, int nth)
-{
-    size_t  pos = 0;
-    int     cnt = 0;
-
-    while (cnt != nth)
-    {
-        pos += 1;
-        pos = str.find(findMe, pos);
-        if ( pos == std::string::npos )
-            return -1;
-        cnt++;
-    }
-    return pos;
 }
 
 std::list<class Server> parseConfig(std::string const path)
@@ -91,75 +128,21 @@ std::list<class Server> parseConfig(std::string const path)
 	std::ifstream				file(path);
     std::string					input;
     std::string					full_str;
-    std::string					str_serv;
     std::string             	str_location;
     std::string             	str_without_loc;
     std::list<class Server> 	serv_list;
 	std::vector<std::string>	data;
-    int							nbr_serv;
-    int							pos;
-    int							pos_next;
-    int							i = 0;
 
-    // protect if file can't open
 	if (!file.is_open())
 	{
         std::cerr << "Error with the config file path\n";
 		exit(1);
 	}
-
-    // create a big string
     while (std::getline(file, input))
         full_str += input;
     full_str.erase(remove_if(full_str.begin(), full_str.end(), isspace), full_str.end());
-
-    // create a string for each server
-    nbr_serv = countFreq("server", full_str);
-    while (i < nbr_serv)
-    {
-        // create the string for each server // note: 7 = size of str server + {
-        pos = nthOccurrence(full_str, "server", i);
-        pos_next = nthOccurrence(full_str, "server", i + 1);
-        str_serv = full_str.substr(pos + 7, pos_next - pos - 7);
-
-        // create a class for each node and fill it with the string
-        Server serv;
-        serv.setFullStr(str_serv);
-        serv_list.push_back(serv);
-
-        i++;
-    }
-
-    // store in a list the locations's strings for each node and remove them for the string
-    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    {
-        i = 1;
-        pos = 0;
-        pos_next = 0;
-        std::list<std::string> lst;
-        std::string::size_type index = 0;
-
-        // add each loc to the list
-        while (pos_next != -1)
-        {
-            pos = nthOccurrence(it->getFullStr(), "location", i);
-            pos_next = nthOccurrence(it->getFullStr(), "location", i + 1);
-            str_location = it->getFullStr().substr(pos + 8, pos_next - pos - 8);
-            lst.push_back(str_location);
-            i++;
-        }
-
-		// create a string without the locations (host, port, etc)
-        if ((index = it->getFullStr().find("location")) != std::string::npos)
-            it->setStrWithoutLoc(it->getFullStr().substr(0, index));
-		else
-			it->setStrWithoutLoc(it->getFullStr());
-
-        // add list to the node
-        it->setLocations(lst);
-    }
-
-    // split with the ; and get the port, the host and the index
+    serv_list = get_serv_list(full_str);
+    parse_loc(serv_list);
     for (std::list<Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
     {
         data = split(it2->getStrWithoutLoc(), ';');
@@ -169,6 +152,12 @@ std::list<class Server> parseConfig(std::string const path)
                 it2->setHost(it3->substr(4, it3->size() - 4));
             else if (it3->find("port") != std::string::npos)
                 it2->setPort(it3->substr(4, it3->size() - 4));
+            else if (it3->find("root") != std::string::npos)
+                it2->setRoot(it3->substr(4, it3->size() - 4));
+            else if (it3->find("default_error_page") != std::string::npos)
+                it2->setDefaultErrorPage(it3->substr(18, it3->size() - 18));
+            else if (it3->find("client_body_size") != std::string::npos)
+                it2->setClientBodySize(it3->substr(16, it3->size() - 16));
         }
     }
     return serv_list;
@@ -176,8 +165,12 @@ std::list<class Server> parseConfig(std::string const path)
 
 int main(int argc, char **argv)
 {
+
     std::list<class Server> serv_list;
     std::vector<int> set_of_port;
+
+    //std::list<Server> serv_list;
+
 
     if (argc != 2)
     {
@@ -186,23 +179,42 @@ int main(int argc, char **argv)
     }
     serv_list = parseConfig(argv[1]);
     
-
     ///////////////////// Print results /////////////////////////
     std::string test2;
 
-    for (std::list<class Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
     {
-        std::cout << it->getPort() << std::endl;
-        std::cout << it->getHost() << std::endl;
+        std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
+        std::cout << "Port: " << it->getPort() << std::endl;
+        std::cout << "Host: " << it->getHost() << std::endl;
+        std::cout << "Root: " << it->getRoot() << std::endl;
+        std::cout << "Ser Name: " << it->getServerName() << std::endl;
+        std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
+        std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
         
 
 
 		it->getLocations();
-        std::cout << "-----------" << std::endl;
+        std::cout << "---------------------- END --------------------------------" << std::endl;
     }
+
 
     for (std::list<class Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
         set_of_port.push_back(stoi(it2->getPort()));
+
+    //// TO DO
+   
+    // - in the roots :
+    //      - define a directory or a file from where the file should be search (for example
+    //        if url /kapouet is rooted to /tmp/www, url /kapouet/pouic/toto/pouet is
+    //        /tmp/www/pouic/toto/pouet)
+    //      - turn on or off directory listing
+    //      - CGI
+    //      - make the route able to accept uploaded files and configure where it should be saved
+
+
+
+
 
     ////////////////////// Server ////////////////////////////////
     TestServer t(serv_list);
@@ -266,15 +278,4 @@ int main(int argc, char **argv)
 // NGINX lit les blocs d'emplacement listés et recherche l'emplacement qui correspond le mieux à la requête URI. 
 // Chaque bloc d'emplacement contient des instructions spécifiques qui montrent à NGINX comment traiter la requête correspondante.
 
-
-// -----Configuration
-// NGINX est centralise sur un seul fichier .conf
-
-/////////////////////////////////////////////////////////////////////////////////////
-
 // https://www.youtube.com/watch?v=N49UyTlUXp4&t=19s&ab_channel=EricOMeehan
-
-
-
-
-

@@ -31,16 +31,11 @@ typedef struct	s_hreq_header
 	std::string cache_control;
 }				t_hreq_header;
 
-typedef struct	s_hreq_body
-{
-	std::string	line;
-}				t_hreq_body;
-
 typedef struct	s_http_request
 {
 	t_hreq_firstline	firstline;
 	t_hreq_header		header;
-	t_hreq_body			body;
+	std::string			body;
 	int					status_code;
 	bool				error;
 }				t_http_request;
@@ -50,11 +45,13 @@ typedef struct	s_http_request
 void	http_request_parser(char *buffer, t_http_request &http_req_struct);
 
 /* UTILS */
-//void	print_request_firstline(t_hreq_firstline const & hreq_firstline_struct);
-//void	print_request_header(t_hreq_header const & hreq_header_struct);
+void	print_request_firstline(t_hreq_firstline const & hreq_firstline_struct);
+void	print_request_header(t_hreq_header const & hreq_header_struct);
+void	print_request_body(std::string body);
+void	print_request(t_http_request const & req);
 
 std::string	remove_whitespaces(std::string str);
-void tokenize(std::string const &str, const char delim, std::vector<std::string> &out);
-bool	is_line_in(std::string s1, std::string s2);
+void 		tokenize(std::string const &str, const char delim, std::vector<std::string> &out);
+bool		is_line_in(std::string s1, std::string s2);
 
 #endif

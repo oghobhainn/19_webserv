@@ -68,14 +68,15 @@ int TestServer::accepter(int socket, std::list<class Server> serv_list)
 
 void TestServer::handler()
 {
-    // std::cout << _buffer << std::endl;
-
     t_http_request  http_req_struct;
     std::string     http_response_firstline;
     http_request_parser(_buffer, http_req_struct);
 
     Http_response test;
     test.Http_response::build_http_response(http_req_struct);
+
+    print_response(test);
+
 }
 
 void TestServer::readsocket(int socket)
@@ -86,7 +87,6 @@ void TestServer::readsocket(int socket)
     if ((ret = recv(socket, _buffer, 2048, 0)) == -1)
     {
         std::cout << "Error with recv" << std::endl;
-
     }
     else if (ret == 0)
     {
@@ -96,7 +96,6 @@ void TestServer::readsocket(int socket)
     else
     {
         _buffer[msgsize - 1] = 0;
-        std::cout << _buffer << std::endl;
     }
 }
 
@@ -146,6 +145,7 @@ void TestServer::launch(std::list<class Server> serv_list)
                     handler();
                     responder(i);
                     FD_CLR(i, &writing_socket);
+
                 }
             }
         }

@@ -44,11 +44,13 @@ class	Http_response{
 		// void	set_retry_after			( std::string const & retry_after );
 		// void	set_www_authenticate	( std::string const & www_authenticate );
 
-		void				init_response( int status_code, t_http_request const http_req );
-		void				build_http_response( t_http_request const http_req_struct);
-		std::string			GET_method( t_http_request const http_req_struct );
-		std::string			POST_method( t_http_request const http_req_struct );
-		std::string			DELETE_method( t_http_request const http_req_struct );
+		void				init_response( int status_code, t_http_request const & http_req );
+		void				build_http_response( t_http_request const & http_req_struct);
+		std::string			GET_method( t_http_request const & http_req_struct );
+		std::string			POST_method( t_http_request const & http_req_struct );
+		std::string			DELETE_method( t_http_request const & http_req_struct );
+		std::string			error_page( int error_nbr, t_http_request const & http_req_struct );
+		std::string			ERROR_method( t_http_request const & http_req_struct );
 	
 	private:
 		std::string		_firstline;
@@ -72,5 +74,7 @@ class	Http_response{
 
 		std::string		_body;
 };
+
+void	print_response(Http_response const & resp);
 
 #endif

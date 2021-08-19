@@ -32,9 +32,6 @@ void	Http_response::set_firstline		( int const & status_code )
 		case 403:
 			status_message = "403 Forbidden";
 			break;
-		// case 404:
-			// status_message = "404 Not Found";
-			// break;
 		case 405:
 			status_message = "405 Method not Allowed";
 			break;
@@ -146,7 +143,43 @@ std::string const & Http_response::get_last_modified	( void ) const { return thi
 std::string const & Http_response::get_body				( void ) const { return this->_body; }
 
 
-void	Http_response::init_response( int status_code, t_http_request const http_req )
+std::string		Http_response::ERROR_method( t_http_request const & http_req_struct )
+{
+	std::string		ERROR_response;
+
+	if (http_req_struct.firstline.complete_urlpath == "TODOTODO")
+		std::cout << "TODODODO" << std::endl;
+	// ERROR_response = this->Http_response::get_firstline() + "\r\n"
+	// 				+ this->Http_response::get_server() + "\r\n"
+	// 				+ this->Http_response::get_date() + "\r\n"
+	// 				+ this->Http_response::get_content_type() + "\r\n"
+	// 				// + this->Http_response::get_content_length() + "\r\n"
+	// 				// + this->Http_response::get_body() + "\r\n"
+	ERROR_response = std::string("THIS IS THE ERROR_method RESPONSE") + "\r\n" + this->Http_response::get_server() + "\r\n";
+	return ERROR_response;
+}
+
+std::string		Http_response::error_page(int error_nbr, t_http_request const & http_req_struct )
+{
+	std::string		path;
+	std::ifstream	fd;
+
+	if (error_nbr == 404)
+		std::cout << "\n\n" << std::endl;
+	path = "default/error/404.html";
+	// path = "default/error/" + std::to_string(error_nbr) + ".html";
+	fd.open(path);
+	if (!fd.is_open())
+	{
+		fd.close();
+		std::cout << "Error: file opening " << path << std::endl;
+		//throw internal_server_error_exc();
+	}
+	fd.close();
+	return ERROR_method(http_req_struct);
+}
+
+void			Http_response::init_response( int status_code, t_http_request const & http_req )
 {
 	this->Http_response::set_firstline( status_code);
 	if (status_code == 405) // method not allowed
@@ -165,12 +198,15 @@ void	Http_response::init_response( int status_code, t_http_request const http_re
 
 }
 
-std::string			Http_response::GET_method(t_http_request const http_req_struct)
+std::string		Http_response::GET_method(t_http_request const & http_req_struct)
 {
 	std::ifstream	fd;
 	std::string		GET_response;
 
-	fd.open(http_req_struct.firstline.complete_urlpath);
+	// fd.open(http_req_struct.firstline.complete_urlpath);
+	fd.open("./frontend/index.html");//TODO
+	PC("complete urlpath:" ,http_req_struct.firstline.complete_urlpath);
+
 	if (!fd.is_open())
 	{
 		fd.close();
@@ -179,7 +215,6 @@ std::string			Http_response::GET_method(t_http_request const http_req_struct)
 		//TODO - construire message d'erreur et le renvoyer
 		//return error_page(404, http_req_struct.firstline.method, conf);
 	}
-	std::cout << "didnt exit, sooooo i guess we found the file?" << std::endl;
 	GET_response = this->Http_response::get_firstline() + "\r\n"
 					+ std::string(this->Http_response::get_allow())
 					+ this->Http_response::get_date() + "\r\n"
@@ -199,7 +234,7 @@ std::string			Http_response::GET_method(t_http_request const http_req_struct)
 	return GET_response;
 }
 
-std::string		Http_response::POST_method(t_http_request const http_req_struct)
+std::string		Http_response::POST_method(t_http_request const & http_req_struct)
 {
 	std::string		POST_response;
 
@@ -213,7 +248,7 @@ std::string		Http_response::POST_method(t_http_request const http_req_struct)
 	return POST_response;
 }
 
-std::string		Http_response::DELETE_method(t_http_request const http_req_struct)
+std::string		Http_response::DELETE_method(t_http_request const & http_req_struct)
 {
 	std::string		DELETE_response;
 
@@ -226,7 +261,7 @@ std::string		Http_response::DELETE_method(t_http_request const http_req_struct)
 	return DELETE_response;
 }
 
-void			Http_response::build_http_response(t_http_request const http_req_struct)
+void			Http_response::build_http_response(t_http_request const & http_req_struct)
 {
 	if (http_req_struct.error == false)
 	{
