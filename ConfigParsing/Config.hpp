@@ -21,7 +21,34 @@
 
 #define P(x) std::cout << x << std::endl
 
-class Location
+class CGI
+{
+    public:
+        CGI();
+        ~CGI();
+
+        bool active;
+        std::string SCRIPT_NAME;
+        std::string AUTH_TYPE;
+        std::string CONTENT_LENGTH;
+        std::string CONTENT_TYPE;
+        std::string GATEWAY_INTERFACE;
+        std::string PATH_INFO;
+        std::string PATH_TRANSLATED;
+        std::string QUERY_STRING;
+        std::string REMOTE_ADDR;
+        std::string REMOTE_INDENT;
+        std::string REMOTE_USER;
+        std::string REQUEST_METHOD;
+        std::string REQUEST_URI;
+        // std::string SERVER_NAME;
+        // std::string SERVER_PORT;
+        std::string SERVER_PROTOCOL;
+        std::string SERVER_SOFTWARE;
+        std::string SECRET;
+};
+
+class Location : public CGI
 {
 	public:
 		Location();
@@ -37,10 +64,9 @@ class Location
 		bool					post_method;
 		bool					delete_method;
         std::string             redirection;
-
         std::string             directory_listing;
         std::string             default_file_if_request_directory;
-        // t_CGI CGI; //If equal to NULL no CGI server, but http static content server
+        CGI                     _CGI;
 };
 
 class Server : public Location
@@ -52,22 +78,18 @@ class Server : public Location
         std::string			    port;
 		std::string				root;
         std::string			    server_name;
-        
-        size_t				    body_size_limit;
-        // std::list<std::string>  locations;
-        ListeningSocket         *_socket; ////////////////////////////
-        fd_set                  socket_client; //////////////////////
-
         std::string             default_error_page;
         int				        client_body_size;
 		int 					nb_loc;
-
+        fd_set                  socket_client;
+        ListeningSocket         *_socket;
 
     public:
         Server();
         ~Server();
-		Location *locations;
         Server& operator=(Server const& copy);
+
+		Location *locations;
         
         void setFullStr(std::string const str);
         std::string getFullStr() const;

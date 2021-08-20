@@ -33,20 +33,31 @@ std::list<class Server> get_serv_list(std::string full_str)
     return serv_list;
 }
 
+void set_cgi(Location *it, int beg, int end, std::string str_location)
+{
+    std::string str_without_cgi;
+
+    str_without_cgi = str_location.substr(beg + 13, len(str_location) - beg - 13 - (len(str_location) - end));
+    if (str_without_cgi.find("SCRIPT_NAME") != std::string::npos)
+        it->_CGI.SCRIPT_NAME = str_without_cgi.substr(11, len(str_without_cgi));
+    if (str_without_cgi.find("AUTH_TYPE") != std::string::npos)
+        it->_CGI.AUTH_TYPE = str_without_cgi.substr(9, len(str_without_cgi));
+}
+
 void parse_loc(std::list<class Server> &serv_list)
 {
     std::string             str_methods;
-    std::string::size_type  index = 0;
     std::string             file_ext;
     std::string             str_location;
     Location *struct_loc = NULL;
-    int found = 0;
+    std::string::size_type  index = 0;
+    int i = 1;
+    int j = 0;
     int pos;
     int	pos_next;
     int beg = 0;
     int end = 0;
-    int i = 1;
-    int j = 0;
+    int found = 0;
 
     for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
     {
@@ -113,6 +124,12 @@ void parse_loc(std::list<class Server> &serv_list)
                 end = str_location.find(";", beg);
                 it->locations[j].default_file_if_request_directory = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
             }
+            if (str_location.find("fastcgi_param") != std::string::npos)
+            {
+                beg = str_location.find("fastcgi_param");
+                end = str_location.find(";", beg);
+                set_cgi(&it->locations[j], beg, end, str_location);
+            }
             i++;
             j++;
         }
@@ -165,12 +182,8 @@ std::list<class Server> parseConfig(std::string const path)
 
 int main(int argc, char **argv)
 {
-
-    std::list<class Server> serv_list;
+    std::list<Server> serv_list;
     std::vector<int> set_of_port;
-
-    //std::list<Server> serv_list;
-
 
     if (argc != 2)
     {
@@ -180,27 +193,21 @@ int main(int argc, char **argv)
     serv_list = parseConfig(argv[1]);
     
     ///////////////////// Print results /////////////////////////
-    std::string test2;
+    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    {
+        std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
+        std::cout << "Port: " << it->getPort() << std::endl;
+        std::cout << "Host: " << it->getHost() << std::endl;
+        std::cout << "Root: " << it->getRoot() << std::endl;
+        std::cout << "Ser Name: " << it->getServerName() << std::endl;
+        std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
+        std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
+		it->getLocations();
+        std::cout << "---------------------- END --------------------------------" << std::endl;
+    }
 
-    // for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    // {
-    //     std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
-    //     std::cout << "Port: " << it->getPort() << std::endl;
-    //     std::cout << "Host: " << it->getHost() << std::endl;
-    //     std::cout << "Root: " << it->getRoot() << std::endl;
-    //     std::cout << "Ser Name: " << it->getServerName() << std::endl;
-    //     std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
-    //     std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
-        
-
-
-	// 	it->getLocations();
-    //     std::cout << "---------------------- END --------------------------------" << std::endl;
-    // }
-
-
-    for (std::list<class Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
-        set_of_port.push_back(stoi(it2->getPort()));
+    // for (std::list<class Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
+    //     set_of_port.push_back(stoi(it2->getPort()));
 
     //// TO DO
    
@@ -212,12 +219,9 @@ int main(int argc, char **argv)
     //      - CGI
     //      - make the route able to accept uploaded files and configure where it should be saved
 
-
-
-
-
     ////////////////////// Server ////////////////////////////////
-    TestServer t(serv_list);
+    // TestServer t(serv_list);
+    
     return 0;
 }
 
