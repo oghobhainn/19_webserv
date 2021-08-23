@@ -139,11 +139,11 @@ void TestServer::launch(std::list<class Server> serv_list)
 				sock_tmp = accepter(i, serv_list);
                 FD_SET(sock_tmp, &exec_socket);
                 readsocket(sock_tmp);
-				std::cout << "hello 1" << std::endl;
+				// std::cout << "hello 1" << std::endl;
                 handler();
-				std::cout << "hello 2" << std::endl;
+				// std::cout << "hello 2" << std::endl;
                 responder(sock_tmp);
-				std::cout << "hello 3" << std::endl;
+				// std::cout << "hello 3" << std::endl;
                 remove_connecting_socket(sock_tmp);
                 FD_CLR(sock_tmp, &exec_socket);
             }
