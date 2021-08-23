@@ -1,4 +1,5 @@
-#include "../main.hpp"
+#include "Request.hpp"
+#include "RequestUtils.hpp"
 
 std::vector<std::string>		Request::initMethods()
 {
@@ -53,12 +54,6 @@ const std::string&							Request::getQuery() const 			{ return this->_query; }
 const std::string&							Request::getRaw() const 			{ return this->_raw; }
 //const std::list<std::pair<std::string, float> >&	Request::getLang() const	{ return this->_lang; }
 
-std::string&					pop(std::string& str)
-{
-	if (str.size())
-		str.resize(str.size() - 1);
-	return str;
-}
 
 void	Request::setBody(const std::string& str)
 {

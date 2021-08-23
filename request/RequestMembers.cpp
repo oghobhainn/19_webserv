@@ -1,18 +1,18 @@
-#include "../main.hpp"
+#include "Request.hpp"
+#include "RequestUtils.hpp"
 
 std::ostream &	operator<<(std::ostream& os, const Request & re)
 {
 	std::map<std::string, std::string>::const_iterator	it;
 
-	os << "Method : " << re.getMethod() << " |\tHTTP version : ";
-	os << re.getVersion() << '\n';
-	os << "Port : " << re.getPort() << '\n';
-	os << "Path : " << re.getPath() << '\n';
+	os << "Method : " << re.getMethod() << " |\tHTTP version : [" << re.getVersion() << "]" << std::endl;
+	os << "Port : " << re.getPort() << std::endl;
+	os << "Path : " << re.getPath() << std::endl;
 
 	for (it = re.getHeaders().begin(); it != re.getHeaders().end(); it++)
-		os << it->first << ": " << it->second << '\n';
+		os << it->first << ": " << it->second << std::endl;
 
-	os << '\n' << "Request body :\n" << re.getBody() << '\n';
+	os << '\n' << "Request body :\n" << re.getBody() << std::endl;
 
 	return os;
 }
@@ -72,7 +72,7 @@ int			Request::readPath(std::string const & line, size_t i)
 		PE("No PATH / HTTP version");
 		return 400;
 	}
-	if (( i = line.find_first_not_of(' ', j)) == std::string::npos)
+	if (( i = line.find_first_of(' ', j)) == std::string::npos)
 	{
 		this->_ret = 400;
 		PE("No HTTP version");

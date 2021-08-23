@@ -1,5 +1,5 @@
 #include "TestServer.hpp"
-#include "../../Request/Request.hpp"
+
 
 // TestServer::TestServer()
 // {
@@ -79,6 +79,8 @@ void TestServer::handler()
 
     P("request : ");
     std::cout << req << std::endl;
+
+    Response response;
     // t_http_request  http_req_struct;
     // std::string     http_response_firstline;
     // http_request_parser(_buffer, http_req_struct);

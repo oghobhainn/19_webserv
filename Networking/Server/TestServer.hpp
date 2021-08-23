@@ -6,9 +6,12 @@
 #include <vector>
 
 // #include "SimpleServer.hpp"
-#include "../../main.hpp"
+#include "SimpleServer.hpp"
 #include "../Sockets/ListeningSocket.hpp"
 #include "../../ConfigParsing/Config.hpp"
+#include "../../Request/Request.hpp"
+#include "../../Response/Response.hpp"
+#include "../../Response/ResponseHeader.hpp"
 
 class TestServer
 {

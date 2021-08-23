@@ -1,4 +1,5 @@
-#include "../main.hpp"
+#include "Request.hpp"
+#include "RequestUtils.hpp"
 
 int								countSubstr(const std::string& str, const std::string& sub)
 {

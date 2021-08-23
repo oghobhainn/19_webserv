@@ -85,11 +85,8 @@ class Server : public Location
         std::string             cgi_param;
         int				        client_body_size;
 		int 					nb_loc;
-<<<<<<< HEAD
-=======
         fd_set                  socket_client;
         ListeningSocket         *_socket;
->>>>>>> 6dfee6f257331e25233a26609809a34b555736ef
 
     public:
         Server();
@@ -135,14 +132,11 @@ class Server : public Location
         void setClientBodySize(std::string const str);
         int getClientBodySize() const;
 
-<<<<<<< HEAD
         void setAllowedMethods();
         std::set<std::string> getAllowedMethods() const;
 
-=======
         void setCgiParam(std::string const str);
         std::string getCgiParam() const;
->>>>>>> 6dfee6f257331e25233a26609809a34b555736ef
 };
 
 

@@ -226,7 +226,6 @@ fd_set Server::getSocketClient()
 	return (socket_client);
 }
 
-<<<<<<< HEAD
 void	Server::setAllowedMethods()
 {
 	if (get_method == true)
@@ -243,10 +242,6 @@ std::set<std::string>	Server::getAllowedMethods() const
 {
 	return _allowed_methods;
 }
-=======
-
->>>>>>> 6dfee6f257331e25233a26609809a34b555736ef
-
 //////////////////////////////////////////////////////////////////////////////////////////
 
 std::ostream& operator<<(std::ostream& os, const Server& item)
