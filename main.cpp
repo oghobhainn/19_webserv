@@ -169,9 +169,6 @@ int main(int argc, char **argv)
     std::list<class Server> serv_list;
     std::vector<int> set_of_port;
 
-    //std::list<Server> serv_list;
-
-
     if (argc != 2)
     {
         std::cout << "ERROR: Wrong Arguments" << std::endl;
