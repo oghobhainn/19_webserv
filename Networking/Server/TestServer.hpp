@@ -40,6 +40,7 @@ class TestServer
         // void set_socket(int new_socket);
         fd_set get_connecting_socket();
         void add_connecting_socket(int connecting_socket);
+        void remove_connecting_socket(int connecting_socket);
 
         ListeningSocket *get_socket();
         ListeningSocket *create_sub_server(int domain, int service, int protocol, int port, u_long interface, int bklg);

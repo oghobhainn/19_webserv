@@ -10,10 +10,11 @@
 //     launch();
 // }
 
+
 TestServer::TestServer(std::list<class Server> serv_list)
 {
     ListeningSocket *socket;
-    
+
     for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
     {
         socket = create_sub_server(AF_INET, SOCK_STREAM, 0, stoi(it->getPort()), INADDR_ANY, 10);
@@ -29,6 +30,7 @@ ListeningSocket *TestServer::create_sub_server(int domain, int service, int prot
      return(new ListeningSocket(domain, service, protocol, port, interface, bklg));
 }
 
+<<<<<<< HEAD
 TestServer::~TestServer()
 {
     
@@ -40,16 +42,18 @@ void TestServer::set_socket(int new_socket)
 // {
 //     _new_socket = new_socket;
 // }
+=======
+>>>>>>> 51d570e258320556a9e451e3b88377ce062d9924
 
 void TestServer::add_connecting_socket(int connecting_socket)
 {
     FD_SET(connecting_socket, &_set_of_socket);
 }*/
 
-// int TestServer::get_new_socket()
-// {
-//     return (_new_socket);
-// }
+void TestServer::remove_connecting_socket(int connecting_socket)
+{
+    FD_CLR(connecting_socket, &_set_of_socket);
+}
 
 fd_set TestServer::get_connecting_socket()
 {
@@ -68,7 +72,7 @@ int TestServer::accepter(int socket, std::list<class Server> serv_list)
     }
     struct sockaddr_in address = it->getSocket()->get_address();
     int addrlen = sizeof(address);
-    sock_tmp = accept(it->getSocket()->get_sock(), (struct sockaddr *)&address, (socklen_t *)&addrlen);
+    sock_tmp = accept(socket, (struct sockaddr *)&address, (socklen_t *)&addrlen);
     it->addSocketClient(sock_tmp);
     return (sock_tmp);
 }
@@ -113,48 +117,108 @@ void TestServer::responder(int socket)
     close(socket);
 }
 
+
 void TestServer::launch(std::list<class Server> serv_list)
 {
-    fd_set ready_sockets;
-    fd_set reading_socket;
     fd_set writing_socket;
+    fd_set reading_socket;
+    fd_set server_socket;
+    fd_set exec_socket;
     int ret;
     int sock_tmp = 0;
 
-    FD_ZERO(&writing_socket);
-    reading_socket = get_connecting_socket();
+	struct timeval timeout = {1, 0};
+    server_socket = get_connecting_socket();
     while(true)
     {
-        std::cout << "=========== Waiting ==========" << std::endl;
-        ready_sockets = reading_socket;
-        if ((ret = select(FD_SETSIZE, &reading_socket, &writing_socket, nullptr, nullptr)) < 0)
+        writing_socket = server_socket;
+        reading_socket = server_socket;
+        FD_ZERO(&exec_socket);
+        ret = select(FD_SETSIZE, &reading_socket, &writing_socket, nullptr, &timeout);
+        if (ret < 0)
         {
             std::cout << "Failure with select " << std::endl;
             exit(EXIT_FAILURE);
         }
+        if (ret == 0)
+            launch(serv_list);
+
         for (int i = 0; i < FD_SETSIZE; i++)
         {
-            if (FD_ISSET(i, &reading_socket) || FD_ISSET(i, &writing_socket))
+            // std::cout << i << std::endl;
+            if (FD_ISSET(i, &server_socket) || FD_ISSET(i, &exec_socket))
             {
-                // if i is in set_fd of read
-                if (FD_ISSET(i, &reading_socket))
-                {
-                    // this is a new connection
-                    sock_tmp = accepter(i, serv_list);
-                    FD_SET(sock_tmp, &writing_socket);
-                    FD_CLR(i, &reading_socket);
-                }
-                // if i is in socket of write
-                else
-                {
-                    // do whatever we do with the connection
-                    readsocket(i);
-                    handler();
-                    responder(i);
-                    FD_CLR(i, &writing_socket);
-
-                }
+                // do whatever we do with the connection
+                std::cout << "================================================================= writing socket : " << i << std::endl;
+				sock_tmp = accepter(i, serv_list);
+                FD_SET(sock_tmp, &exec_socket);
+                readsocket(sock_tmp);
+				// std::cout << "hello 1" << std::endl;
+                handler();
+				// std::cout << "hello 2" << std::endl;
+                responder(sock_tmp);
+				// std::cout << "hello 3" << std::endl;
+                remove_connecting_socket(sock_tmp);
+                FD_CLR(sock_tmp, &exec_socket);
             }
         }
     }
 }
+
+// void TestServer::launch(std::list<class Server> serv_list)
+// {
+//     fd_set writing_socket;
+//     fd_set reading_socket;
+//     fd_set server_socket;
+//     fd_set exec_socket;
+//     int ret;
+//     int sock_tmp = 0;
+
+// 	struct timeval timeout = {1, 0};
+//     server_socket = get_connecting_socket();
+//     writing_socket = server_socket;
+//     reading_socket = server_socket;
+//     while(true)
+//     {
+//         FD_ZERO(&exec_socket);
+//         ret = select(FD_SETSIZE, &reading_socket, &writing_socket, nullptr, &timeout);
+//         if (ret < 0)
+//         {
+//             std::cout << "Failure with select " << std::endl;
+//             exit(EXIT_FAILURE);
+//         }
+//         if (ret == 0)
+//             launch(serv_list);
+//         for (int i = 0; i < FD_SETSIZE; i++)
+//         {
+//             // std::cout << i << std::endl;
+//             if (FD_ISSET(i, &server_socket) || FD_ISSET(i, &exec_socket))
+//             {
+//                 // if i is in set_fd of read
+//                 if (FD_ISSET(i, &server_socket))
+//                 {
+// 					std::cout << "================================================================= reading socket : " << i << std::endl;
+//                     // this is a new connection
+//                     sock_tmp = accepter(i, serv_list);
+//                     FD_SET(sock_tmp, &exec_socket);
+//                     // FD_CLR(i, &reading_socket);
+// 					std::cout << "================================================================= writing socket after being accepted : " << sock_tmp << std::endl;
+//                 }
+//                 // if i is in socket of write
+//                 else
+//                 {
+//                     // do whatever we do with the connection
+//                     std::cout << "================================================================= writing socket : " << i << std::endl;
+// 					readsocket(i);
+// 					std::cout << "hello 1" << std::endl;
+//                     handler();
+// 					std::cout << "hello 2" << std::endl;
+//                     responder(i);
+// 					std::cout << "hello 3" << std::endl;
+//                     remove_connecting_socket(i);
+//                     FD_CLR(i, &exec_socket);
+//                 }
+//             }
+//         }
+//     }
+// }
