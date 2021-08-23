@@ -51,6 +51,8 @@ int TestServer::accepter(int socket, std::list<class Server> serv_list)
     int sock_tmp;
     std::list<Server>::iterator it;
 
+
+    std::cout << socket << std::endl;
     for (it = serv_list.begin(); it != serv_list.end(); ++it)
     {
         if (socket == it->getSocket()->get_sock())
@@ -58,7 +60,10 @@ int TestServer::accepter(int socket, std::list<class Server> serv_list)
     }
     struct sockaddr_in address = it->getSocket()->get_address();
     int addrlen = sizeof(address);
+    std::cout << "hello 1" << std::endl;
     sock_tmp = accept(socket, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+    std::cout << "hello 2" << std::endl;
+    fcntl(sock_tmp, F_SETFL, O_NONBLOCK);
     it->addSocketClient(sock_tmp);
     return (sock_tmp);
 }
@@ -104,22 +109,82 @@ void TestServer::responder(int socket)
 }
 
 
+// void TestServer::launch(std::list<class Server> serv_list)
+// {
+//     fd_set server_socket;
+//     fd_set writing_socket;
+//     fd_set reading_socket;
+//     fd_set client_socket;
+//     int ret;
+//     int sock_tmp = 0;
+
+// 	struct timeval timeout = {1, 0};
+//     server_socket = get_connecting_socket();
+//     FD_ZERO(&client_socket);
+//     while(true)
+//     {
+//         FD_ZERO(&writing_socket);
+//         FD_ZERO(&reading_socket);
+//         ret = select(FD_SETSIZE, &reading_socket, &writing_socket, nullptr, &timeout);
+//         if (ret < 0)
+//         {
+//             std::cout << "Failure with select " << std::endl;
+//             exit(EXIT_FAILURE);
+//         }
+// 		std::cout << "hello 1" << std::endl;
+//         if (ret == 0)
+//             launch(serv_list);
+//         std::cout << "hello 2" << std::endl;
+//         for (int i = 0; i < FD_SETSIZE; i++)
+//         {
+//             // std::cout << i << std::endl;
+
+
+
+//             /////////////////// solution transformer fd_set en tab de set
+//             if (FD_ISSET(i, &reading_socket) || FD_ISSET(i, &reading_socket))
+//             {
+//                 std::cout << i << std::endl;
+//                 if (FD_ISSET(i, &reading_socket))
+//                 // do whatever we do with the connection
+//                 {
+//                     std::cout << "================================================================= reading socket : " << i << std::endl;
+// 				    sock_tmp = accepter(i, serv_list);
+//                     FD_SET(sock_tmp, &client_socket);
+//                 }
+//                 else
+//                 {
+//                     std::cout << "================================================================= writing socket : " << i << std::endl;
+//                     readsocket(i);
+// 				    // std::cout << "hello 1" << std::endl;
+//                     handler();
+// 				    // std::cout << "hello 2" << std::endl;
+//                     responder(i);
+// 				    // std::cout << "hello 3" << std::endl;
+//                     remove_connecting_socket(i);
+//                     FD_CLR(i, &client_socket);
+//                 }
+//             }
+//         }
+//     }
+// }
+
 void TestServer::launch(std::list<class Server> serv_list)
 {
     fd_set writing_socket;
     fd_set reading_socket;
     fd_set server_socket;
-    fd_set exec_socket;
+    fd_set client_socket;
     int ret;
     int sock_tmp = 0;
 
 	struct timeval timeout = {1, 0};
     server_socket = get_connecting_socket();
+    writing_socket = server_socket;
+    reading_socket = server_socket;
     while(true)
     {
-        writing_socket = server_socket;
-        reading_socket = server_socket;
-        FD_ZERO(&exec_socket);
+        FD_ZERO(&client_socket);
         ret = select(FD_SETSIZE, &reading_socket, &writing_socket, nullptr, &timeout);
         if (ret < 0)
         {
@@ -128,83 +193,36 @@ void TestServer::launch(std::list<class Server> serv_list)
         }
         if (ret == 0)
             launch(serv_list);
-
         for (int i = 0; i < FD_SETSIZE; i++)
         {
             // std::cout << i << std::endl;
-            if (FD_ISSET(i, &server_socket) || FD_ISSET(i, &exec_socket))
+            if (FD_ISSET(i, &server_socket) || FD_ISSET(i, &client_socket))
             {
-                // do whatever we do with the connection
-                std::cout << "================================================================= writing socket : " << i << std::endl;
-				sock_tmp = accepter(i, serv_list);
-                FD_SET(sock_tmp, &exec_socket);
-                readsocket(sock_tmp);
-				// std::cout << "hello 1" << std::endl;
-                handler();
-				// std::cout << "hello 2" << std::endl;
-                responder(sock_tmp);
-				// std::cout << "hello 3" << std::endl;
-                remove_connecting_socket(sock_tmp);
-                FD_CLR(sock_tmp, &exec_socket);
+                // if i is in set_fd of read
+                if (FD_ISSET(i, &server_socket) /* && connection client */)
+                {
+					std::cout << "================================================================= reading socket : " << i << std::endl;
+                    // this is a new connection
+                    sock_tmp = accepter(i, serv_list);
+                    FD_SET(sock_tmp, &client_socket);
+                    // FD_CLR(i, &reading_socket);
+					std::cout << "================================================================= writing socket after being accepted : " << sock_tmp << std::endl;
+                }
+                // if i is in socket of write
+                else
+                {
+                    // do whatever we do with the connection
+                    std::cout << "================================================================= writing socket : " << i << std::endl;
+					readsocket(i);
+					std::cout << "hello 1" << std::endl;
+                    handler();
+					std::cout << "hello 2" << std::endl;
+                    responder(i);
+					std::cout << "hello 3" << std::endl;
+                    remove_connecting_socket(i);
+                    FD_CLR(i, &client_socket);
+                }
             }
         }
     }
 }
-
-// void TestServer::launch(std::list<class Server> serv_list)
-// {
-//     fd_set writing_socket;
-//     fd_set reading_socket;
-//     fd_set server_socket;
-//     fd_set exec_socket;
-//     int ret;
-//     int sock_tmp = 0;
-
-// 	struct timeval timeout = {1, 0};
-//     server_socket = get_connecting_socket();
-//     writing_socket = server_socket;
-//     reading_socket = server_socket;
-//     while(true)
-//     {
-//         FD_ZERO(&exec_socket);
-//         ret = select(FD_SETSIZE, &reading_socket, &writing_socket, nullptr, &timeout);
-//         if (ret < 0)
-//         {
-//             std::cout << "Failure with select " << std::endl;
-//             exit(EXIT_FAILURE);
-//         }
-//         if (ret == 0)
-//             launch(serv_list);
-//         for (int i = 0; i < FD_SETSIZE; i++)
-//         {
-//             // std::cout << i << std::endl;
-//             if (FD_ISSET(i, &server_socket) || FD_ISSET(i, &exec_socket))
-//             {
-//                 // if i is in set_fd of read
-//                 if (FD_ISSET(i, &server_socket))
-//                 {
-// 					std::cout << "================================================================= reading socket : " << i << std::endl;
-//                     // this is a new connection
-//                     sock_tmp = accepter(i, serv_list);
-//                     FD_SET(sock_tmp, &exec_socket);
-//                     // FD_CLR(i, &reading_socket);
-// 					std::cout << "================================================================= writing socket after being accepted : " << sock_tmp << std::endl;
-//                 }
-//                 // if i is in socket of write
-//                 else
-//                 {
-//                     // do whatever we do with the connection
-//                     std::cout << "================================================================= writing socket : " << i << std::endl;
-// 					readsocket(i);
-// 					std::cout << "hello 1" << std::endl;
-//                     handler();
-// 					std::cout << "hello 2" << std::endl;
-//                     responder(i);
-// 					std::cout << "hello 3" << std::endl;
-//                     remove_connecting_socket(i);
-//                     FD_CLR(i, &exec_socket);
-//                 }
-//             }
-//         }
-//     }
-// }

@@ -12,7 +12,6 @@
 #include <sys/select.h>
 
 #include "ConfigParsing/Config.hpp"
-#include "Networking/Server/SimpleServer.hpp"
 #include "Networking/Server/TestServer.hpp"
 #include "Networking/Sockets/SimpleSocket.hpp"
 #include "Networking/Sockets/ListeningSocket.hpp"

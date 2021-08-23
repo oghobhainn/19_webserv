@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
+#include <fcntl.h>
 
 // #include "SimpleServer.hpp"
 #include "../../main.hpp"
