@@ -1,10 +1,6 @@
 #ifndef RESPONSEHEADER_HPP
 # define RESPONSEHEADER_HPP
 
-//response header hpp
-
-
-
 # include "../main.hpp"
 
 class ResponseHeader {
@@ -31,10 +27,10 @@ public:
 	void			setWwwAuthenticate(int code);
 
 	// Member functions
-	std::string		getHeader(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang);
+	std::string		getHeader(size_t size, const std::string& path, int code, std::string type, const std::string& Location, const std::string& lang);
 	std::string		notAllowed(std::set<std::string> methods, const std::string& path, int code, const std::string& lang);
 	std::string		writeHeader(void);
-	void			setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang);
+	void			setValues(size_t size, const std::string& path, int code, std::string type, const std::string& Location, const std::string& lang);
 	void			resetValues(void);
 	std::string		getStatusMessage(int code);
 

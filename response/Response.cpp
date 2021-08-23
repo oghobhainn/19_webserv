@@ -1,10 +1,10 @@
 #include "Response.hpp"
+#include "ResponseHeader.hpp"
 #include "../Cgi/CgiHandler.hpp"
-
-//Response
 
 // Static Assets
 
+// std::map<std::string, void (Response::*)(Request &, serverig &)>	Response::initMethods()
 std::map<std::string, void (Response::*)(Request &, Server &)>	Response::initMethods()
 {
 	std::map<std::string, void (Response::*)(Request &, Server &)> map;
@@ -20,46 +20,53 @@ std::map<std::string, void (Response::*)(Request &, Server &)> Response::_method
 
 // Member functions
 
-void			Response::call(Request & request, Server & serv)
+void			Response::call(Request & request, Server & server)
 {
-	_errorMap = serv.getErrorPage();
-	_isAutoIndex = serv.getAutoIndex();
+	_error = server.getDefaultErrorPage();
+	// _errorMap = server.getErrorPage();
+	
+	// _isAutoIndex = server.getAutoIndex(); //TODO
+	// _isAutoIndex = server.getAutoIndex();
+	
 	_code = request.getRet();
-	_host = serv.getHost();
-	_port = serv.getPort();
-	_path = serv.getPath();
+	_host = server.getHost();
+	_port = server.getPort();
+	// _hostPort.host = server.getHostPort().host;
+	// _hostPort.port = server.getHostPort().port;
+	// _path = server.getPath();
+	//_path = server.getPath(); // TODO
 
-	if (serv.getAllowedMethods().find(request.getMethod()) == serv.getAllowedMethods().end())
+	if (server.getAllowedMethods().find(request.getMethod()) == server.getAllowedMethods().end())
 		_code = 405;
-	else if (serv.getClientBodySize() < request.getBody().size())
+	else if (server.getClientBodySize() < request.getBody().size())
 		_code = 413;
 
 	if (_code == 405 || _code == 413)
 	{
 		ResponseHeader	head;
 
-		// _response = head.notAllowed(serv.getAllowedMethods(), serv.getContentLocation(), _code, serv.getLang()) + "\r\n";
-		_response = head.notAllowed(serv.getAllowedMethods(), serv.getContentLocation(), _code, "\r\n";
+		// _response = head.notAllowed(server.getAllowedMethods(), server.getLocations(), _code, server.getLang() + "\r\n";
+		_response = head.notAllowed(server.getAllowedMethods(), server.getLocations(), _code, "\r\n");
 
 		return ;
 	}
 
 
-	(this->*Response::_method[request.getMethod()])(request, serv);
+	(this->*Response::_method[request.getMethod()])(request, server);
 }
 
 // Methods
-void			Response::getMethod(Request & request, Server & serv)
+void			Response::getMethod(Request & request, Server & server)
 {
 	ResponseHeader	head;
 
-	if (serv.getCgiPass() != "")
+	if (server.getCgiPass() != "")
 	{
-		CgiHandler	cgi(request, serv);
+		CgiHandler	cgi(request, server);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
-		_response = cgi.executeCgi(serv.getCgiPass());
+		_response = cgi.executeCgi(server.getCgiPass());
 
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
@@ -82,20 +89,24 @@ void			Response::getMethod(Request & request, Server & serv)
 	if (_code == 500)
 		_response = this->readHtml(_errorMap[_code]);
 
-	_response = head.getHeader(_response.size(), _path, _code, _type, serv.getContentLocation(), "\r\n" + _response;
+	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), server.getLang()) + "\r\n" + _response;
+	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
+	_response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), "\r\n" + _response);
+
+
 }
 
-void			Response::postMethod(Request & request, Server & serv)
+void			Response::postMethod(Request & request, Server & server)
 {
 	ResponseHeader	head;
 
-	if (serv.getCgiPass() != "")
+	if (server.getCgiPass() != "")
 	{
-		CgiHandler	cgi(request, serv);
+		CgiHandler	cgi(request, server);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
-		_response = cgi.executeCgi(serv.getCgiPass());
+		_response = cgi.executeCgi(server.getCgiPass());
 
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
@@ -118,10 +129,12 @@ void			Response::postMethod(Request & request, Server & serv)
 	}
 	if (_code == 500)
 		_response = this->readHtml(_errorMap[_code]);
-	_response = head.getHeader(_response.size(), _path, _code, _type, serv.getContentLocation(), "\r\n" + _response;
+	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
+	_response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), "\r\n" + _response);
+
 }
 
-void			Response::deleteMethod(Request & request, Server & serv)
+void			Response::deleteMethod(Request & request, Server & server)
 {
 	ResponseHeader	head;
 	(void)request;
@@ -138,11 +151,28 @@ void			Response::deleteMethod(Request & request, Server & serv)
 		_code = 404;
 	if (_code == 403 || _code == 404)
 		_response = this->readHtml(_errorMap[_code]);
-	_response = head.getHeader(_response.size(), _path, _code, _type, serv.getContentLocation(), serv.getLang()) + "\r\n" + _response;
-
+	_response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), "\r\n" + _response;
+	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
 
 }
+
 // Utils
+
+int             pathIsFile(const std::string& path)
+{
+        struct stat s;
+        if (stat(path.c_str(), &s) == 0 )
+        {
+                if (s.st_mode & S_IFDIR)
+                        return 0;
+                else if (s.st_mode & S_IFREG)
+                        return 1;
+                else
+                        return 0;
+        }
+        else
+                return 0;
+}
 
 int				Response::readContent(void)
 {
@@ -165,12 +195,12 @@ int				Response::readContent(void)
 
 		file.close();
 	}
-	else if (_isAutoIndex) {
-		buffer << AutoIndexGenerator::getPage(_path.c_str(),\
-			to_string(_hostPort.host), _hostPort.port);
-		_response = buffer.str();
-		_type = "text/html";
-	}
+	// else if (_isAutoIndex) {
+		// buffer << AutoIndexGenerator::getPage(_path.c_str(),\
+			// to_string(_hostPort.host), _hostPort.port);
+		// _response = buffer.str();
+		// _type = "text/html";
+	// }
 	else
 	{
 		_response = this->readHtml(_errorMap[404]);
@@ -224,21 +254,18 @@ std::string		Response::readHtml(const std::string& path)
 		return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
 }
 
-int				Response::fileExists(std::string path) //deprecated, replaced by ::pathIsFile()
-{
-	struct stat		stats;
+// int				Response::fileExists(std::string path) //deprecated, replaced by ::pathIsFile()
+// {
+// 	struct stat		stats;
 
-	if (stat(path.c_str(), &stats) == 0)
-		return (1);
-	return (0);
-}
+// 	if (stat(path.c_str(), &stats) == 0)
+// 		return (1);
+// 	return (0);
+// }
 
 // Getter functions
 
-std::string		Response::getResponse(void)
-{
-	return (_response);
-}
+std::string		Response::getResponse(void) { return (_response); }
 
 // Overloaders
 
