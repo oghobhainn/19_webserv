@@ -13,7 +13,7 @@
 class TestServer
 {
     private:
-        // int _new_socket;
+        int _new_socket;
         fd_set _set_of_socket;
         char _buffer[300000];
         ListeningSocket *_socket;
@@ -36,8 +36,8 @@ class TestServer
         void handler();
         void responder(int socket);
 
-        // int get_new_socket();
-        // void set_socket(int new_socket);
+        int get_new_socket();
+        void set_socket(int new_socket);
         fd_set get_connecting_socket();
         void add_connecting_socket(int connecting_socket);
         void remove_connecting_socket(int connecting_socket);

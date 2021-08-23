@@ -1,4 +1,5 @@
 #include "TestServer.hpp"
+#include "../../Request/Request.hpp"
 
 // TestServer::TestServer()
 // {
@@ -30,25 +31,20 @@ ListeningSocket *TestServer::create_sub_server(int domain, int service, int prot
      return(new ListeningSocket(domain, service, protocol, port, interface, bklg));
 }
 
-<<<<<<< HEAD
 TestServer::~TestServer()
 {
     
 }
 
-/*
 void TestServer::set_socket(int new_socket)
-// void TestServer::set_socket(int new_socket)
-// {
-//     _new_socket = new_socket;
-// }
-=======
->>>>>>> 51d570e258320556a9e451e3b88377ce062d9924
+{
+    _new_socket = new_socket;
+}
 
 void TestServer::add_connecting_socket(int connecting_socket)
 {
     FD_SET(connecting_socket, &_set_of_socket);
-}*/
+}
 
 void TestServer::remove_connecting_socket(int connecting_socket)
 {
@@ -79,14 +75,18 @@ int TestServer::accepter(int socket, std::list<class Server> serv_list)
 
 void TestServer::handler()
 {
-    t_http_request  http_req_struct;
-    std::string     http_response_firstline;
-    http_request_parser(_buffer, http_req_struct);
+    Request     req(_buffer);
 
-    Http_response test;
-    test.Http_response::build_http_response(http_req_struct);
+    P("request : ");
+    std::cout << req << std::endl;
+    // t_http_request  http_req_struct;
+    // std::string     http_response_firstline;
+    // http_request_parser(_buffer, http_req_struct);
 
-    print_response(test);
+    // Http_response test;
+    // test.Http_response::build_http_response(http_req_struct);
+
+    // print_response(test);
 
 }
 
