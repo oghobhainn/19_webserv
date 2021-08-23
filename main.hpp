@@ -20,6 +20,7 @@
 #include "Networking/Sockets/ConnectingSocket.hpp"
 #include "Networking/Sockets/BindingSocket.hpp"
 
+<<<<<<< HEAD
 // #include "Request/Request.hpp"
 // #include "Response/Response.hpp"
 // #include "Response/ResponseHeader.hpp"
@@ -35,6 +36,11 @@
 #define MAGENTA "\033[35m"      /* Magenta */
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
+=======
+#include "request_parser/request.hpp"
+#include "response_builder/response.hpp"
+#include "utils/utils.hpp"
+>>>>>>> 6dfee6f257331e25233a26609809a34b555736ef
 
 #define PC(a, b) std::cout << a << b << std::endl;
 #define PE(a) std::cout << RED << a << RESET << std::endl;
