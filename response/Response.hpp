@@ -1,8 +1,9 @@
 #ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 
-# include "../main.hpp"
 # include "../Request/Request.hpp"
+# include "../ConfigParsing/Config.hpp"
+# include "../Cgi/CgiHandler.hpp"
 
 class Response {
 public:

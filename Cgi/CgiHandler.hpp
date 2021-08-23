@@ -4,6 +4,8 @@
 
 # include "../main.hpp"
 # include "../Request/Request.hpp"
+# include "../Response/Response.hpp"
+# include "../Response/ResponseHeader.hpp"
 
 class CgiHandler {
 	public:

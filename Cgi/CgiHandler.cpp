@@ -41,7 +41,7 @@ void		CgiHandler::_initEnv(Request &request, Server &serv) {
 	this->_env["PATH_INFO"] = request.getPath(); //might need some change, using serv path/contentLocation
 	this->_env["PATH_TRANSLATED"] = request.getPath(); //might need some change, using serv path/contentLocation
 	this->_env["QUERY_STRING"] = request.getQuery();
-	this->_env["REMOTEaddr"] = std::to_string(serv.getHost());
+	this->_env["REMOTEaddr"] = serv.getHost();
 	this->_env["REMOTE_IDENT"] = headers["Authorization"];
 	this->_env["REMOTE_USER"] = headers["Authorization"];
 	this->_env["REQUEST_URI"] = request.getPath() + request.getQuery();
@@ -49,7 +49,7 @@ void		CgiHandler::_initEnv(Request &request, Server &serv) {
 		this->_env["SERVER_NAME"] = headers["Hostname"];
 	else
 		this->_env["SERVER_NAME"] = this->_env["REMOTEaddr"];
-	this->_env["SERVER_PORT"] = std::to_string(serv.getPort());
+	this->_env["SERVER_PORT"] = serv.getPort();
 	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
 

@@ -12,6 +12,7 @@ SRCS = main.cpp \
 		Request/RequestUtils.cpp \
 		Response/Response.cpp \
 		Response/ResponseHeader.cpp \
+		Cgi/CgiHandler.cpp \
 		utils/utils.cpp
 
 CXX = clang++

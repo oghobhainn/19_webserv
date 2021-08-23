@@ -166,11 +166,13 @@ std::string Server::getDefaultErrorPage() const
 
 void Server::setClientBodySize(std::string const str)
 {
-	int nb = std::stoi(str);
-	this->client_body_size = nb;
+	std::stringstream ss(str);
+	size_t result;
+	ss >> result;
+	this->client_body_size = result;
 }
 
-int Server::getClientBodySize() const
+size_t Server::getClientBodySize() const
 {
 	return this->client_body_size;
 }
@@ -183,6 +185,26 @@ void Server::setCgiParam(std::string const str)
 std::string Server::getCgiParam() const
 {
 	return this->cgi_param;
+}
+
+void Server::setCgiPass(std::string const str)
+{
+	this->cgi_pass = str;
+}
+
+std::string Server::getCgiPass() const
+{
+	return this->cgi_pass;
+}
+
+void Server::setPath(std::string const str)
+{
+	this->path = str;
+}
+
+std::string Server::getPath() const
+{
+	return this->path;
 }
 
 void Server::setStrWithoutLoc(std::string const str)
@@ -241,6 +263,16 @@ void	Server::setAllowedMethods()
 std::set<std::string>	Server::getAllowedMethods() const
 {
 	return _allowed_methods;
+}
+
+void	Server::setContentLocation(const std::string &path)
+{
+	this->content_location = path;
+}
+
+std::string	Server::getContentLocation() const
+{
+	return this->content_location;
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 

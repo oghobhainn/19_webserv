@@ -1,6 +1,5 @@
 #include "Response.hpp"
 #include "ResponseHeader.hpp"
-#include "../Cgi/CgiHandler.hpp"
 
 // Static Assets
 
@@ -46,7 +45,7 @@ void			Response::call(Request & request, Server & server)
 		ResponseHeader	head;
 
 		// _response = head.notAllowed(server.getAllowedMethods(), server.getLocations(), _code, server.getLang() + "\r\n";
-		_response = head.notAllowed(server.getAllowedMethods(), server.getLocations(), _code, "\r\n");
+		_response = head.notAllowed(server.getAllowedMethods(), server.getContentLocation(), _code, "\r\n");
 
 		return ;
 	}
@@ -91,7 +90,7 @@ void			Response::getMethod(Request & request, Server & server)
 
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), server.getLang()) + "\r\n" + _response;
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
-	_response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), "\r\n" + _response);
+	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
 
 
 }
@@ -130,7 +129,7 @@ void			Response::postMethod(Request & request, Server & server)
 	if (_code == 500)
 		_response = this->readHtml(_errorMap[_code]);
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
-	_response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), "\r\n" + _response);
+	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
 
 }
 
@@ -151,7 +150,7 @@ void			Response::deleteMethod(Request & request, Server & server)
 		_code = 404;
 	if (_code == 403 || _code == 404)
 		_response = this->readHtml(_errorMap[_code]);
-	_response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), "\r\n" + _response;
+	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
 
 }

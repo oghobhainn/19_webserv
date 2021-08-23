@@ -1,4 +1,5 @@
 #include "Request.hpp"
+#include "RequestUtils.hpp"
 
 std::ostream&		operator<<(std::ostream& os, const Request& re)
 {

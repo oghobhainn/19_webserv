@@ -83,10 +83,13 @@ class Server : public Location
         std::string			    server_name;
         std::string             default_error_page;
         std::string             cgi_param;
+        std::string             cgi_pass;
+        std::string             path;
         int				        client_body_size;
 		int 					nb_loc;
         fd_set                  socket_client;
         ListeningSocket         *_socket;
+        std::string             content_location;
 
     public:
         Server();
@@ -130,13 +133,22 @@ class Server : public Location
         std::string getDefaultErrorPage() const;
 
         void setClientBodySize(std::string const str);
-        int getClientBodySize() const;
+        size_t getClientBodySize() const;
 
         void setAllowedMethods();
         std::set<std::string> getAllowedMethods() const;
 
         void setCgiParam(std::string const str);
         std::string getCgiParam() const;
+
+        void setCgiPass(std::string const str);
+        std::string getCgiPass() const;
+
+        void setPath(std::string const str);
+        std::string getPath() const;
+
+        void setContentLocation(std::string const & path);
+        std::string getContentLocation() const;
 };
 
 

@@ -6,6 +6,7 @@
 #include <list>
 #include <vector>
 #include <set>
+#include <map>
 #include <sstream>
 #include <sys/time.h>
 #include <sys/stat.h>
@@ -35,8 +36,12 @@
 #define MAGENTA "\033[35m"      /* Magenta */
 #define CYAN    "\033[36m"      /* Cyan */
 #define WHITE   "\033[37m"      /* White */
-#include "request_parser/request.hpp"
-#include "response_builder/response.hpp"
+
+# define RECV_SIZE 65536
+# define CGI_BUFSIZE 65536
+
+//#include "request_parser/request.hpp"
+//#include "response_builder/response.hpp"
 #include "Utils/utils.hpp"
 
 #define PC(a, b) std::cout << a << b << std::endl;
