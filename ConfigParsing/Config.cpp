@@ -97,8 +97,7 @@ void Server::getLocations() const
 		std::cout << "FILES front:  " << locations[i].file_extensions.front() << std::endl;
 		std::cout << "FILES back:   " << locations[i].file_extensions.back() << std::endl;
 		std::cout << "---CGI------" << std::endl;
-		std::cout << "CGI SCRIPT_NAME:" << locations[i]._CGI.SCRIPT_NAME << std::endl;
-		std::cout << "CGI AUTH_TYPE:" << locations[i]._CGI.AUTH_TYPE << std::endl;
+		std::cout << "CGI PATH_INFO:" << locations[i]._CGI.PATH_INFO << std::endl;
 	}
 }
 
@@ -176,6 +175,16 @@ int Server::getClientBodySize() const
 	return this->client_body_size;
 }
 
+void Server::setCgiParam(std::string const str)
+{
+	this->cgi_param = str;
+}
+
+std::string Server::getCgiParam() const
+{
+	return this->cgi_param;
+}
+
 void Server::setStrWithoutLoc(std::string const str)
 {
 	this->str_without_loc = str;
@@ -216,6 +225,8 @@ fd_set Server::getSocketClient()
 {
 	return (socket_client);
 }
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 

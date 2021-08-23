@@ -28,12 +28,12 @@ class CGI
         ~CGI();
 
         bool active;
+        std::string PATH_INFO;
         std::string SCRIPT_NAME;
         std::string AUTH_TYPE;
         std::string CONTENT_LENGTH;
         std::string CONTENT_TYPE;
         std::string GATEWAY_INTERFACE;
-        std::string PATH_INFO;
         std::string PATH_TRANSLATED;
         std::string QUERY_STRING;
         std::string REMOTE_ADDR;
@@ -79,6 +79,7 @@ class Server : public Location
 		std::string				root;
         std::string			    server_name;
         std::string             default_error_page;
+        std::string             cgi_param;
         int				        client_body_size;
 		int 					nb_loc;
         fd_set                  socket_client;
@@ -109,7 +110,6 @@ class Server : public Location
         void setPort(std::string const str);
         std::string getPort() const;
 
-
         void setSocket(ListeningSocket *socket); //////////////////////////
         ListeningSocket *getSocket(); ////////////////////////////////////
 
@@ -129,6 +129,8 @@ class Server : public Location
         void setClientBodySize(std::string const str);
         int getClientBodySize() const;
 
+        void setCgiParam(std::string const str);
+        std::string getCgiParam() const;
 };
 
 
