@@ -1,6 +1,8 @@
 #include "Response.hpp"
 #include "../Cgi/CgiHandler.hpp"
 
+//Response
+
 // Static Assets
 
 std::map<std::string, void (Response::*)(Request &, Server &)>	Response::initMethods()

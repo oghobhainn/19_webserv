@@ -1,5 +1,6 @@
 #include "ResponseHeader.hpp"
 
+//response header
 // Member functions
 
 std::string		ResponseHeader::getHeader(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
