@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <list>
 #include <map>
+#include <set>
 #include <vector>
 #include <sys/socket.h>
 #include <errno.h>
@@ -63,6 +64,8 @@ class Location : public CGI
 		bool                    get_method;
 		bool					post_method;
 		bool					delete_method;
+        std::set<std::string>   _allowed_methods;
+
         std::string             redirection;
         std::string             directory_listing;
         std::string             default_file_if_request_directory;
@@ -128,6 +131,9 @@ class Server : public Location
 
         void setClientBodySize(std::string const str);
         int getClientBodySize() const;
+
+        void setAllowedMethods();
+        std::set<std::string> getAllowedMethods() const;
 
         void setCgiParam(std::string const str);
         std::string getCgiParam() const;

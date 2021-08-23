@@ -1,5 +1,6 @@
 #include "TestServer.hpp"
 
+
 // TestServer::TestServer()
 // {
 //     ListeningSocket *socket;
@@ -30,6 +31,15 @@ ListeningSocket *TestServer::create_sub_server(int domain, int service, int prot
      return(new ListeningSocket(domain, service, protocol, port, interface, bklg));
 }
 
+TestServer::~TestServer()
+{
+    
+}
+
+void TestServer::set_socket(int new_socket)
+{
+    _new_socket = new_socket;
+}
 
 void TestServer::add_connecting_socket(int connecting_socket)
 {
@@ -65,14 +75,20 @@ int TestServer::accepter(int socket, std::list<class Server> serv_list)
 
 void TestServer::handler()
 {
-    t_http_request  http_req_struct;
-    std::string     http_response_firstline;
-    http_request_parser(_buffer, http_req_struct);
+    Request     req(_buffer);
 
-    Http_response test;
-    test.Http_response::build_http_response(http_req_struct);
+    P("request : ");
+    std::cout << req << std::endl;
 
-    print_response(test);
+    Response response;
+    // t_http_request  http_req_struct;
+    // std::string     http_response_firstline;
+    // http_request_parser(_buffer, http_req_struct);
+
+    // Http_response test;
+    // test.Http_response::build_http_response(http_req_struct);
+
+    // print_response(test);
 
 }
 
