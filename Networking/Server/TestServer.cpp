@@ -1,15 +1,32 @@
-// probleme de read et transformer _new_socket en fd_set
-
 #include "TestServer.hpp"
 
-TestServer::TestServer() : SimpleServer(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, 10)
+// TestServer::TestServer()
+// {
+//     ListeningSocket *socket;
+
+//     socket = create_sub_server(AF_INET, SOCK_STREAM, 0, 80, INADDR_ANY, 10);
+//     setSocket(socket);
+//     add_connecting_socket(socket->get_listening());
+//     launch();
+// }
+
+TestServer::TestServer(std::list<class Server> serv_list)
 {
-    launch();
+    ListeningSocket *socket;
+    
+    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    {
+        socket = create_sub_server(AF_INET, SOCK_STREAM, 0, stoi(it->getPort()), INADDR_ANY, 10);
+        it->setSocket(socket);
+        add_connecting_socket(socket->get_sock());
+        socket = nullptr;
+    }
+    launch(serv_list);
 }
 
-TestServer::TestServer(int port) : SimpleServer(AF_INET, SOCK_STREAM, 0, port, INADDR_ANY, 10)
+ListeningSocket *TestServer::create_sub_server(int domain, int service, int protocol, int port, u_long interface, int bklg)
 {
-    launch();
+     return(new ListeningSocket(domain, service, protocol, port, interface, bklg));
 }
 
 TestServer::~TestServer()
@@ -17,25 +34,43 @@ TestServer::~TestServer()
     
 }
 
-
+/*
 void TestServer::set_socket(int new_socket)
+// void TestServer::set_socket(int new_socket)
+// {
+//     _new_socket = new_socket;
+// }
+
+void TestServer::add_connecting_socket(int connecting_socket)
 {
-    _new_socket = new_socket;
+    FD_SET(connecting_socket, &_set_of_socket);
+}*/
+
+// int TestServer::get_new_socket()
+// {
+//     return (_new_socket);
+// }
+
+fd_set TestServer::get_connecting_socket()
+{
+    return (_set_of_socket);
 }
 
-int TestServer::get_new_socket()
+int TestServer::accepter(int socket, std::list<class Server> serv_list)
 {
-    return (_new_socket);
-}
+    int sock_tmp;
+    std::list<Server>::iterator it;
 
-void TestServer::accepter()
-{
-    // int sock;
-    struct sockaddr_in address = get_socket()->get_address();
+    for (it = serv_list.begin(); it != serv_list.end(); ++it)
+    {
+        if (socket == it->getSocket()->get_sock())
+            break ;
+    }
+    struct sockaddr_in address = it->getSocket()->get_address();
     int addrlen = sizeof(address);
-    set_socket(accept(get_socket()->get_sock(), (struct sockaddr *)&address, (socklen_t *)&addrlen));
-    // sock = accept(get_socket()->get_sock(), (struct sockaddr *)&address, (socklen_t *)&addrlen);
-    // recv(sock, _buffer, 2048, 0);
+    sock_tmp = accept(it->getSocket()->get_sock(), (struct sockaddr *)&address, (socklen_t *)&addrlen);
+    it->addSocketClient(sock_tmp);
+    return (sock_tmp);
 }
 
 void TestServer::handler()
@@ -51,12 +86,12 @@ void TestServer::handler()
 
 }
 
-void TestServer::readsocket()
+void TestServer::readsocket(int socket)
 {
     long ret;
     int msgsize = 0;
 
-    if ((ret = recv(get_new_socket(), _buffer, 2048, 0)) == -1)
+    if ((ret = recv(socket, _buffer, 2048, 0)) == -1)
     {
         std::cout << "Error with recv" << std::endl;
     }
@@ -71,56 +106,53 @@ void TestServer::readsocket()
     }
 }
 
-void TestServer::responder()
+void TestServer::responder(int socket)
 {
     const char *hello = "Hello from server";
-    write(get_new_socket(), hello, strlen(hello));
-    close(get_new_socket());
+    write(socket, hello, strlen(hello));
+    close(socket);
 }
 
-void TestServer::launch()
+void TestServer::launch(std::list<class Server> serv_list)
 {
     fd_set ready_sockets;
-    fd_set current_socket;
+    fd_set reading_socket;
+    fd_set writing_socket;
     int ret;
+    int sock_tmp = 0;
 
-    // fd_set writing_socket;
-    // fd_set reading_socket;
-
-    FD_ZERO(&current_socket);
-    FD_SET(get_socket()->get_sock(), &current_socket);
-
-
+    FD_ZERO(&writing_socket);
+    reading_socket = get_connecting_socket();
     while(true)
     {
-        ready_sockets = current_socket;
-        if ((ret = select(FD_SETSIZE, &ready_sockets, nullptr, nullptr, nullptr)) < 0)
+        std::cout << "=========== Waiting ==========" << std::endl;
+        ready_sockets = reading_socket;
+        if ((ret = select(FD_SETSIZE, &reading_socket, &writing_socket, nullptr, nullptr)) < 0)
         {
             std::cout << "Failure with select " << std::endl;
             exit(EXIT_FAILURE);
         }
         for (int i = 0; i < FD_SETSIZE; i++)
         {
-            if (FD_ISSET(i, &current_socket))
+            if (FD_ISSET(i, &reading_socket) || FD_ISSET(i, &writing_socket))
             {
-                std::cout << "=========== Waiting ==========" << std::endl;
-                if (i == get_socket()->get_sock())
+                // if i is in set_fd of read
+                if (FD_ISSET(i, &reading_socket))
                 {
                     // this is a new connection
-                    accepter();
-                    FD_SET(get_new_socket(), &current_socket);
+                    sock_tmp = accepter(i, serv_list);
+                    FD_SET(sock_tmp, &writing_socket);
+                    FD_CLR(i, &reading_socket);
                 }
+                // if i is in socket of write
                 else
                 {
                     // do whatever we do with the connection
-                    // std::cout << " step 0" << std::endl;
-                    readsocket();
-                    // std::cout << " step 1" << std::endl;
+                    readsocket(i);
                     handler();
-                    // std::cout << " step 2" << std::endl;
-                    responder();
-                    // std::cout << " step 3" << std::endl;
-                    FD_CLR(i, &current_socket);
+                    responder(i);
+                    FD_CLR(i, &writing_socket);
+
                 }
             }
         }

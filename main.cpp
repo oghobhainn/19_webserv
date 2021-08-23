@@ -165,7 +165,12 @@ std::list<class Server> parseConfig(std::string const path)
 
 int main(int argc, char **argv)
 {
-    std::list<Server> serv_list;
+
+    std::list<class Server> serv_list;
+    std::vector<int> set_of_port;
+
+    //std::list<Server> serv_list;
+
 
     if (argc != 2)
     {
@@ -177,19 +182,25 @@ int main(int argc, char **argv)
     ///////////////////// Print results /////////////////////////
     std::string test2;
 
-    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    {
-        std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
-        std::cout << "Port: " << it->getPort() << std::endl;
-        std::cout << "Host: " << it->getHost() << std::endl;
-        std::cout << "Root: " << it->getRoot() << std::endl;
-        std::cout << "Ser Name: " << it->getServerName() << std::endl;
-        std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
-        std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
+    // for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    // {
+    //     std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
+    //     std::cout << "Port: " << it->getPort() << std::endl;
+    //     std::cout << "Host: " << it->getHost() << std::endl;
+    //     std::cout << "Root: " << it->getRoot() << std::endl;
+    //     std::cout << "Ser Name: " << it->getServerName() << std::endl;
+    //     std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
+    //     std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
         
-		it->getLocations();
-        std::cout << "---------------------- END --------------------------------" << std::endl;
-    }
+
+
+	// 	it->getLocations();
+    //     std::cout << "---------------------- END --------------------------------" << std::endl;
+    // }
+
+
+    for (std::list<class Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
+        set_of_port.push_back(stoi(it2->getPort()));
 
     //// TO DO
    
@@ -204,8 +215,9 @@ int main(int argc, char **argv)
 
 
 
+
     ////////////////////// Server ////////////////////////////////
-    TestServer t(80);
+    TestServer t(serv_list);
     return 0;
 }
 

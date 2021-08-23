@@ -3,18 +3,21 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <vector>
 
-#include "SimpleServer.hpp"
+// #include "SimpleServer.hpp"
 #include "../../main.hpp"
+#include "../Sockets/ListeningSocket.hpp"
+#include "../../ConfigParsing/Config.hpp"
 
-class TestServer : public SimpleServer
+class TestServer
 {
     private:
-        int _new_socket;
+        // int _new_socket;
+        fd_set _set_of_socket;
         char _buffer[300000];
-        // fd_set writing_socket;
-        // fd_set reading_socket;
-        
+        ListeningSocket *_socket;
+
 
     public:
         TestServer();
@@ -24,11 +27,22 @@ class TestServer : public SimpleServer
         void launch();
         void accepter();
         void readsocket();
+        // TestServer();
+        TestServer(std::list<class Server> serv_list);
+        
+        void launch(std::list<class Server> serv_list);
+        int accepter(int socket, std::list<class Server> serv_list);
+        void readsocket(int socket);
         void handler();
-        void responder();
+        void responder(int socket);
 
-        int get_new_socket();
-        void set_socket(int new_socket);
+        // int get_new_socket();
+        // void set_socket(int new_socket);
+        fd_set get_connecting_socket();
+        void add_connecting_socket(int connecting_socket);
+
+        ListeningSocket *get_socket();
+        ListeningSocket *create_sub_server(int domain, int service, int protocol, int port, u_long interface, int bklg);
 };
 
 
