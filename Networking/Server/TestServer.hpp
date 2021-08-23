@@ -19,7 +19,8 @@ class TestServer : public SimpleServer
     public:
         TestServer();
         TestServer(int port);
-        
+        ~TestServer();
+
         void launch();
         void accepter();
         void readsocket();

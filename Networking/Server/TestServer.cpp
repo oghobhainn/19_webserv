@@ -12,6 +12,12 @@ TestServer::TestServer(int port) : SimpleServer(AF_INET, SOCK_STREAM, 0, port, I
     launch();
 }
 
+TestServer::~TestServer()
+{
+    
+}
+
+
 void TestServer::set_socket(int new_socket)
 {
     _new_socket = new_socket;
