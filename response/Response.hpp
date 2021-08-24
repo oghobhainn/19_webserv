@@ -35,6 +35,8 @@ public:
 	int				fileExists(std::string path);
 	std::string		readHtml(const std::string& path);
 
+	Response		buildResponse(Request & req, Server & serv);
+
 private:
 	std::string					_response;
 	std::string					_path;

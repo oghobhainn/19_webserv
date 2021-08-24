@@ -1,6 +1,6 @@
 POST/tmp_dir_for_php/index.php?truc=machin&foo=bar&jean-michel=francisHTTP1.1
 User-Agent: custom-client
-Host: weebserv
+Host: webserv
 Accept-Language: en-US
 Connection: Keep-Alive
 Content-type: text/html

@@ -7,6 +7,8 @@
 # include "../Response/Response.hpp"
 # include "../Response/ResponseHeader.hpp"
 
+# include <map>
+
 class CgiHandler {
 	public:
 		CgiHandler(Request &request, Server &server); // sets up env according to the request

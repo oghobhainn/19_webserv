@@ -53,7 +53,7 @@ void		CgiHandler::_initEnv(Request &request, Server &serv) {
 	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
 
-	this->_env.insert(serv.getCgiParam().begin(), serv.getCgiParam().end());
+	//this->_env.insert(serv.getCgiParam().begin(), serv.getCgiParam().end()); //TODO
 }
 
 char					**CgiHandler::_getEnvAsCstrArray() const {

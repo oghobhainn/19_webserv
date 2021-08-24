@@ -73,23 +73,25 @@ int TestServer::accepter(int socket, std::list<class Server> serv_list)
     return (sock_tmp);
 }
 
-void TestServer::handler()
+void TestServer::handler(int socket)
 {
     Request     req(_buffer);
 
-    P("request : ");
-    std::cout << req << std::endl;
+    //PY("request : ");
+    //std::cout << req << std::endl;
 
-    Response response;
-    // t_http_request  http_req_struct;
-    // std::string     http_response_firstline;
-    // http_request_parser(_buffer, http_req_struct);
+    Server          serv;
+    //RequestConfig	requestConf;
+	Response		response;
+    response.call(req, serv);
+    response = response.Response::buildResponse(req, serv);
 
-    // Http_response test;
-    // test.Http_response::build_http_response(http_req_struct);
-
-    // print_response(test);
-
+    P("response : ");
+    std::cout << response.getResponse() << std::endl;
+    char char_response[response.getResponse().length() + 1];
+    strcpy(char_response, response.getResponse().c_str()); 
+    write(socket, char_response, strlen(char_response));
+    close(socket);
 }
 
 void TestServer::readsocket(int socket)
@@ -114,9 +116,12 @@ void TestServer::readsocket(int socket)
 
 void TestServer::responder(int socket)
 {
-    const char *hello = "Hello from server";
-    write(socket, hello, strlen(hello));
-    close(socket);
+    if (socket == -45) // shutting error
+    {
+        const char *hello = "<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>";
+        write(socket, hello, strlen(hello));
+        close(socket);
+    }
 }
 
 
@@ -156,7 +161,7 @@ void TestServer::launch(std::list<class Server> serv_list)
                 FD_SET(sock_tmp, &exec_socket);
                 readsocket(sock_tmp);
 				// std::cout << "hello 1" << std::endl;
-                handler();
+                handler(sock_tmp);
 				// std::cout << "hello 2" << std::endl;
                 responder(sock_tmp);
 				// std::cout << "hello 3" << std::endl;

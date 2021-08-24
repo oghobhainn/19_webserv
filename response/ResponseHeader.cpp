@@ -88,8 +88,9 @@ void			ResponseHeader::initErrorMap()
 
 void			ResponseHeader::setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
 {
+	if (lang == "salut TODOTODO")
+		setContentLanguage(lang);
 	setAllow();
-	setContentLanguage(lang);
 	setContentLength(size);
 	setContentLocation(contentLocation, code);
 	setContentType(type, path);
@@ -180,6 +181,17 @@ void			ResponseHeader::setContentType(std::string type, std::string path)
 		_contentType = "text/plain";
 }
 
+void			ResponseHeader::setDate( void )
+{
+	char		buf[255];
+	time_t		now = time(0);
+	struct tm	timenow = *gmtime(&now);
+	timenow.tm_hour += 2;
+	strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %Z+2", &timenow);
+
+	this->_date = std::string("Date: ") + std::string(buf);
+}
+/*
 void			ResponseHeader::setDate(void)
 {
 	char			buffer[100];
@@ -191,7 +203,7 @@ void			ResponseHeader::setDate(void)
 	strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
 	_date = std::string(buffer);
 }
-
+*/
 void			ResponseHeader::setLastModified(const std::string& path)
 {
 	char			buffer[100];
@@ -224,7 +236,7 @@ void			ResponseHeader::setRetryAfter(int code, int sec)
 
 void			ResponseHeader::setServer(void)
 {
-	_server = "Weebserv/1.0.0 (Unix)";
+	_server = "Webserv/1.0";
 }
 
 void			ResponseHeader::setTransferEncoding(void)

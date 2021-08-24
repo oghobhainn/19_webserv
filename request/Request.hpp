@@ -24,6 +24,8 @@
 #define WHITE   "\033[37m"      /* White */
 
 #define PE(a) std::cout << RED << a << RESET << std::endl;
+#define PY(a) std::cout << YELLOW << a << RESET << std::endl;
+
 /* USAGE :
 -	Method and version are stored separtely in a string.
 	Any version other than 1.0 or 1.1 is considered invalid

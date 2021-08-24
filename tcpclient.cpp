@@ -6,16 +6,40 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 #define PORT 80
+
+std::string readFileIntoString(const std::string& path) {
+	std::ifstream input_file(path);
+    if (!input_file.is_open()) {
+		std::cerr << "Could not open the file - '" << path << "'" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    return std::string((std::istreambuf_iterator<char>(input_file)), std::istreambuf_iterator<char>());
+}
 
 int main(int argc, char const *argv[])
 {
     int sock = 0; long valread;
     struct sockaddr_in serv_addr;
 
-    char hello[512] = "GET /index.html HTTP/1.1\r\nHost: 192.241.213.65:6880\r\nContent-Type: text/plain\r\nContent-Length: 27\r\n\r\nDeep down the rabbit hole,\nThere lies him, the CLIENT\r\n";
-    char buffer[1024] = {0};
+	if (argc != 2)
+	{
+		printf("wrong number of arguments, plz add a request_example");
+		return 1;
+	}
+   // char hello[1024] = "GET /index.html HTTP/1.1\r\nHost: 192.241.213.65:6880\r\nContent-Type: text/plain\r\nContent-Length: 27\r\n\r\nDeep down the rabbit hole,\nThere lies him, the CLIENT\r\n";
+   	
+	std::string filename(argv[1]);
+	std::string file_contents;
+
+	file_contents = readFileIntoString(filename);
+	char hello[file_contents.length()];
+	strcpy(hello, file_contents.c_str());
+	char buffer[1024] = {0};
     
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {

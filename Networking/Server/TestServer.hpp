@@ -36,7 +36,7 @@ class TestServer
         void launch(std::list<class Server> serv_list);
         int accepter(int socket, std::list<class Server> serv_list);
         void readsocket(int socket);
-        void handler();
+        void handler(int socket);
         void responder(int socket);
 
         int get_new_socket();
