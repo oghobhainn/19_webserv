@@ -153,6 +153,7 @@ int					Request::parse(const std::string& str)
 
 	this->readFirstLine(nextLine(str, i));
 	i += 1;
+
 	while ((line = nextLine(str, i)) != "\r" && line != "" && this->_ret != 400)
 	{
 		key = readKey(line);
@@ -162,11 +163,17 @@ int					Request::parse(const std::string& str)
 		if (key.find("Secret") != std::string::npos)
 			this->_env_for_cgi[formatHeaderForCGI(key)] = value;
 		i+=1;
+		if (i == std::string::npos)
+			break;
 	}
+
 	if (this->_headers["Www-Authenticate"] != "")
 		this->_env_for_cgi["Www-Authenticate"] = this->_headers["Www-Authenticate"];
 	this->setLang();
-	this->setBody(str.substr(i));//, std::string::npos));
+	if (i < str.length())
+	{
+		this->setBody(str.substr(i));//, std::string::npos));
+	}
 
 	this->findQuery();
 	return this->_ret;

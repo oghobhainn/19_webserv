@@ -19,6 +19,7 @@ Request::Request(const std::string& str) :
 	this->resetHeaders();
 	this->_env_for_cgi.clear();
 	this->parse(str);
+
 	if (this->_ret != 200)
 		PE("Parse error : " + std::to_string(this->_ret));
 }

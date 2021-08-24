@@ -60,7 +60,6 @@ void			Response::getMethod(Request & request, Server & server)
 
 	if (server.getCgiPass() != "")
 	{
-	PY("GET : inside server.getCgiPass");
 		CgiHandler	cgi(request, server);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
@@ -137,16 +136,28 @@ void			Response::postMethod(Request & request, Server & server)
 	_response += "\r\n";
 }
 
+
+
+    // Un code de statut 202 (Accepted) si l'action est en passe de réussir mais n'a pas encore été confirmée.
+    // Un code de statut 204 (No Content) si l'action a été confirmée et qu'aucune information supplémentaire n'est à fournir.
+    // Un code de statut 200 (OK) si l'action a été confirmée et que le message de réponse inclut une représentation décrivant le statut.
+	// <html>
+	//   <body>
+	    // <h1>File deleted.</h1>
+	//   </body>
+	// </html>
+	
 void			Response::deleteMethod(Request & request, Server & server)
 {
 	ResponseHeader	head;
 	(void)request;
-
 	_response = "";
 	if (pathIsFile(_path))
 	{
 		if (remove(_path.c_str()) == 0)
+		{
 			_code = 204;
+		}
 		else
 			_code = 403;
 	}
@@ -156,7 +167,7 @@ void			Response::deleteMethod(Request & request, Server & server)
 		_response = this->readHtml(_errorMap[_code]);
 	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
-
+	_response += "\r\n";
 }
 
 Response		Response::buildResponse(Request & req, Server & serv)

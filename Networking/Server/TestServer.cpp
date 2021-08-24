@@ -77,8 +77,8 @@ void TestServer::handler(int socket)
 {
     Request     req(_buffer);
 
-    //PY("request : ");
-    //std::cout << req << std::endl;
+    PY("request : ");
+    std::cout << req << std::endl;
 
     Server          serv;
     //RequestConfig	requestConf;
