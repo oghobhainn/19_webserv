@@ -1,8 +1,9 @@
 #ifndef RESPONSE_HPP
 # define RESPONSE_HPP
 
-# include "../main.hpp"
 # include "../Request/Request.hpp"
+# include "../ConfigParsing/Config.hpp"
+# include "../Cgi/CgiHandler.hpp"
 
 class Response {
 public:
@@ -33,6 +34,8 @@ public:
 	int				writeContent(std::string content);
 	int				fileExists(std::string path);
 	std::string		readHtml(const std::string& path);
+
+	Response		buildResponse(Request & req, Server & serv);
 
 private:
 	std::string					_response;

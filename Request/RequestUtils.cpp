@@ -1,6 +1,7 @@
 #include "Request.hpp"
+#include "RequestUtils.hpp"
 
-int                                                             countSubstr(const std::string& str, const std::string& sub)
+int     countSubstr(const std::string& str, const std::string& sub)
 {
         int                                             n = 0;
         std::string::size_type  pos = 0;
@@ -14,7 +15,7 @@ int                                                             countSubstr(cons
         return (n);
 }
 
-int                                                             checkStart(const std::string& str, const std::string& end)
+int     checkStart(const std::string& str, const std::string& end)
 {
         size_t  i = 0;
         size_t  j = 0;
@@ -29,7 +30,7 @@ int                                                             checkStart(const
         return (0);
 }
 
-int                                                             checkEnd(const std::string& str, const std::string& end)
+int     checkEnd(const std::string& str, const std::string& end)
 {
         size_t  i = str.size();
         size_t  j = end.size();
@@ -44,7 +45,7 @@ int                                                             checkEnd(const s
         return (0);
 }
 
-std::string                                             readKey(char *line)
+std::string     readKey(char *line)
 {
         std::string     ret;
 
@@ -54,7 +55,7 @@ std::string                                             readKey(char *line)
         return (strip(ret, ' '));
 }
 
-std::string                                             readKey(const std::string& line)
+std::string     readKey(const std::string& line)
 {
         std::string     ret;
 
@@ -64,7 +65,7 @@ std::string                                             readKey(const std::strin
         return (strip(ret, ' '));
 }
 
-std::string                                             readValue(char *line)
+std::string     readValue(char *line)
 {
         int i;
         std::string     ret;
@@ -77,7 +78,7 @@ std::string                                             readValue(char *line)
         return (strip(ret, ' '));
 }
 
-std::string                                             readValue(const std::string& line)
+std::string     readValue(const std::string& line)
 {
         size_t i;
         std::string     ret;
@@ -89,7 +90,7 @@ std::string                                             readValue(const std::str
         return (strip(ret, ' '));
 }
 
-std::vector<std::string>                split(const std::string& str, char c)
+std::vector<std::string>        split(const std::string& str, char c)
 {
         std::vector<std::string> tokens;
         std::string token;
@@ -100,7 +101,7 @@ std::vector<std::string>                split(const std::string& str, char c)
         return tokens;
 }
 
-std::string&                                    strip(std::string& str, char c)
+std::string&    strip(std::string& str, char c)
 {
         size_t  i;
 
@@ -115,26 +116,26 @@ std::string&                                    strip(std::string& str, char c)
         return str;
 }
 
-std::string&                                    to_upper(std::string& str)
+std::string&    to_upper(std::string& str)
 {
         std::transform(str.begin(), str.end(),str.begin(), ::toupper);
         return str;
 }
 
-std::string&                                    to_lower(std::string& str)
+std::string&    to_lower(std::string& str)
 {
         std::transform(str.begin(), str.end(),str.begin(), ::tolower);
         return str;
 }
 
-std::string&                                    pop(std::string& str)
+std::string&    pop(std::string& str)
 {
         if (str.size())
                 str.resize(str.size() - 1);
         return str;
 }
 
-std::string&                                    capitalize(std::string& str)
+std::string&    capitalize(std::string& str)
 {
         size_t  i = 0;
 

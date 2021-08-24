@@ -1,4 +1,5 @@
 #include "Request.hpp"
+#include "RequestUtils.hpp"
 
 std::ostream&		operator<<(std::ostream& os, const Request& re)
 {
@@ -137,7 +138,7 @@ std::string			Request::nextLine(const std::string &str, size_t& i)
 	ret = str.substr(i, j - i);
 	if (ret[ret.size() - 1] == '\r')
 		pop(ret);
-	i = (j == std::string::npos ? j : j + 1);
+	i = (j >= 10000000 ? i + 1 : j); //TODO brouillon, j == std::string::npos ne fonctionne pas // de base: (j == npos) ? j : j + 1;
 	return ret;
 }
 
@@ -149,7 +150,9 @@ int					Request::parse(const std::string& str)
 	std::string		line;
 	size_t			i(0);
 
+
 	this->readFirstLine(nextLine(str, i));
+	i += 1;
 	while ((line = nextLine(str, i)) != "\r" && line != "" && this->_ret != 400)
 	{
 		key = readKey(line);
@@ -158,11 +161,13 @@ int					Request::parse(const std::string& str)
 				this->_headers[key] = value;
 		if (key.find("Secret") != std::string::npos)
 			this->_env_for_cgi[formatHeaderForCGI(key)] = value;
+		i+=1;
 	}
 	if (this->_headers["Www-Authenticate"] != "")
 		this->_env_for_cgi["Www-Authenticate"] = this->_headers["Www-Authenticate"];
 	this->setLang();
-	this->setBody(str.substr(i, std::string::npos));
+	this->setBody(str.substr(i));//, std::string::npos));
+
 	this->findQuery();
 	return this->_ret;
 }

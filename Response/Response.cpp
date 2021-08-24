@@ -1,6 +1,5 @@
 #include "Response.hpp"
 #include "ResponseHeader.hpp"
-#include "../Cgi/CgiHandler.hpp"
 
 // Static Assets
 
@@ -31,10 +30,9 @@ void			Response::call(Request & request, Server & server)
 	_code = request.getRet();
 	_host = server.getHost();
 	_port = server.getPort();
-	// _hostPort.host = server.getHostPort().host;
-	// _hostPort.port = server.getHostPort().port;
-	// _path = server.getPath();
 	//_path = server.getPath(); // TODO
+	_path = "frontend/index_example.html"; // en attendant...
+	
 
 	if (server.getAllowedMethods().find(request.getMethod()) == server.getAllowedMethods().end())
 		_code = 405;
@@ -46,7 +44,7 @@ void			Response::call(Request & request, Server & server)
 		ResponseHeader	head;
 
 		// _response = head.notAllowed(server.getAllowedMethods(), server.getLocations(), _code, server.getLang() + "\r\n";
-		_response = head.notAllowed(server.getAllowedMethods(), server.getLocations(), _code, "\r\n");
+		_response = head.notAllowed(server.getAllowedMethods(), server.getContentLocation(), _code, "\r\n");
 
 		return ;
 	}
@@ -62,6 +60,7 @@ void			Response::getMethod(Request & request, Server & server)
 
 	if (server.getCgiPass() != "")
 	{
+	PY("GET : inside server.getCgiPass");
 		CgiHandler	cgi(request, server);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
@@ -83,7 +82,9 @@ void			Response::getMethod(Request & request, Server & server)
 		_response = _response.substr(i, j - i);
 	}
 	else if  (_code == 200)
+	{
 		_code = readContent();
+	}
 	else
 		_response = this->readHtml(_errorMap[_code]);
 	if (_code == 500)
@@ -91,7 +92,9 @@ void			Response::getMethod(Request & request, Server & server)
 
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), server.getLang()) + "\r\n" + _response;
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
-	_response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), "\r\n" + _response);
+	std::string body = _response;
+	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
+	_response += "\r\n" + body;
 
 
 }
@@ -124,14 +127,14 @@ void			Response::postMethod(Request & request, Server & server)
 	}
 	else
 	{
-		_code = 204;
+		_code = writeContent(request.getBody());
 		_response = "";
 	}
 	if (_code == 500)
 		_response = this->readHtml(_errorMap[_code]);
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
-	_response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), "\r\n" + _response);
-
+	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
+	_response += "\r\n";
 }
 
 void			Response::deleteMethod(Request & request, Server & server)
@@ -151,11 +154,26 @@ void			Response::deleteMethod(Request & request, Server & server)
 		_code = 404;
 	if (_code == 403 || _code == 404)
 		_response = this->readHtml(_errorMap[_code]);
-	_response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), "\r\n" + _response;
+	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
 
 }
 
+Response		Response::buildResponse(Request & req, Server & serv)
+{
+	// PY("Allowed Methods: ");
+	// for(std::set<std::string>::iterator it = serv.getAllowedMethods().begin(); it != serv.getAllowedMethods().end(); it++)
+    // {
+    //     PY(*it);
+    // }
+	if (req.getMethod() == "GET") //if its allowed, TODO : gotta use setMethodsAllowed in the parsing of .conf 
+		Response::getMethod(req, serv);
+	if (req.getMethod() == "POST")
+		Response::postMethod(req, serv);
+	if (req.getMethod() == "DELETE")
+		Response::deleteMethod(req, serv);
+	return	*this;
+}
 // Utils
 
 int             pathIsFile(const std::string& path)
@@ -254,17 +272,6 @@ std::string		Response::readHtml(const std::string& path)
 		return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
 }
 
-// int				Response::fileExists(std::string path) //deprecated, replaced by ::pathIsFile()
-// {
-// 	struct stat		stats;
-
-// 	if (stat(path.c_str(), &stats) == 0)
-// 		return (1);
-// 	return (0);
-// }
-
-// Getter functions
-
 std::string		Response::getResponse(void) { return (_response); }
 
 // Overloaders
@@ -291,3 +298,4 @@ Response::Response(const Response & src)
 Response::~Response(void)
 {
 }
+
