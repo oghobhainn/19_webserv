@@ -33,20 +33,29 @@ std::list<class Server> get_serv_list(std::string full_str)
     return serv_list;
 }
 
+void set_cgi(Location *it, int beg, int end, std::string str_location)
+{
+    std::string str_without_cgi;
+
+    str_without_cgi = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
+    if (str_without_cgi.find("PATH_INFO") != std::string::npos)
+        it->_CGI.PATH_INFO = str_without_cgi.substr(9, len(str_without_cgi));
+}
+
 void parse_loc(std::list<class Server> &serv_list)
 {
     std::string             str_methods;
-    std::string::size_type  index = 0;
     std::string             file_ext;
     std::string             str_location;
     Location *struct_loc = NULL;
-    int found = 0;
+    std::string::size_type  index = 0;
+    int i = 1;
+    int j = 0;
     int pos;
     int	pos_next;
     int beg = 0;
     int end = 0;
-    int i = 1;
-    int j = 0;
+    int found = 0;
 
     for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
     {
@@ -113,6 +122,12 @@ void parse_loc(std::list<class Server> &serv_list)
                 end = str_location.find(";", beg);
                 it->locations[j].default_file_if_request_directory = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
             }
+            if (str_location.find("fastcgi_pass") != std::string::npos)
+            {
+                beg = str_location.find("fastcgi_pass");
+                end = str_location.find(";", beg);
+                set_cgi(&it->locations[j], beg, end, str_location);
+            }
             i++;
             j++;
         }
@@ -158,6 +173,8 @@ std::list<class Server> parseConfig(std::string const path)
                 it2->setDefaultErrorPage(it3->substr(18, it3->size() - 18));
             else if (it3->find("client_body_size") != std::string::npos)
                 it2->setClientBodySize(it3->substr(16, it3->size() - 16));
+            else if (it3->find("cgi_param") != std::string::npos)
+                it2->setCgiParam(it3->substr(9, it3->size() - 9));
         }
     }
     return serv_list;
@@ -165,8 +182,7 @@ std::list<class Server> parseConfig(std::string const path)
 
 int main(int argc, char **argv)
 {
-
-    std::list<class Server> serv_list;
+    std::list<Server> serv_list;
     std::vector<int> set_of_port;
 
     if (argc != 2)
@@ -177,8 +193,6 @@ int main(int argc, char **argv)
     serv_list = parseConfig(argv[1]);
     
     ///////////////////// Print results /////////////////////////
-    std::string test2;
-
     // for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
     // {
     //     std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
@@ -188,16 +202,13 @@ int main(int argc, char **argv)
     //     std::cout << "Ser Name: " << it->getServerName() << std::endl;
     //     std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
     //     std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
-        
-
-
+    //     std::cout << "CGI param : " << it->getCgiParam() << std::endl; 
 	// 	it->getLocations();
     //     std::cout << "---------------------- END --------------------------------" << std::endl;
     // }
 
-
-    for (std::list<class Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
-        set_of_port.push_back(stoi(it2->getPort()));
+    // for (std::list<class Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
+    //     set_of_port.push_back(stoi(it2->getPort()));
 
     //// TO DO
    
@@ -209,12 +220,9 @@ int main(int argc, char **argv)
     //      - CGI
     //      - make the route able to accept uploaded files and configure where it should be saved
 
-
-
-
-
     ////////////////////// Server ////////////////////////////////
     TestServer t(serv_list);
+    
     return 0;
 }
 
@@ -276,3 +284,13 @@ int main(int argc, char **argv)
 // Chaque bloc d'emplacement contient des instructions spécifiques qui montrent à NGINX comment traiter la requête correspondante.
 
 // https://www.youtube.com/watch?v=N49UyTlUXp4&t=19s&ab_channel=EricOMeehan
+
+
+
+// CGI
+
+// The Common Gateway Interface (CGI) [1] is an interface between your web server and the programs you write
+// 1. The client (a web browser) sends a request to the server for a document. If it can, the server responds to the request directly by sending the document.
+// 2. If the server determines the request isn't for a document it can simply deliver, the server creates a CGI process.
+// 3. The CGI process turns the request information into environment variables. Next, it establishes a current working directory for the child process. Finally, it establishes pipes (data pathways) between the server and an external CGI program.
+// 4. After the external CGI program processes the request, it uses the data pathway to send a response back to the server, which in turn, sends the response back to the client.

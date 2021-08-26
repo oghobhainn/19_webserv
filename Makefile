@@ -7,10 +7,12 @@ SRCS = main.cpp \
 		Networking/Sockets/ConnectingSocket.cpp \
 		Networking/Sockets/ListeningSocket.cpp \
 		Networking/Sockets/SimpleSocket.cpp \
-		request_parser/http_request_parsing.cpp \
-		request_parser/utils_parser.cpp \
-		response_builder/response.cpp \
-		response_builder/utils_response.cpp \
+		Request/Request.cpp \
+		Request/RequestMembers.cpp \
+		Request/RequestUtils.cpp \
+		Response/Response.cpp \
+		Response/ResponseHeader.cpp \
+		Cgi/CgiHandler.cpp \
 		utils/utils.cpp
 
 CXX = clang++

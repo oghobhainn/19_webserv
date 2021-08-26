@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <list>
 #include <map>
+#include <set>
 #include <vector>
 #include <sys/socket.h>
 #include <errno.h>
@@ -19,9 +20,45 @@
 
 #include "../Networking/Sockets/ListeningSocket.hpp"
 
+#define RESET   "\033[0m"
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+
+#define PC(a, b) std::cout << a << b << std::endl;
+#define PY(a) std::cout << YELLOW << a << RESET << std::endl;
+#define PE(a) std::cout << RED << a << RESET << std::endl;
 #define P(x) std::cout << x << std::endl
 
-class Location
+class CGI
+{
+    public:
+        CGI();
+        ~CGI();
+
+        bool active;
+        std::string PATH_INFO;
+        std::string SCRIPT_NAME;
+        std::string AUTH_TYPE;
+        std::string CONTENT_LENGTH;
+        std::string CONTENT_TYPE;
+        std::string GATEWAY_INTERFACE;
+        std::string PATH_TRANSLATED;
+        std::string QUERY_STRING;
+        std::string REMOTE_ADDR;
+        std::string REMOTE_INDENT;
+        std::string REMOTE_USER;
+        std::string REQUEST_METHOD;
+        std::string REQUEST_URI;
+        // std::string SERVER_NAME;
+        // std::string SERVER_PORT;
+        std::string SERVER_PROTOCOL;
+        std::string SERVER_SOFTWARE;
+        std::string SECRET;
+};
+
+class Location : public CGI
 {
 	public:
 		Location();
@@ -36,11 +73,12 @@ class Location
 		bool                    get_method;
 		bool					post_method;
 		bool					delete_method;
-        std::string             redirection;
+        std::set<std::string>   _allowed_methods;
 
+        std::string             redirection;
         std::string             directory_listing;
         std::string             default_file_if_request_directory;
-        // t_CGI CGI; //If equal to NULL no CGI server, but http static content server
+        CGI                     _CGI;
 };
 
 class Server : public Location
@@ -52,22 +90,22 @@ class Server : public Location
         std::string			    port;
 		std::string				root;
         std::string			    server_name;
-        
-        size_t				    body_size_limit;
-        // std::list<std::string>  locations;
-        ListeningSocket         *_socket; ////////////////////////////
-        fd_set                  socket_client; //////////////////////
-
         std::string             default_error_page;
+        std::string             cgi_param;
+        std::string             cgi_pass;
+        std::string             path;
         int				        client_body_size;
 		int 					nb_loc;
-
+        ListeningSocket         *_socket;
+        std::string             content_location;
 
     public:
+        fd_set                  socket_client;
         Server();
         ~Server();
-		Location *locations;
         Server& operator=(Server const& copy);
+
+		Location *locations;
         
         void setFullStr(std::string const str);
         std::string getFullStr() const;
@@ -87,13 +125,13 @@ class Server : public Location
         void setPort(std::string const str);
         std::string getPort() const;
 
-
         void setSocket(ListeningSocket *socket); //////////////////////////
         ListeningSocket *getSocket(); ////////////////////////////////////
 
         void addSocketClient(int socket); //////////////////////////////
         void removeSocketClient(int socket); //////////////////////////
         fd_set getSocketClient(); ////////////////////////////////////
+        void setSocketClient(fd_set socket_client);
 
 		void setRoot(std::string const str);
         std::string getRoot() const;
@@ -105,8 +143,22 @@ class Server : public Location
         std::string getDefaultErrorPage() const;
 
         void setClientBodySize(std::string const str);
-        int getClientBodySize() const;
+        size_t getClientBodySize() const;
 
+        void setAllowedMethods();
+        std::set<std::string> getAllowedMethods() const;
+
+        void setCgiParam(std::string const str);
+        std::string getCgiParam() const;
+
+        void setCgiPass(std::string const str);
+        std::string getCgiPass() const;
+
+        void setPath(std::string const str);
+        std::string getPath() const;
+
+        void setContentLocation(std::string const & path);
+        std::string getContentLocation() const;
 };
 
 
