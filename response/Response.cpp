@@ -31,13 +31,26 @@ void			Response::call(Request & request, Server & server)
 	_host = server.getHost();
 	_port = server.getPort();
 	//_path = server.getPath(); // TODO
-	_path = "frontend/index_example.html"; // en attendant...
-	
 
-	if (server.getAllowedMethods().find(request.getMethod()) == server.getAllowedMethods().end())
+	_path = "html/index_example.html"; // en attendant... //TODO
+	
+	std::set<std::string> allowedTODO;
+	allowedTODO.insert("GET");
+	allowedTODO.insert("POST");
+	allowedTODO.insert("DELETE");
+
+	// if (server.getAllowedMethods().find(request.getMethod()) == server.getAllowedMethods().end())
+	// {
+	// 	_code = 405;
+	// }
+	if (allowedTODO.find(request.getMethod()) == allowedTODO.end())
+	{
 		_code = 405;
+	}
 	else if (server.getClientBodySize() < request.getBody().size())
+	{
 		_code = 413;
+	}
 
 	if (_code == 405 || _code == 413)
 	{
@@ -48,8 +61,6 @@ void			Response::call(Request & request, Server & server)
 
 		return ;
 	}
-
-
 	(this->*Response::_method[request.getMethod()])(request, server);
 }
 
@@ -85,9 +96,9 @@ void			Response::getMethod(Request & request, Server & server)
 		_code = readContent();
 	}
 	else
-		_response = this->readHtml(_errorMap[_code]);
+		_response = this->readHtml("html/error/" + to_string(_code) + ".html");
 	if (_code == 500)
-		_response = this->readHtml(_errorMap[_code]);
+		_response = this->readHtml("html/error/" + to_string(_code) + ".html");
 
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), server.getLang()) + "\r\n" + _response;
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
@@ -108,7 +119,7 @@ void			Response::postMethod(Request & request, Server & server)
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
-		_response = cgi.executeCgi(server.getCgiPass());
+		_response = cgi.executeCgi(server.getCgiPass()); //magic happens here TODO
 
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
@@ -130,7 +141,7 @@ void			Response::postMethod(Request & request, Server & server)
 		_response = "";
 	}
 	if (_code == 500)
-		_response = this->readHtml(_errorMap[_code]);
+		_response = this->readHtml("html/error"+ to_string(_code) + ".html");
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
 	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
 	_response += "\r\n";
@@ -156,6 +167,7 @@ void			Response::deleteMethod(Request & request, Server & server)
 	{
 		if (remove(_path.c_str()) == 0)
 		{
+			PY(_path + " DELETED");
 			_code = 204;
 		}
 		else
@@ -164,7 +176,7 @@ void			Response::deleteMethod(Request & request, Server & server)
 	else
 		_code = 404;
 	if (_code == 403 || _code == 404)
-		_response = this->readHtml(_errorMap[_code]);
+		_response = this->readHtml("html/error"+ to_string(_code) + ".html");
 	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
 	_response += "\r\n";
@@ -215,7 +227,7 @@ int				Response::readContent(void)
 		file.open(_path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 		{
-			_response = this->readHtml(_errorMap[403]);
+			_response = this->readHtml("html/error/403.html");
 			return (403);
 		}
 
@@ -232,7 +244,7 @@ int				Response::readContent(void)
 	// }
 	else
 	{
-		_response = this->readHtml(_errorMap[404]);
+		_response = this->readHtml("html/error/404.html");
 		return (404);
 	}
 
@@ -266,7 +278,6 @@ std::string		Response::readHtml(const std::string& path)
 {
 	std::ofstream		file;
 	std::stringstream	buffer;
-
 	if (pathIsFile(path))
 	{
 		file.open(path.c_str(), std::ifstream::in);

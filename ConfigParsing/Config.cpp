@@ -61,15 +61,27 @@ Server::~Server()
 
 }
 
-Server& Server::operator=(Server const& copy)
+Server Server::operator=(Server const& copy)
 {
-	if (this != &copy)
-	{
-
-	}
-	return *this;
+    if (this != &copy)
+    {
+        this->full_str = copy.full_str ;
+        this->str_without_loc = copy.str_without_loc;
+        this->port = copy.port;
+        this->root = copy.root;
+        this->server_name = copy.server_name;
+        this->default_error_page = copy.default_error_page;
+        this->cgi_param = copy.cgi_param;
+        this->cgi_pass = copy.cgi_pass;
+        this->path = copy.path;
+        this->client_body_size = copy.client_body_size;
+        this->nb_loc = copy.nb_loc;
+        this->socket_client = copy.socket_client;
+        this->_socket = copy._socket;
+        this->content_location = copy.content_location;
+    }
+    return *this;
 }
-
 void Server::setFullStr(std::string const str)
 {
 	this->full_str = str;
@@ -282,6 +294,8 @@ std::string	Server::getContentLocation() const
 
 std::ostream& operator<<(std::ostream& os, const Server& item)
 {
-	item.getLocations();
-    return os << "NODE \n" << "full_str : " << item.getFullStr();
+	//os << item.getFullStr();
+	//item.getLocations();
+    return os << "full_str : " << item.getFullStr();
 }
+

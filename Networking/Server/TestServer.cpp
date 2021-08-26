@@ -1,6 +1,5 @@
 #include "TestServer.hpp"
 
-
 // TestServer::TestServer()
 // {
 //     ListeningSocket *socket;
@@ -10,7 +9,6 @@
 //     add_connecting_socket(socket->get_listening());
 //     launch();
 // }
-
 
 TestServer::TestServer(std::list<class Server> serv_list)
 {
@@ -56,7 +54,9 @@ fd_set TestServer::get_connecting_socket()
     return (_set_of_socket);
 }
 
-int TestServer::accepter(int socket, std::list<class Server> serv_list)
+
+
+int TestServer::accepter(int socket, std::list<class Server> serv_list, Server & serv)
 {
     int sock_tmp;
     std::list<Server>::iterator it;
@@ -66,6 +66,9 @@ int TestServer::accepter(int socket, std::list<class Server> serv_list)
         if (socket == it->getSocket()->get_sock())
             break ;
     }
+    serv = *it;
+    // std::cout << serv << std::endl;
+
     struct sockaddr_in address = it->getSocket()->get_address();
     int addrlen = sizeof(address);
     sock_tmp = accept(socket, (struct sockaddr *)&address, (socklen_t *)&addrlen);
@@ -73,21 +76,46 @@ int TestServer::accepter(int socket, std::list<class Server> serv_list)
     return (sock_tmp);
 }
 
-void TestServer::handler(int socket)
+Server TestServer::find_server(int socket_client, std::list<class Server> serv_list)
+{
+    std::list<Server>::iterator it;
+    fd_set tmp;
+    Server server_client;
+
+    for (it = serv_list.begin(); it != serv_list.end(); ++it)
+    {
+        tmp = it->getSocketClient();
+        if (FD_ISSET(socket_client, &tmp))
+        {
+            server_client = *it;
+            return (server_client);
+        }
+    }
+    PE("on n'a pas trouve le server...");
+    return server_client;
+}
+
+void TestServer::handler(int socket, Server & serv)
 {
     Request     req(_buffer);
+    // PY("config file : ");
+    // std::cout << serv << std::endl;
+    // PY("end of config file");
+    //serv.setDefaultErrorPage("/html/error/400.html");
+    // PY("request : ======");
+    // std::cout << req << std::endl;
+    // PY("================");
 
-    PY("request : ");
-    std::cout << req << std::endl;
 
-    Server          serv;
+    // Server          serv = TestServer::find_server(socket,);
     //RequestConfig	requestConf;
 	Response		response;
     response.call(req, serv);
     response = response.Response::buildResponse(req, serv);
 
-    P("response : ");
-    std::cout << response.getResponse() << std::endl;
+    // PY("response : //////");
+    // std::cout << response.getResponse() << std::endl;
+    // PY("/////////////////");
     char char_response[response.getResponse().length() + 1];
     strcpy(char_response, response.getResponse().c_str()); 
     write(socket, char_response, strlen(char_response));
@@ -127,6 +155,7 @@ void TestServer::responder(int socket)
 
 void TestServer::launch(std::list<class Server> serv_list)
 {
+    Server serv;
     fd_set writing_socket;
     fd_set reading_socket;
     fd_set server_socket;
@@ -153,22 +182,56 @@ void TestServer::launch(std::list<class Server> serv_list)
         for (int i = 0; i < FD_SETSIZE; i++)
         {
             // std::cout << i << std::endl;
-            if (FD_ISSET(i, &server_socket) || FD_ISSET(i, &exec_socket))
+            // if i is in set_fd of read
+            if (FD_ISSET(i, &reading_socket) && FD_ISSET(i, &server_socket))
+            {
+				// std::cout << "================================================================= reading socket : " << i << std::endl;
+                // this is a new connection
+                sock_tmp = accepter(i, serv_list, serv);
+                // std::cout << serv << std::endl;
+                fcntl(sock_tmp, F_SETFL, O_NONBLOCK);
+                FD_SET(sock_tmp, &reading_socket);
+				// std::cout << "================================================================= writing socket after being accepted : " << sock_tmp << std::endl;
+            }
+            // if i is in socket of write
+            if (FD_ISSET(i, &reading_socket) && !FD_ISSET(i, &server_socket))
             {
                 // do whatever we do with the connection
-                std::cout << "================================================================= writing socket : " << i << std::endl;
-				sock_tmp = accepter(i, serv_list);
-                FD_SET(sock_tmp, &exec_socket);
-                readsocket(sock_tmp);
+                // std::cout << "================================================================= writing socket : " << i << std::endl;
+				// actif_serv = find_server(i, serv_list);
+                readsocket(i);
 				// std::cout << "hello 1" << std::endl;
-                handler(sock_tmp);
+                handler(i, serv);
 				// std::cout << "hello 2" << std::endl;
-                responder(sock_tmp);
+                responder(i);
 				// std::cout << "hello 3" << std::endl;
-                remove_connecting_socket(sock_tmp);
-                FD_CLR(sock_tmp, &exec_socket);
+                // remove_connecting_socket(i);
+                FD_CLR(i, &reading_socket);
             }
         }
+        // for (int i = 0; i < FD_SETSIZE; i++)
+        // {
+        //     // std::cout << i << std::endl;
+        //     if (FD_ISSET(i, &server_socket) || FD_ISSET(i, &exec_socket))
+        //     {
+        //         // do whatever we do with the connection
+        //         std::cout << "================================================================= writing socket : " << i << std::endl;
+		// 		sock_tmp = accepter(i, serv_list);
+        //         find_server(i, serv_list, actif_serv);
+        //         PY("config file :");
+        //         std::cout << actif_serv << std::endl;
+        //         PY("end of config file");
+        //         FD_SET(sock_tmp, &exec_socket);
+        //         readsocket(sock_tmp);
+		// 		// std::cout << "hello 1" << std::endl;
+        //         handler(sock_tmp, actif_serv);
+		// 		// std::cout << "hello 2" << std::endl;
+        //         responder(sock_tmp);
+		// 		// std::cout << "hello 3" << std::endl;
+        //         remove_connecting_socket(sock_tmp);
+        //         FD_CLR(sock_tmp, &exec_socket);
+        //     }
+        // }
     }
 }
 

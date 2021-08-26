@@ -27,6 +27,10 @@
 // #include "Cgi/CgiHandler.hpp"
 // #include "Utils/utils.hpp"
 
+//#include "request_parser/request.hpp"
+//#include "response_builder/response.hpp"
+#include "Utils/utils.hpp"
+
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -40,13 +44,8 @@
 # define RECV_SIZE 65536
 # define CGI_BUFSIZE 65536
 
-//#include "request_parser/request.hpp"
-//#include "response_builder/response.hpp"
-#include "Utils/utils.hpp"
-
 #define PC(a, b) std::cout << a << b << std::endl;
 #define PE(a) std::cout << RED << a << RESET << std::endl;
-
 
 /*
 *** Utils

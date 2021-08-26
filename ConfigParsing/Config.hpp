@@ -103,7 +103,7 @@ class Server : public Location
     public:
         Server();
         ~Server();
-        Server& operator=(Server const& copy);
+        Server operator=(Server const& copy);
 
 		Location *locations;
         
@@ -162,6 +162,5 @@ class Server : public Location
 
 
 std::ostream& operator<<(std::ostream& os, const Server& item);
-
 
 # endif

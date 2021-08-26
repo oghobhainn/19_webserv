@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
+#include <fcntl.h>
+
 
 // #include "SimpleServer.hpp"
 #include "SimpleServer.hpp"
@@ -34,9 +36,10 @@ class TestServer
         TestServer(std::list<class Server> serv_list);
         
         void launch(std::list<class Server> serv_list);
-        int accepter(int socket, std::list<class Server> serv_list);
+        int accepter(int socket, std::list<class Server> serv_list, Server & serv);
         void readsocket(int socket);
-        void handler(int socket);
+        Server find_server(int socket_client, std::list<class Server> serv_list);
+        void handler(int socket, Server & serv);
         void responder(int socket);
 
         int get_new_socket();
