@@ -20,6 +20,7 @@ TestServer::TestServer(std::list<class Server> serv_list)
     {
         socket = create_sub_server(AF_INET, SOCK_STREAM, 0, stoi(it->getPort()), INADDR_ANY, 10);
         it->setSocket(socket);
+        FD_ZERO(&it->socket_client);
         add_connecting_socket(socket->get_sock());
         socket = nullptr;
     }
@@ -63,8 +64,11 @@ std::list<Server>::iterator TestServer::find_server(int socket_client, std::list
     int i = 0;
     for (it = serv_list.begin(); it != serv_list.end(); ++it)
     {
-        if (FD_ISSET(socket_client, &it->socket_client))
+        std::cout << "str found: " << it->getFullStr() << std::endl;
+        // if (FD_ISSET(socket_client, &it->socket_client))
+        if (socket_client == it->tmp_client)
         {
+            std::cout << "string found" << it->getFullStr();
             return(it);
         }
         i++;
@@ -88,9 +92,11 @@ int TestServer::accepter(int socket, std::list<class Server> serv_list)
     int addrlen = sizeof(address);
     // std::cout << "hello 1" << std::endl;
     sock_tmp = accept(socket, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+    printf("==================== sock = %p \n", &sock_tmp);
+    FD_SET(sock_tmp, &it->socket_client);
+    it->tmp_client = sock_tmp;
     fcntl(sock_tmp, F_SETFL, O_NONBLOCK);
     // std::cout << "hello 2" << std::endl;
-    FD_SET(sock_tmp, &it->socket_client);
     // it->addSocketClient(sock_tmp);
     return (sock_tmp);
 }
@@ -119,9 +125,9 @@ void TestServer::handler(int socket)
 void TestServer::readsocket(int socket)
 {
     long ret = 0;
-    char buff[1000001];
+    char buff[100001];
 	std::cout << "Socket read " << socket << std::endl;
-    if ((ret = recv(socket, buff, 1000000, 0)) == -1)
+    if ((ret = recv(socket, buff, 100000, 0)) == -1)
     {
         std::cout << "buff: " << buff << std::endl;
         std::cout << "Error with recv" << std::endl;
@@ -194,7 +200,7 @@ void TestServer::launch(std::list<class Server> serv_list)
 				std::cout << "================================================================= reading socket : " << i << std::endl;
                 // this is a new connection
                 sock_tmp = accepter(i, serv_list);
-                fcntl(sock_tmp, F_SETFL, O_NONBLOCK);
+                // fcntl(sock_tmp, F_SETFL, O_NONBLOCK);
                 FD_SET(sock_tmp, &reading_socket);
 				std::cout << "================================================================= writing socket after being accepted : " << sock_tmp << std::endl;
             }
