@@ -101,7 +101,6 @@ class Server : public Location
 
     public:
         fd_set                  socket_client;
-        int                     tmp_client;
         Server();
         ~Server();
         Server& operator=(Server const& copy);

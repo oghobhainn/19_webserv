@@ -64,12 +64,9 @@ std::list<Server>::iterator TestServer::find_server(int socket, std::list<class 
     int i = 0;
     for (it = serv_list->begin(); it != serv_list->end(); ++it)
     {
-        // std::cout << "str found: " << it->getFullStr() << std::endl;
-        // if (FD_ISSET(socket_client, &it->socket_client))
-        // if (socket_client == it->tmp_client)
         if (FD_ISSET(socket, &it->socket_client))
         {
-            std::cout << "string found : " << it->getFullStr() << std::endl;
+            // std::cout << "string found : " << it->getFullStr() << std::endl;
             return(it);
         }
         i++;
@@ -83,7 +80,7 @@ int TestServer::accepter(int socket, std::list<class Server> *serv_list)
     int sock_tmp;
     std::list<Server>::iterator it;
 
-    std::cout << socket << std::endl;
+    // std::cout << socket << std::endl;
     for (it = serv_list->begin(); it != serv_list->end(); ++it)
     {
         if (socket == it->getSocket()->get_sock())
@@ -91,12 +88,8 @@ int TestServer::accepter(int socket, std::list<class Server> *serv_list)
     }
     struct sockaddr_in address = it->getSocket()->get_address();
     int addrlen = sizeof(address);
-    // std::cout << "hello 1" << std::endl;
     sock_tmp = accept(socket, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-    // FD_SET(sock_tmp, &it->socket_client);
-    // it->tmp_client = sock_tmp;
-    fcntl(sock_tmp, F_SETFL, O_NONBLOCK);
-    // std::cout << "hello 2" << std::endl;
+    // fcntl(sock_tmp, F_SETFL, O_NONBLOCK);
     it->addSocketClient(sock_tmp);
     return (sock_tmp);
 }
@@ -124,14 +117,13 @@ void TestServer::handler(int socket)
 
 void TestServer::readsocket(int socket)
 {
-    long ret = -1;
-    char buff[100001];
-	std::cout << "Socket read " << socket << std::endl;
-    if ((ret = recv(socket, buff, 100000, 0)) == -1)
-    {
-        std::cout << "buff: " << buff << std::endl;
+    int ret = -1;
+    char buff[1000001];
+    ret = recv(socket, buff, 1000000, 0);
+    // std::cout << "=============---------------- " << ret << std::endl;
+	// std::cout << "Socket read " << socket << std::endl;
+    if (ret == -1)
         std::cout << "Error with recv" << std::endl;
-    }
     else if (ret == 0)
     {
         std::cout << "No bytes are there to read" << std::endl;
@@ -139,8 +131,10 @@ void TestServer::readsocket(int socket)
     }
     else
     {
-        buff[ret - 1] = 0;
-        strcpy(buff, _buffer);
+        buff[ret] = 0;
+        strcpy(_buffer, buff);
+        // std::cout << buff << std::endl;
+        // std::cout << _buffer << std::endl;
     }
 }
 
@@ -188,7 +182,6 @@ void TestServer::launch(std::list<class Server> *serv_list)
     fd_set server_socket;
     int ret;
     int sock_tmp = 0;
-    int i = 0;
 
 	struct timeval timeout = {2, 0};
     server_socket = get_connecting_socket();
@@ -214,9 +207,7 @@ void TestServer::launch(std::list<class Server> *serv_list)
             {
                 FD_ZERO(&writing_socket);
                 FD_ZERO(&reading_socket);
-                i++;
             }
-            // std::cout << "shit " << i << std::endl;
         }
         for (int i = 0; i < FD_SETSIZE; i++)
         {
@@ -224,26 +215,25 @@ void TestServer::launch(std::list<class Server> *serv_list)
             // if i is in set_fd of read
             if (FD_ISSET(i, &reading_socket) && FD_ISSET(i, &server_socket))
             {
-				std::cout << "================================================================= reading socket : " << i << std::endl;
+				// std::cout << "================================================================= reading socket : " << i << std::endl;
                 // this is a new connection
                 sock_tmp = accepter(i, serv_list);
-                // fcntl(sock_tmp, F_SETFL, O_NONBLOCK);
                 FD_SET(sock_tmp, &reading_socket);
-				std::cout << "================================================================= writing socket after being accepted : " << sock_tmp << std::endl;
+				// std::cout << "================================================================= writing socket after being accepted : " << sock_tmp << std::endl;
             }
             // if i is in socket of write
             if (FD_ISSET(i, &reading_socket) && !FD_ISSET(i, &server_socket))
             {
                 std::list<Server>::iterator it;
                 // do whatever we do with the connection
-                std::cout << "================================================================= writing socket : " << i << std::endl;
+                // std::cout << "================================================================= writing socket : " << i << std::endl;
 				it = find_server(i, serv_list);
                 readsocket(i);
-				std::cout << "hello 1" << std::endl;
+				// std::cout << "hello 1" << std::endl;
                 handler(i);
-				std::cout << "hello 2" << std::endl;
+				// std::cout << "hello 2" << std::endl;
                 responder(i);
-				std::cout << "hello 3" << std::endl;
+				// std::cout << "hello 3" << std::endl;
                 remove_connecting_socket(i);
                 FD_CLR(i, &reading_socket);
             }
