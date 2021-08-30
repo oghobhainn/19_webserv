@@ -34,8 +34,8 @@ class TestServer
         // TestServer();
         TestServer(std::list<class Server> serv_list);
         
-        void launch(std::list<class Server> serv_list);
-        int accepter(int socket, std::list<class Server> serv_list);
+        void launch(std::list<class Server> *serv_list);
+        int accepter(int socket, std::list<class Server> *serv_list);
         void readsocket(int socket);
         void handler(int socket);
         void responder(int socket);
@@ -46,7 +46,7 @@ class TestServer
         void add_connecting_socket(int connecting_socket);
         void remove_connecting_socket(int connecting_socket);
 
-        std::list<Server>::iterator find_server(int socket_client, std::list<class Server> serv_list);
+        std::list<Server>::iterator find_server(int socket_client, std::list<class Server> *serv_list);
         ListeningSocket *get_socket();
         ListeningSocket *create_sub_server(int domain, int service, int protocol, int port, u_long interface, int bklg);
 };

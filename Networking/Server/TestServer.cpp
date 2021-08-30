@@ -24,7 +24,7 @@ TestServer::TestServer(std::list<class Server> serv_list)
         add_connecting_socket(socket->get_sock());
         socket = nullptr;
     }
-    launch(serv_list);
+    launch(&serv_list);
 }
 
 ListeningSocket *TestServer::create_sub_server(int domain, int service, int protocol, int port, u_long interface, int bklg)
@@ -57,18 +57,19 @@ fd_set TestServer::get_connecting_socket()
     return (_set_of_socket);
 }
 
-std::list<Server>::iterator TestServer::find_server(int socket_client, std::list<class Server> serv_list)
+std::list<Server>::iterator TestServer::find_server(int socket, std::list<class Server> *serv_list)
 {
     std::list<Server>::iterator it;
 
     int i = 0;
-    for (it = serv_list.begin(); it != serv_list.end(); ++it)
+    for (it = serv_list->begin(); it != serv_list->end(); ++it)
     {
-        std::cout << "str found: " << it->getFullStr() << std::endl;
+        // std::cout << "str found: " << it->getFullStr() << std::endl;
         // if (FD_ISSET(socket_client, &it->socket_client))
-        if (socket_client == it->tmp_client)
+        // if (socket_client == it->tmp_client)
+        if (FD_ISSET(socket, &it->socket_client))
         {
-            std::cout << "string found" << it->getFullStr();
+            std::cout << "string found : " << it->getFullStr() << std::endl;
             return(it);
         }
         i++;
@@ -77,13 +78,13 @@ std::list<Server>::iterator TestServer::find_server(int socket_client, std::list
     return(it);
 }
 
-int TestServer::accepter(int socket, std::list<class Server> serv_list)
+int TestServer::accepter(int socket, std::list<class Server> *serv_list)
 {
     int sock_tmp;
     std::list<Server>::iterator it;
 
     std::cout << socket << std::endl;
-    for (it = serv_list.begin(); it != serv_list.end(); ++it)
+    for (it = serv_list->begin(); it != serv_list->end(); ++it)
     {
         if (socket == it->getSocket()->get_sock())
             break ;
@@ -92,12 +93,11 @@ int TestServer::accepter(int socket, std::list<class Server> serv_list)
     int addrlen = sizeof(address);
     // std::cout << "hello 1" << std::endl;
     sock_tmp = accept(socket, (struct sockaddr *)&address, (socklen_t *)&addrlen);
-    printf("==================== sock = %p \n", &sock_tmp);
-    FD_SET(sock_tmp, &it->socket_client);
-    it->tmp_client = sock_tmp;
+    // FD_SET(sock_tmp, &it->socket_client);
+    // it->tmp_client = sock_tmp;
     fcntl(sock_tmp, F_SETFL, O_NONBLOCK);
     // std::cout << "hello 2" << std::endl;
-    // it->addSocketClient(sock_tmp);
+    it->addSocketClient(sock_tmp);
     return (sock_tmp);
 }
 
@@ -124,7 +124,7 @@ void TestServer::handler(int socket)
 
 void TestServer::readsocket(int socket)
 {
-    long ret = 0;
+    long ret = -1;
     char buff[100001];
 	std::cout << "Socket read " << socket << std::endl;
     if ((ret = recv(socket, buff, 100000, 0)) == -1)
@@ -144,6 +144,33 @@ void TestServer::readsocket(int socket)
     }
 }
 
+// void get_client_request(t_server &s, t_active_socket &active_socket)
+// {
+// 	int message_len = -1; //Receive message lenght to add a /0 at end str
+// 	char message_buffer[1000001];  //Received message is taken into a char* message_buffer because we use C functions
+
+// 	for (unsigned int i = 0; i < s.fd_max; i++)
+// 	{
+// 		if (FD_ISSET(s.client_socket[i] , &active_socket.read)) //If client socket still in active sockets, a request exists from that client
+// 		{
+// 			if ((message_len = recv(s.client_socket[i] , message_buffer, 1000000, 0)) == -1) //Read the incoming message //MSG_PEEK //read whole message
+// 			{
+// 				P("Error: recv failed");
+// 				client_restart(s, i);
+// 			}
+// 			else if (message_len == 0) //If incoming message lenght is equal to 0, the client socket closed connection
+// 				client_disconnection(s, i);
+// 			else
+// 			{
+// 				message_buffer[message_len] = '\0'; //End message buffer with terminating /0
+// 				if (s.requests[s.client_socket[i]].complete_request.size() == 0)
+// 					s.requests[s.client_socket[i]].complete_request.reserve(1000000100);
+// 				s.requests[s.client_socket[i]].complete_request += message_buffer; //Create key in map with its value
+// 			}
+// 		}
+// 	}
+// }
+
 void TestServer::responder(int socket)
 {
     if (socket == -45) // shutting error
@@ -154,7 +181,7 @@ void TestServer::responder(int socket)
     }
 }
 
-void TestServer::launch(std::list<class Server> serv_list)
+void TestServer::launch(std::list<class Server> *serv_list)
 {
     fd_set writing_socket;
     fd_set reading_socket;
@@ -217,7 +244,7 @@ void TestServer::launch(std::list<class Server> serv_list)
 				std::cout << "hello 2" << std::endl;
                 responder(i);
 				std::cout << "hello 3" << std::endl;
-                // remove_connecting_socket(i);
+                remove_connecting_socket(i);
                 FD_CLR(i, &reading_socket);
             }
         }
