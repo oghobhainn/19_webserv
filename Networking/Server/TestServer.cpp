@@ -94,15 +94,16 @@ int TestServer::accepter(int socket, std::list<class Server> *serv_list)
     return (sock_tmp);
 }
 
-void TestServer::handler(int socket)
+void TestServer::handler(int socket, Server serv)
 {
     Request     req(_buffer);
 
     std::cout << "=============================================================================================" << std::endl;
     PY("request : ");
-    std::cout << req << std::endl;
+    // std::cout << req << std::endl;
+    std::cout << _buffer << std::endl;
 
-    Server          serv;
+    // Server          serv;
     //RequestConfig	requestConf;
 	Response		response;
     response.call(req, serv);
@@ -119,10 +120,10 @@ void TestServer::handler(int socket)
 
 void TestServer::readsocket(int socket)
 {
-    int ret = -1;
-    char buff[1000001];
-    ret = recv(socket, buff, 1000000, 0);
-
+    int ret = 0;
+    char buff[100001];
+    memset(buff, 0, 100001);
+    ret = recv(socket, buff, 100000, 0);
     if (ret == -1)
         std::cout << "Error with recv" << std::endl;
     else if (ret == 0)
@@ -139,12 +140,12 @@ void TestServer::readsocket(int socket)
 
 void TestServer::responder(int socket)
 {
-    // if (socket == -45) // shutting error
-    // {
-    const char *hello = "<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>";
-    write(socket, hello, strlen(hello));
-    close(socket);
-    // }
+    if (socket == -45) // shutting error
+    {
+        const char *hello = "<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>";
+        write(socket, hello, strlen(hello));
+        close(socket);
+    }
 }
 
 void TestServer::launch(std::list<class Server> *serv_list)
@@ -196,9 +197,10 @@ void TestServer::launch(std::list<class Server> *serv_list)
                 std::list<Server>::iterator it;
 				it = find_server(i, serv_list);
                 readsocket(i);
-                handler(i);
+                handler(i, *it);
                 responder(i);
                 remove_connecting_socket(i);
+                memset(_buffer, 0, 1000001);
                 FD_CLR(i, &reading_socket);
             }
         }
