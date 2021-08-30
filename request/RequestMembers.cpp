@@ -166,10 +166,9 @@ int					Request::parse(const std::string& str)
 		if (i == std::string::npos)
 			break;
 	}
-
 	if (this->_headers["Www-Authenticate"] != "")
 		this->_env_for_cgi["Www-Authenticate"] = this->_headers["Www-Authenticate"];
-	this->setLang();
+	//this->setLang();
 	if (i < str.length())
 	{
 		this->setBody(str.substr(i));//, std::string::npos));

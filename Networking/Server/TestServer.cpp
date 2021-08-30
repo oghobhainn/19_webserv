@@ -1,6 +1,5 @@
 #include "TestServer.hpp"
 
-
 // TestServer::TestServer()
 // {
 //     ListeningSocket *socket;
@@ -10,7 +9,6 @@
 //     add_connecting_socket(socket->get_listening());
 //     launch();
 // }
-
 
 TestServer::TestServer(std::list<class Server> serv_list)
 {
@@ -78,14 +76,17 @@ std::list<Server>::iterator TestServer::find_server(int socket, std::list<class 
 int TestServer::accepter(int socket, std::list<class Server> *serv_list)
 {
     int sock_tmp;
+    // Server serv;
     std::list<Server>::iterator it;
 
-    // std::cout << socket << std::endl;
     for (it = serv_list->begin(); it != serv_list->end(); ++it)
     {
         if (socket == it->getSocket()->get_sock())
             break ;
     }
+    // serv = *it;
+    // std::cout << serv << std::endl;
+
     struct sockaddr_in address = it->getSocket()->get_address();
     int addrlen = sizeof(address);
     sock_tmp = accept(socket, (struct sockaddr *)&address, (socklen_t *)&addrlen);
@@ -100,11 +101,9 @@ void TestServer::handler(int socket, Server serv)
 
     std::cout << "=============================================================================================" << std::endl;
     PY("request : ");
-    // std::cout << req << std::endl;
-    std::cout << _buffer << std::endl;
+    std::cout << req << std::endl;
+    // std::cout << _buffer << std::endl;
 
-    // Server          serv;
-    //RequestConfig	requestConf;
 	Response		response;
     response.call(req, serv);
     response = response.Response::buildResponse(req, serv);
@@ -150,22 +149,23 @@ void TestServer::responder(int socket)
 
 void TestServer::launch(std::list<class Server> *serv_list)
 {
+    Server serv;
     fd_set writing_socket;
     fd_set reading_socket;
     fd_set server_socket;
     int ret;
     int sock_tmp = 0;
+    // int j;
 
+    // j = 0;
 	struct timeval timeout = {2, 0};
     server_socket = get_connecting_socket();
     FD_ZERO(&writing_socket);
     while(true)
     {
         ret = 0;
-        // server_socket = get_connecting_socket();
-        // writing_socket = server_socket;
-        // reading_socket = server_socket;
-        // FD_ZERO(&writing_socket);
+        FD_ZERO(&writing_socket);
+        FD_ZERO(&reading_socket);
         while (ret == 0)
         {
             writing_socket = server_socket;
@@ -181,28 +181,35 @@ void TestServer::launch(std::list<class Server> *serv_list)
                 FD_ZERO(&writing_socket);
                 FD_ZERO(&reading_socket);
             }
+            std::cout << "waiting for connection" << std::endl;
         }
         for (int i = 0; i < FD_SETSIZE; i++)
         {
             // if i is in set_fd of read
             if (FD_ISSET(i, &reading_socket) && FD_ISSET(i, &server_socket))
             {
+                std::cout << "boucle for " << i << std::endl;
                 // this is a new connection
                 sock_tmp = accepter(i, serv_list);
                 FD_SET(sock_tmp, &reading_socket);
+                FD_CLR(i, &reading_socket);
             }
             // if i is in socket of write
             if (FD_ISSET(i, &reading_socket) && !FD_ISSET(i, &server_socket))
             {
+                std::cout << "2eme boucle for  " << i << std::endl;
                 std::list<Server>::iterator it;
 				it = find_server(i, serv_list);
                 readsocket(i);
                 handler(i, *it);
                 responder(i);
                 remove_connecting_socket(i);
-                memset(_buffer, 0, 1000001);
+                // memset(_buffer, 0, 1000001);
                 FD_CLR(i, &reading_socket);
+                close(i);
             }
         }
+        // std::cout <<  << std::endl;
+        std::cout << "---------------------------- boucle for finished ---------------------------- " << std::endl;
     }
 }

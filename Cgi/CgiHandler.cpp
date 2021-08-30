@@ -51,7 +51,7 @@ void		CgiHandler::_initEnv(Request &request, Server &serv) {
 		this->_env["SERVER_NAME"] = this->_env["REMOTEaddr"];
 	this->_env["SERVER_PORT"] = serv.getPort();
 	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-	this->_env["SERVER_SOFTWARE"] = "Weebserv/1.0";
+	this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
 
 	//this->_env.insert(serv.getCgiParam().begin(), serv.getCgiParam().end()); //TODO
 }
@@ -80,7 +80,7 @@ std::string		CgiHandler::executeCgi(const std::string& scriptName) {
 		env = this->_getEnvAsCstrArray();
 	}
 	catch (std::bad_alloc &e) {
-		std::cerr << RED << e.what() << RESET << std::endl;
+		PE(e.what())
 	}
 
 	// SAVING STDIN AND STDOUT IN ORDER TO TURN THEM BACK TO NORMAL LATER
@@ -100,18 +100,18 @@ std::string		CgiHandler::executeCgi(const std::string& scriptName) {
 
 	if (pid == -1)
 	{
-		std::cerr << RED << "Fork crashed." << RESET << std::endl;
+		PE("Fork crashed");
 		return ("Status: 500\r\n\r\n");
 	}
 	else if (!pid)
 	{
 		char * const * nll = NULL;
 
-		dup2(fdIn, STDIN_FILENO);
-		dup2(fdOut, STDOUT_FILENO);
+		dup2(fdIn, 0);
+		dup2(fdOut, 1);
 		execve(scriptName.c_str(), nll, env);
-		std::cerr << RED << "Execve crashed." << RESET << std::endl;
-		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
+		PE("Execve crashed");
+		write(1, "Status: 500\r\n\r\n", 15);
 	}
 	else
 	{

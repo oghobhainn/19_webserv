@@ -82,7 +82,6 @@ Server& Server::operator=(Server const& copy)
 	}
 	return *this;
 }
-
 void Server::setFullStr(std::string const str)
 {
 	this->full_str = str;
@@ -303,6 +302,8 @@ std::string	Server::getContentLocation() const
 
 std::ostream& operator<<(std::ostream& os, const Server& item)
 {
-	item.getLocations();
-    return os << "NODE \n" << "full_str : " << item.getFullStr();
+	//os << item.getFullStr();
+	//item.getLocations();
+    return os << "full_str : " << item.getFullStr();
 }
+

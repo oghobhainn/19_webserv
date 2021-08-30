@@ -164,5 +164,4 @@ class Server : public Location
 
 std::ostream& operator<<(std::ostream& os, const Server& item);
 
-
 # endif
