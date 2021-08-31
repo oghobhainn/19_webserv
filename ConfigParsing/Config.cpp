@@ -61,10 +61,10 @@ Server::~Server()
 
 }
 
-Server Server::operator=(Server const& copy)
+Server& Server::operator=(Server const& copy)
 {
-    if (this != &copy)
-    {
+	if (this != &copy)
+	{
         this->full_str = copy.full_str ;
         this->str_without_loc = copy.str_without_loc;
         this->port = copy.port;
@@ -79,8 +79,8 @@ Server Server::operator=(Server const& copy)
         this->socket_client = copy.socket_client;
         this->_socket = copy._socket;
         this->content_location = copy.content_location;
-    }
-    return *this;
+	}
+	return *this;
 }
 void Server::setFullStr(std::string const str)
 {
@@ -241,23 +241,31 @@ ListeningSocket *Server::getSocket()
 
 void Server::addSocketClient(int socket)
 {
-	fd_set tmp;
+	// fd_set tmp;
 
-	tmp = getSocketClient();
-	FD_SET(socket, &tmp);
+	// tmp = getSocketClient();
+	FD_SET(socket, &socket_client);
+	// setSocketClient(tmp);
 }
 
 void Server::removeSocketClient(int socket)
 {
-	fd_set tmp;
+	// fd_set tmp;
 
-	tmp = getSocketClient();
-	FD_CLR(socket, &tmp);
+	// tmp = getSocketClient();
+	FD_CLR(socket, &socket_client);
+	// setSocketClient(tmp);
 }
 
 fd_set Server::getSocketClient()
 {
 	return (socket_client);
+}
+
+void Server::setSocketClient(fd_set socket)
+{
+	FD_ZERO(&socket_client);
+	socket_client = socket;
 }
 
 void	Server::setAllowedMethods()

@@ -96,14 +96,14 @@ class Server : public Location
         std::string             path;
         int				        client_body_size;
 		int 					nb_loc;
-        fd_set                  socket_client;
         ListeningSocket         *_socket;
         std::string             content_location;
 
     public:
+        fd_set                  socket_client;
         Server();
         ~Server();
-        Server operator=(Server const& copy);
+        Server& operator=(Server const& copy);
 
 		Location *locations;
         
@@ -131,6 +131,7 @@ class Server : public Location
         void addSocketClient(int socket); //////////////////////////////
         void removeSocketClient(int socket); //////////////////////////
         fd_set getSocketClient(); ////////////////////////////////////
+        void setSocketClient(fd_set socket_client);
 
 		void setRoot(std::string const str);
         std::string getRoot() const;
