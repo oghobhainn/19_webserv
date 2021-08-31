@@ -193,6 +193,7 @@ void TestServer::launch(std::list<class Server> *serv_list)
                 sock_tmp = accepter(i, serv_list);
                 FD_SET(sock_tmp, &reading_socket);
                 FD_CLR(i, &reading_socket);
+                // close(i);
             }
             // if i is in socket of write
             if (FD_ISSET(i, &reading_socket) && !FD_ISSET(i, &server_socket))
@@ -204,7 +205,7 @@ void TestServer::launch(std::list<class Server> *serv_list)
                 handler(i, *it);
                 responder(i);
                 remove_connecting_socket(i);
-                // memset(_buffer, 0, 1000001);
+                memset(_buffer, 0, 1000001);
                 FD_CLR(i, &reading_socket);
                 close(i);
             }
