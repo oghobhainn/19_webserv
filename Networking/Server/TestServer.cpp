@@ -109,7 +109,7 @@ void TestServer::handler(int socket, Server serv)
     response = response.Response::buildResponse(req, serv);
 
     std::cout << "=============================================================================================" << std::endl;
-    P("response : ");
+    PY("response : ");
     std::cout << response.getResponse() << std::endl;
     char char_response[response.getResponse().length() + 1];
     strcpy(char_response, response.getResponse().c_str()); 
@@ -150,35 +150,34 @@ void TestServer::responder(int socket)
 void TestServer::launch(std::list<class Server> *serv_list)
 {
     Server serv;
-    fd_set writing_socket;
+    // fd_set writing_socket;
     fd_set reading_socket;
     fd_set server_socket;
     int ret;
     int sock_tmp = 0;
-    // int j;
 
-    // j = 0;
 	struct timeval timeout = {2, 0};
     server_socket = get_connecting_socket();
-    FD_ZERO(&writing_socket);
+    // FD_ZERO(&writing_socket);
     while(true)
     {
+        std::cout << "--------------------BOUCLE WHILE BEGIN-----------------------" << std::endl;
         ret = 0;
-        FD_ZERO(&writing_socket);
+        // FD_ZERO(&writing_socket);
         FD_ZERO(&reading_socket);
         while (ret == 0)
         {
-            writing_socket = server_socket;
+            // writing_socket = server_socket;
             reading_socket = server_socket;
-            ret = select(FD_SETSIZE, &reading_socket, &writing_socket, nullptr, &timeout);
+            ret = select(FD_SETSIZE, &reading_socket, nullptr, nullptr, &timeout);
             if (ret < 0)
             {
-                std::cout << "Failure with select " << std::endl;
+                std::cout << "Failure with select" << std::endl;
                 exit(EXIT_FAILURE);
             }
             if (ret == 0)
             {
-                FD_ZERO(&writing_socket);
+                // FD_ZERO(&writing_socket);
                 FD_ZERO(&reading_socket);
             }
             std::cout << "waiting for connection" << std::endl;
@@ -193,7 +192,6 @@ void TestServer::launch(std::list<class Server> *serv_list)
                 sock_tmp = accepter(i, serv_list);
                 FD_SET(sock_tmp, &reading_socket);
                 FD_CLR(i, &reading_socket);
-                // close(i);
             }
             // if i is in socket of write
             if (FD_ISSET(i, &reading_socket) && !FD_ISSET(i, &server_socket))
@@ -206,11 +204,11 @@ void TestServer::launch(std::list<class Server> *serv_list)
                 responder(i);
                 remove_connecting_socket(i);
                 memset(_buffer, 0, 1000001);
-                FD_CLR(i, &reading_socket);
                 close(i);
+                FD_CLR(i, &reading_socket);
             }
+            std::cout << "---------------------------- boucle for finished ---------------------------- " << std::endl;
         }
-        // std::cout <<  << std::endl;
-        std::cout << "---------------------------- boucle for finished ---------------------------- " << std::endl;
+        std::cout << "--------------------BOUCLE WHILE BEGIN-----------------------" << std::endl;
     }
 }
