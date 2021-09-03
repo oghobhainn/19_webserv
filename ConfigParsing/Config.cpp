@@ -54,6 +54,7 @@ Server::Server()
     this->port = "";
 	this->server_name = "None";
 	this->client_body_size = 30000;
+	this->host = "127.0.0.1";
 }
 
 Server::~Server()

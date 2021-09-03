@@ -97,7 +97,7 @@ int TestServer::accepter(int socket, std::list<class Server> *serv_list)
 
 void TestServer::handler(int socket, Server serv)
 {
-    Request     req(_buffer);
+    Request     req(_buffer, serv);
 
     std::cout << "=============================================================================================" << std::endl;
     PY("request : ");
@@ -155,6 +155,7 @@ void TestServer::launch(std::list<class Server> *serv_list)
     fd_set server_socket;
     int ret;
     int sock_tmp = 0;
+    // int fd_max;
 
 	struct timeval timeout = {2, 0};
     server_socket = get_connecting_socket();
@@ -207,8 +208,7 @@ void TestServer::launch(std::list<class Server> *serv_list)
                 close(i);
                 FD_CLR(i, &reading_socket);
             }
-            std::cout << "---------------------------- boucle for finished ---------------------------- " << std::endl;
         }
-        std::cout << "--------------------BOUCLE WHILE BEGIN-----------------------" << std::endl;
+        std::cout << "--------------------BOUCLE WHILE END-----------------------" << std::endl;
     }
 }

@@ -6,8 +6,6 @@
 #include <vector>
 #include <fcntl.h>
 
-// #include "SimpleServer.hpp"
-#include "SimpleServer.hpp"
 #include "../Sockets/ListeningSocket.hpp"
 #include "../../ConfigParsing/Config.hpp"
 #include "../../Request/Request.hpp"

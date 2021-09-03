@@ -7,6 +7,8 @@
 #include <map>
 #include <vector>
 
+#include "../ConfigParsing/Config.hpp"
+
 #ifdef DEBUG
 # define PRINT 1
 #else
@@ -74,7 +76,7 @@ class Request
 			Request(const Request&);
 
 		public:
-			Request(const std::string& str);
+			Request(const std::string& str, Server serv);
 			~Request();
 			Request&	operator=(const Request&);
 
