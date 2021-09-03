@@ -128,10 +128,10 @@ void	Cluster::run(void)
 		 		std::cout << "Received a connection" << std::endl;
 		 	for (std::map<long, ActiveServer *>::iterator it = _sockets.begin(); ret && it != _sockets.end(); it++)
 		 	{
-		// 		long	socket = it->first;
+		 		long	socket = it->first;
 
-		// 		if (FD_ISSET(socket, &reading_set))
-		// 		{
+		 		if (FD_ISSET(socket, &reading_set))
+				{
 		// 			long	ret = it->second->recv(socket);
 
 		// 			if (ret == 0)
@@ -148,7 +148,7 @@ void	Cluster::run(void)
 		// 			}
 		// 			ret = 0;
 		// 			break;
-		// 		}
+		 		}
 		 	}
 
 			// for (std::map<long, Server>::iterator it = _servers.begin() ; ret && it != _servers.end() ; it++)
