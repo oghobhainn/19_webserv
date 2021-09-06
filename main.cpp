@@ -1,12 +1,12 @@
 #include "ConfigParsing/Config.hpp"
-#include "Networking/Server/SimpleServer.hpp"
 #include "Networking/Server/TestServer.hpp"
 #include "Networking/Sockets/SimpleSocket.hpp"
 #include "Networking/Sockets/ListeningSocket.hpp"
 #include "Networking/Sockets/ConnectingSocket.hpp"
 #include "Networking/Sockets/BindingSocket.hpp"
 
-#include "main.hpp" 
+#include "main.hpp"
+#include "./Server/Cluster.hpp"
 
 std::list<class Server> get_serv_list(std::string full_str)
 {
@@ -221,7 +221,13 @@ int main(int argc, char **argv)
     //      - make the route able to accept uploaded files and configure where it should be saved
 
     ////////////////////// Server ////////////////////////////////
-    TestServer t(serv_list);
+    //TestServer t(serv_list);
+
+    Cluster	cluster(serv_list);
+
+    if (cluster.setup() == -1)
+		return (1);
+	cluster.run();
     
     return 0;
 }

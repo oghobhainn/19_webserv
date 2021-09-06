@@ -13,7 +13,9 @@ SRCS = main.cpp \
 		Response/Response.cpp \
 		Response/ResponseHeader.cpp \
 		Cgi/CgiHandler.cpp \
-		utils/utils.cpp
+		utils/utils.cpp \
+		Server/Cluster.cpp \
+		Server/ActiveServer.cpp \
 
 CXX = clang++
 CXXFLAGS = -Wall -Wextra -Werror
