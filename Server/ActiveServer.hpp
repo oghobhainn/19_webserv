@@ -24,9 +24,9 @@ class ActiveServer
         void	process(long socket, std::list<Server> &serv_list);
         // void	processChunk(long socket);
         int		recv(long socket);
-        // int		send(long socket);
+        int		send(long socket);
         void	close(int socket);
-        // void	clean(void);
+        void	clean(void);
 
     private:
         std::map<long, std::string>	_requests;

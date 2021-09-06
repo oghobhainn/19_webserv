@@ -83,10 +83,11 @@ long		ActiveServer::accept(void)
 
 void		ActiveServer::process(long socket, std::list<Server> &serv_list)
 {
+	std::list<Server> test;
 // 	RequestConfig	requestConf;
 // 	Response		response;
 	std::string		recvd = "";
-	Server serv;
+	test = serv_list;
 
 // 	if (_requests[socket].find("Transfer-Encoding: chunked") != std::string::npos &&
 // 		_requests[socket].find("Transfer-Encoding: chunked") < _requests[socket].find("\r\n\r\n"))
@@ -99,12 +100,27 @@ void		ActiveServer::process(long socket, std::list<Server> &serv_list)
 // 		else
 // 			std::cout << "\nRequest :" << std::endl << "[" << YELLOW << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]" << std::endl;
 // 	}
-
-	// serv = 
  	if (_requests[socket] != "")
  	{
 // 		Request			request(_requests[socket]);
-		Request     req(_requests[socket], serv);
+		Request     req(_requests[socket], _listen);
+
+		std::cout << "=============================================================================================" << std::endl;
+		PY("request : ");
+		std::cout << req << std::endl;
+		// std::cout << _buffer << std::endl;
+
+		Response		response;
+		response.call(req, _listen);
+		response = response.Response::buildResponse(req, _listen);
+
+		std::cout << "=============================================================================================" << std::endl;
+		PY("response : ");
+		std::cout << response.getResponse() << std::endl;
+		char char_response[response.getResponse().length() + 1];
+		strcpy(char_response, response.getResponse().c_str()); 
+		write(socket, char_response, strlen(char_response));
+		// close(socket);
 
 // 		if (request.getRet() != 200)
 // 			request.setMethod("GET");
@@ -113,8 +129,8 @@ void		ActiveServer::process(long socket, std::list<Server> &serv_list)
 
 // 		response.call(request, requestConf);
 
-// 		_requests.erase(socket);
-// 		_requests.insert(std::make_pair(socket, response.getResponse()));
+		_requests.erase(socket);
+ 		_requests.insert(std::make_pair(socket, response.getResponse()));
  	}
 }
 
@@ -183,12 +199,12 @@ int			ActiveServer::recv(long socket)
  	return (1);
 }
 
-// int			Server::send(long socket)
-// {
-// 	static std::map<long, size_t>	sent;
+int			ActiveServer::send(long socket)
+{
+	static std::map<long, size_t>	sent;
 
-// 	if (sent.find(socket) == sent.end())
-// 		sent[socket] = 0;
+	// if (sent.find(socket) == sent.end())
+	// 	sent[socket] = 0;
 
 // 	if (OUT && sent[socket] == 0)
 // 	{
@@ -196,30 +212,28 @@ int			ActiveServer::recv(long socket)
 // 			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket] << RESET << "]\n" << std::endl;
 // 		else
 // 			std::cout << "\rResponse :                " << std::endl << "[" << GREEN << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]\n" << std::endl;
-// 	}
-
-// 	std::string	str = _requests[socket].substr(sent[socket], RECV_SIZE);
-// 	int	ret = ::send(socket, str.c_str(), str.size(), 0);
-
-// 	if (ret == -1)
-// 	{
-// 		this->close(socket);
-// 		sent[socket] = 0;
-// 		return (-1);
-// 	}
-// 	else
-// 	{
-// 		sent[socket] += ret;
-// 		if (sent[socket] >= _requests[socket].size())
-// 		{
-// 			_requests.erase(socket);
-// 			sent[socket] = 0;
-// 			return (0);
-// 		}
-// 		else
-// 			return (1);
-// 	}
-// }
+	// }
+	std::string	str = _requests[socket].substr(sent[socket], 10000);
+ 	int	ret = ::send(socket, str.c_str(), str.size(), 0);
+	if (ret == -1)
+	{
+		this->close(socket);
+		sent[socket] = 0;
+		return (-1);
+	}
+	else
+	{
+		sent[socket] += ret;
+		if (sent[socket] >= _requests[socket].size())
+		{
+			_requests.erase(socket);
+			sent[socket] = 0;
+			return (0);
+		}
+		else
+			return (1);
+	}
+}
 
 void ActiveServer::close(int socket)
 {
@@ -228,12 +242,12 @@ void ActiveServer::close(int socket)
 	_requests.erase(socket);
 }
 
-// void		Server::clean(void)
-// {
-// 	if (_fd > 0)
-// 		::close(_fd);
-// 	_fd = -1;
-// }
+void		ActiveServer::clean(void)
+{
+	if (_fd > 0)
+		::close(_fd);
+	_fd = -1;
+}
 
 long ActiveServer::getFd(void)
 {

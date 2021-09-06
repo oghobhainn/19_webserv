@@ -20,7 +20,7 @@ class Cluster
         // void	config(std::string fileconf);
         int		setup(void);
         void	run(void);
-        // void	clean(void);
+        void	clean(void);
 
     private:
         std::list<Server>			        _serv_list;
