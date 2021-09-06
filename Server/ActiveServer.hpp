@@ -2,6 +2,11 @@
 # define ACTIVESERVER_HPP
 
 #include "../ConfigParsing/Config.hpp"
+// #include "../Sockets/ListeningSocket.hpp"
+#include "../Request/Request.hpp"
+#include "../Response/Response.hpp"
+#include "../Response/ResponseHeader.hpp"
+#include <fcntl.h>
 
 class ActiveServer 
 {
@@ -15,10 +20,10 @@ class ActiveServer
 
         int		setup(void);
         void	setAddr(void);
-        // long	accept(void);
-        // void	process(long socket, Config & conf);
+        long	accept(void);
+        void	process(long socket, std::list<Server> &serv_list);
         // void	processChunk(long socket);
-        // int		recv(long socket);
+        int		recv(long socket);
         // int		send(long socket);
         void	close(int socket);
         // void	clean(void);

@@ -96,7 +96,11 @@ void	Cluster::run(void)
 			ft_memcpy(&reading_set, &_fd_set, sizeof(_fd_set));
 			FD_ZERO(&writing_set);
 			for (std::vector<int>::iterator it = _ready.begin() ; it != _ready.end() ; it++)
+			{
 				FD_SET(*it, &writing_set);
+				std::cout << "----------------------------------" << std::endl;
+				std::cout << *it << std::endl;
+			}
 			std::cout << "Waiting on a connection" << std::endl;
 			if (n == 3)
 				n = 0;
@@ -132,44 +136,49 @@ void	Cluster::run(void)
 
 		 		if (FD_ISSET(socket, &reading_set))
 				{
-		// 			long	ret = it->second->recv(socket);
+					std::cout << "----------------------- in _socket " << socket << std::endl;
+		 			long	ret = it->second->recv(socket);
 
-		// 			if (ret == 0)
-		// 			{
-		// 				it->second->process(socket, _config);
+		 			if (ret == 0)
+		 			{
+						std::cout << "INNNNNN" << std::endl;
+		 				it->second->process(socket, _serv_list);
 		// 				_ready.push_back(socket);
-		// 			}
-		// 			else if (ret == -1)
-		// 			{
+		 			}
+					else if (ret == -1)
+					{
+						std::cout << "hello world" << std::endl;
 		// 				FD_CLR(socket, &_fd_set);
 		// 				FD_CLR(socket, &reading_set);
 		// 				_sockets.erase(socket);
 		// 				it = _sockets.begin();
-		// 			}
+					}
 		// 			ret = 0;
 		// 			break;
 		 		}
 		 	}
 
-			// for (std::map<long, Server>::iterator it = _servers.begin() ; ret && it != _servers.end() ; it++)
-			// {
-			// 	long	fd = it->first;
+			for (std::map<long, ActiveServer>::iterator it = _servers.begin(); ret && it != _servers.end(); it++)
+			{
+			 	long	fd = it->first;
+				std::cout << "------- in _server" << fd << std::endl;
 
-			// 	if (FD_ISSET(fd, &reading_set))
-			// 	{
-			// 		long	socket = it->second.accept();
+			 	if (FD_ISSET(fd, &reading_set))
+			 	{
+			 		long	socket = it->second.accept();
+					std::cout << "socket created : " << socket << std::endl;
 
-			// 		if (socket != -1)
-			// 		{
-			// 			FD_SET(socket, &_fd_set);
-			// 			_sockets.insert(std::make_pair(socket, &(it->second)));
-			// 			if (socket > _max_fd)
-			// 				_max_fd = socket;
-			// 		}
-			// 		ret = 0;
-			// 		break;
-			// 	}
-			// }
+			 		if (socket != -1)
+			 		{
+						FD_SET(socket, &_fd_set);
+						_sockets.insert(std::make_pair(socket, &(it->second)));
+						if (socket > _max_fd)
+							_max_fd = socket;
+			 		}
+			 		ret = 0;
+			 		break;
+			 	}
+			}
 		}
 		else
 		{
@@ -182,6 +191,7 @@ void	Cluster::run(void)
 			// for (std::map<long, ActiveServer>::iterator it = _servers.begin(); it != _servers.end(); it++)
 			// 	FD_SET(it->first, &_fd_set);
 		}
+		std::cout << "-- END --" << std::endl;
 		n = 0;
 	}
 }

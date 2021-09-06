@@ -66,26 +66,27 @@ void ActiveServer::setAddr(void)
 	_addr.sin_port = htons(port);
 }
 
-// long		Server::accept(void)
-// {
-// 	long	socket;
+long		ActiveServer::accept(void)
+{
+	long	socket;
 
-// 	socket = ::accept(_fd, NULL, NULL);
-// 	if (socket == -1)
-// 		std::cerr << RED << "Could not create socket. " << strerror(errno) << RESET << std::endl;
-// 	else
-// 	{
-// 		fcntl(socket, F_SETFL, O_NONBLOCK);
-// 		_requests.insert(std::make_pair(socket, ""));
-// 	}
-// 	return (socket);
-// }
+	socket = ::accept(_fd, NULL, NULL);
+	if (socket == -1)
+		std::cerr << RED << "Could not create socket. " << strerror(errno) << std::endl;
+	else
+	{
+		fcntl(socket, F_SETFL, O_NONBLOCK);
+		_requests.insert(std::make_pair(socket, ""));
+	}
+	return (socket);
+}
 
-// void		Server::process(long socket, Config & conf)
-// {
+void		ActiveServer::process(long socket, std::list<Server> &serv_list)
+{
 // 	RequestConfig	requestConf;
 // 	Response		response;
-// 	std::string		recvd = "";
+	std::string		recvd = "";
+	Server serv;
 
 // 	if (_requests[socket].find("Transfer-Encoding: chunked") != std::string::npos &&
 // 		_requests[socket].find("Transfer-Encoding: chunked") < _requests[socket].find("\r\n\r\n"))
@@ -99,9 +100,11 @@ void ActiveServer::setAddr(void)
 // 			std::cout << "\nRequest :" << std::endl << "[" << YELLOW << _requests[socket].substr(0, 1000) << "..." << _requests[socket].substr(_requests[socket].size() - 10, 15) << RESET << "]" << std::endl;
 // 	}
 
-// 	if (_requests[socket] != "")
-// 	{
+	// serv = 
+ 	if (_requests[socket] != "")
+ 	{
 // 		Request			request(_requests[socket]);
+		Request     req(_requests[socket], serv);
 
 // 		if (request.getRet() != 200)
 // 			request.setMethod("GET");
@@ -112,8 +115,8 @@ void ActiveServer::setAddr(void)
 
 // 		_requests.erase(socket);
 // 		_requests.insert(std::make_pair(socket, response.getResponse()));
-// 	}
-// }
+ 	}
+}
 
 // void		Server::processChunk(long socket)
 // {
@@ -136,30 +139,30 @@ void ActiveServer::setAddr(void)
 // 	_requests[socket] = head + "\r\n\r\n" + body + "\r\n\r\n";
 // }
 
-// int			Server::recv(long socket)
-// {
-// 	char	buffer[RECV_SIZE] = {0};
-// 	int		ret;
+int			ActiveServer::recv(long socket)
+{
+ 	char	buffer[10000] = {0};
+ 	int		ret;
 
-// 	ret = ::recv(socket, buffer, RECV_SIZE - 1, 0);
+ 	ret = ::recv(socket, buffer, 10000, 0);
 
-// 	if (ret == 0 || ret == -1)
-// 	{
-// 		this->close(socket);
-// 		if (!ret)
-// 			std::cout << "\rConnection was closed by client.\n" << std::endl;
-// 		else
-// 			std::cout << "\rRead error, closing connection.\n" << std::endl;
-// 		return (-1);
-// 	}
+ 	if (ret == 0 || ret == -1)
+ 	{
+ 		this->close(socket);
+ 		if (!ret)
+ 			std::cout << "Connection closed by client" << std::endl;
+ 		else
+ 			std::cout << "Read error, closing connection" << std::endl;
+ 		return (-1);
+ 	}
+ 	_requests[socket] += std::string(buffer);
+	//std::cout << _requests[socket] << std::endl;
 
-// 	_requests[socket] += std::string(buffer);
-
-// 	size_t	i = _requests[socket].find("\r\n\r\n");
-// 	if (i != std::string::npos)
-// 	{
-// 		if (_requests[socket].find("Content-Length: ") == std::string::npos)
-// 		{
+ 	size_t	i = _requests[socket].find("\r\n\r\n");
+ 	if (i != std::string::npos)
+ 	{
+ 		// if (_requests[socket].find("Content-Length: ") == std::string::npos)
+ 		// {
 // 			if (_requests[socket].find("Transfer-Encoding: chunked") != std::string::npos)
 // 			{
 // 				if (checkEnd(_requests[socket], "0\r\n\r\n") == 0)
@@ -168,18 +171,17 @@ void ActiveServer::setAddr(void)
 // 					return (1);
 // 			}
 // 			else
-// 				return (0);
-// 		}
+ 				return (0);
+ //		}
 
-// 		size_t	len = std::atoi(_requests[socket].substr(_requests[socket].find("Content-Length: ") + 16, 10).c_str());
+ 		// size_t	len = std::atoi(_requests[socket].substr(_requests[socket].find("Content-Length: ") + 16, 10).c_str());
 // 		if (_requests[socket].size() >= len + i + 4)
 // 			return (0);
 // 		else
 // 			return (1);
-// 	}
-
-// 	return (1);
-// }
+ 	}
+ 	return (1);
+}
 
 // int			Server::send(long socket)
 // {
