@@ -128,6 +128,13 @@ void parse_loc(std::list<class Server> &serv_list)
                 end = str_location.find(";", beg);
                 set_cgi(&it->locations[j], beg, end, str_location);
             }
+            if (str_location.find("autoindex") != std::string::npos)
+            {
+                beg = str_location.find("autoindex");
+                end = str_location.find(";", beg);
+                if (str_location.substr(beg + 9, len(str_location) - beg - 9 - (len(str_location) - end)).find("off") != std::string::npos)
+                    it->locations[j].autoindex = false;
+            }
             i++;
             j++;
         }
@@ -193,32 +200,19 @@ int main(int argc, char **argv)
     serv_list = parseConfig(argv[1]);
     
     ///////////////////// Print results /////////////////////////
-    // for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    // {
-    //     std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
-    //     std::cout << "Port: " << it->getPort() << std::endl;
-    //     std::cout << "Host: " << it->getHost() << std::endl;
-    //     std::cout << "Root: " << it->getRoot() << std::endl;
-    //     std::cout << "Ser Name: " << it->getServerName() << std::endl;
-    //     std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
-    //     std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
-    //     std::cout << "CGI param : " << it->getCgiParam() << std::endl; 
-	// 	it->getLocations();
-    //     std::cout << "---------------------- END --------------------------------" << std::endl;
-    // }
-
-    // for (std::list<class Server>::iterator it2 = serv_list.begin(); it2 != serv_list.end(); ++it2)
-    //     set_of_port.push_back(stoi(it2->getPort()));
-
-    //// TO DO
-   
-    // - in the roots :
-    //      - define a directory or a file from where the file should be search (for example
-    //        if url /kapouet is rooted to /tmp/www, url /kapouet/pouic/toto/pouet is
-    //        /tmp/www/pouic/toto/pouet)
-    //      - turn on or off directory listing
-    //      - CGI
-    //      - make the route able to accept uploaded files and configure where it should be saved
+    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    {
+        std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
+        std::cout << "Port: " << it->getPort() << std::endl;
+        std::cout << "Host: " << it->getHost() << std::endl;
+        std::cout << "Root: " << it->getRoot() << std::endl;
+        std::cout << "Ser Name: " << it->getServerName() << std::endl;
+        std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
+        std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
+        std::cout << "CGI param : " << it->getCgiParam() << std::endl; 
+		it->getLocations();
+        std::cout << "---------------------- END --------------------------------" << std::endl;
+    }
 
     ////////////////////// Server ////////////////////////////////
     //TestServer t(serv_list);
