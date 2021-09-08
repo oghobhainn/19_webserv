@@ -19,10 +19,6 @@ void	*ft_memcpy(void *dst, const void *src, size_t n)
 
 // Constructors and destructors
 
-// Cluster::Cluster(void) : _config(DEFAULT_CONFIG)
-// {
-// }
-
 Cluster::Cluster(std::list<Server> serv_list)
 {
     _serv_list = serv_list;
@@ -125,7 +121,7 @@ void	Cluster::run(void)
 						_sockets.erase(*it);
 						_ready.erase(it);
 					}
-					ret = 0;
+					// ret = 0;
 					break;
 		 		}
 		 	}

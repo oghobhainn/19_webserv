@@ -125,12 +125,12 @@ class Server : public Location
         void setPort(std::string const str);
         std::string getPort() const;
 
-        void setSocket(ListeningSocket *socket); //////////////////////////
-        ListeningSocket *getSocket(); ////////////////////////////////////
+        void setSocket(ListeningSocket *socket);
+        ListeningSocket *getSocket();
 
-        void addSocketClient(int socket); //////////////////////////////
-        void removeSocketClient(int socket); //////////////////////////
-        fd_set getSocketClient(); ////////////////////////////////////
+        void addSocketClient(int socket);
+        void removeSocketClient(int socket);
+        fd_set getSocketClient();
         void setSocketClient(fd_set socket_client);
 
 		void setRoot(std::string const str);
@@ -159,6 +159,9 @@ class Server : public Location
 
         void setContentLocation(std::string const & path);
         std::string getContentLocation() const;
+
+        void setAutoIndex(std::string const str);
+        bool getAutoIndex();
 };
 
 

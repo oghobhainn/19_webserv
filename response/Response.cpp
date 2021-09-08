@@ -34,7 +34,7 @@ void			Response::call(Request & request, Server & server)
 
 	// _path = "html/index_example.html"; // en attendant... //TODO
 	_path = "./default/default.html";
-	
+
 	std::set<std::string> allowedTODO;
 	allowedTODO.insert("GET");
 	allowedTODO.insert("POST");

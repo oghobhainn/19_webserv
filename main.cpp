@@ -182,6 +182,8 @@ std::list<class Server> parseConfig(std::string const path)
                 it2->setClientBodySize(it3->substr(16, it3->size() - 16));
             else if (it3->find("cgi_param") != std::string::npos)
                 it2->setCgiParam(it3->substr(9, it3->size() - 9));
+            else if (it3->find("autoindex") != std::string::npos)
+                it2->setAutoIndex(it3->substr(9, it3->size() - 9));
         }
     }
     return serv_list;
@@ -209,20 +211,19 @@ int main(int argc, char **argv)
         std::cout << "Ser Name: " << it->getServerName() << std::endl;
         std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
         std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
-        std::cout << "CGI param : " << it->getCgiParam() << std::endl; 
-		it->getLocations();
+        std::cout << "CGI param : " << it->getCgiParam() << std::endl;
+        std::cout << "Autoindex : " << it->getAutoIndex() << std::endl;
+ 		it->getLocations();
         std::cout << "---------------------- END --------------------------------" << std::endl;
     }
 
     ////////////////////// Server ////////////////////////////////
-    //TestServer t(serv_list);
-
     Cluster	cluster(serv_list);
 
     if (cluster.setup() == -1)
 		return (1);
 	cluster.run();
-    
+    cluster.clean();
     return 0;
 }
 

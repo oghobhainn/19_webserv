@@ -131,7 +131,10 @@ int			ActiveServer::recv(long socket)
  	_requests[socket] += std::string(buffer);
  	size_t	i = _requests[socket].find("\r\n\r\n");
  	if (i != std::string::npos)
+	{
+		memset(buffer, 0, 10000);
  		return (0);
+	}
  	return (1);
 }
 

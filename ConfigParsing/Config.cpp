@@ -301,6 +301,20 @@ std::string	Server::getContentLocation() const
 {
 	return this->content_location;
 }
+
+void Server::setAutoIndex(std::string const str)
+{
+	if (str.find("off") != std::string::npos)
+		this->autoindex = false;
+	else
+		this->autoindex = true;
+}
+
+bool Server::getAutoIndex()
+{
+	return this->autoindex;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 
 std::ostream& operator<<(std::ostream& os, const Server& item)
