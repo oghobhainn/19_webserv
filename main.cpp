@@ -189,6 +189,17 @@ std::list<class Server> parseConfig(std::string const path)
     return serv_list;
 }
 
+// void ft_exit(std::list<Server> serv_list)
+// {
+//     Server tmp;
+// 
+//     for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+//     {
+//         it.getLocations().clear();
+//     }
+//     serv_list.clear();
+// }
+
 int main(int argc, char **argv)
 {
     std::list<Server> serv_list;
@@ -224,6 +235,7 @@ int main(int argc, char **argv)
 		return (1);
 	cluster.run();
     cluster.clean();
+    // ft_exit(serv_list);
     return 0;
 }
 
