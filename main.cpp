@@ -187,6 +187,17 @@ std::list<class Server> parseConfig(std::string const path)
     return serv_list;
 }
 
+// void ft_exit(std::list<Server> serv_list)
+// {
+//     Server tmp;
+// 
+//     for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+//     {
+//         it.getLocations().clear();
+//     }
+//     serv_list.clear();
+// }
+
 int main(int argc, char **argv)
 {
     std::list<Server> serv_list;
@@ -200,19 +211,19 @@ int main(int argc, char **argv)
     serv_list = parseConfig(argv[1]);
     
     ///////////////////// Print results /////////////////////////
-    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    {
-        std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
-        std::cout << "Port: " << it->getPort() << std::endl;
-        std::cout << "Host: " << it->getHost() << std::endl;
-        std::cout << "Root: " << it->getRoot() << std::endl;
-        std::cout << "Ser Name: " << it->getServerName() << std::endl;
-        std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
-        std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
-        std::cout << "CGI param : " << it->getCgiParam() << std::endl; 
-		it->getLocations();
-        std::cout << "---------------------- END --------------------------------" << std::endl;
-    }
+    // for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    // {
+    //     std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
+    //     std::cout << "Port: " << it->getPort() << std::endl;
+    //     std::cout << "Host: " << it->getHost() << std::endl;
+    //     std::cout << "Root: " << it->getRoot() << std::endl;
+    //     std::cout << "Ser Name: " << it->getServerName() << std::endl;
+    //     std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
+    //     std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
+    //     std::cout << "CGI param : " << it->getCgiParam() << std::endl; 
+	// 	it->getLocations();
+    //     std::cout << "---------------------- END --------------------------------" << std::endl;
+    // }
 
     ////////////////////// Server ////////////////////////////////
     //TestServer t(serv_list);
@@ -222,7 +233,7 @@ int main(int argc, char **argv)
     if (cluster.setup() == -1)
 		return (1);
 	cluster.run();
-    
+    // ft_exit(serv_list);
     return 0;
 }
 

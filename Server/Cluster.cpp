@@ -92,13 +92,12 @@ void	Cluster::run(void)
 		// boucle du select: selectione les sockets actives.
 		while (ret == 0)
 		{
-			sleep(1);
 			ft_memcpy(&reading_set, &_fd_set, sizeof(_fd_set));
 			FD_ZERO(&writing_set);
 			for (std::vector<int>::iterator it = _ready.begin() ; it != _ready.end() ; it++)
 			{
 				FD_SET(*it, &writing_set);
-				std::cout << "creation writing : " << *it << std::endl;
+				std::cout << "---------- add socket writing : " << *it << std::endl;
 			}
 			std::cout << "Waiting on a connection" << std::endl;
 			if (n == 3)
@@ -113,7 +112,7 @@ void	Cluster::run(void)
 		 	{
 		 		if (FD_ISSET(*it, &writing_set))
 		 		{
-					 std::cout << "In ready writing" << std::endl;
+					std::cout << "---------- start writing : " << *it << std::endl;
 					long	ret = _sockets[*it]->send(*it);
 
 					if (ret == 0)
@@ -136,13 +135,14 @@ void	Cluster::run(void)
 
 		 		if (FD_ISSET(socket, &reading_set))
 				{
-					std::cout << "----------------------- in _socket " << socket << std::endl;
+					std::cout << "---------- read socket : " << socket << std::endl;
 		 			long	ret = it->second->recv(socket);
 
 		 			if (ret == 0)
 		 			{
 		 				it->second->process(socket, _serv_list);
 						_ready.push_back(socket);
+						
 		 			}
 					else if (ret == -1)
 					{
@@ -159,13 +159,11 @@ void	Cluster::run(void)
 			for (std::map<long, ActiveServer>::iterator it = _servers.begin(); ret && it != _servers.end(); it++)
 			{
 			 	long	fd = it->first;
-				std::cout << "------- in _server" << fd << std::endl;
 
 			 	if (FD_ISSET(fd, &reading_set))
 			 	{
 			 		long	socket = it->second.accept();
-					std::cout << "socket created : " << socket << std::endl;
-
+					std::cout << "---------- socket created : " << socket << " for the port : " << fd << std::endl;
 			 		if (socket != -1)
 			 		{
 						FD_SET(socket, &_fd_set);
