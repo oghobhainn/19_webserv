@@ -142,6 +142,7 @@ void	Cluster::run(void)
 		 			{
 		 				it->second->process(socket, _serv_list);
 						_ready.push_back(socket);
+						
 		 			}
 					else if (ret == -1)
 					{

@@ -137,7 +137,10 @@ int			ActiveServer::recv(long socket)
 			if (_requests[socket].find("Transfer-Encoding: chunked") != std::string::npos)
 			{
 				if (checkEnd(_requests[socket], "0\r\n\r\n") == 0)
+				{
+					memset(buffer, 0, 10000);
 					return (0);
+				}
 				else
 					return (1);
 			}
