@@ -47,8 +47,9 @@ int		Cluster::setup(void)
 	FD_ZERO(&_fd_set);
 	_max_fd = 0;
     unsigned int nb_server = 0;
-	std::list<int> ports_lst;
-	int port;
+	// int *ports_lst = NULL;
+	// int i = 0;
+	// int port;
 
     for (std::list<Server>::iterator it = _serv_list.begin(); it != _serv_list.end(); ++it)
         nb_server++;
@@ -67,22 +68,14 @@ int		Cluster::setup(void)
 				_max_fd = fd;
 			std::cout << it2->getHost() << ":" << it2->getPort() << " is setup" << std::endl;
 		}
-		port = stoi(it2->getPort());
-		ports_lst.push_back(port);
+		else 
+			return (-1);
 	}
     if (_max_fd == 0)
     {
         std::cerr << "Could not setup cluster " << std::endl;
         return (-1);
     }
-	for (std::list<int>::iterator head = ports_lst.begin(); head != ports_lst.end(); head++)
-	{
-		if (*head == *head++)
-		{
-			std::cerr << "Same ports for differents servers " << std::endl;
-        	return (-1);
-		}
-	}
     return (0);
 }
 
