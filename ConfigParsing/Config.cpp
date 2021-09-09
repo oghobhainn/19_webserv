@@ -56,6 +56,7 @@ Server::Server()
 	this->server_name = "None";
 	this->client_body_size = 30000;
 	this->host = "127.0.0.1";
+	this->default_error_page = "./default/404.html";
 }
 
 Server::~Server()

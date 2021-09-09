@@ -103,7 +103,7 @@ void		ActiveServer::process(long socket, std::list<Server> &serv_list)
 		PY("response : ");
 		std::cout << response.getResponse() << std::endl;
 		char char_response[response.getResponse().length() + 1];
-		strcpy(char_response, response.getResponse().c_str()); 
+		strcpy(char_response, response.getResponse().c_str());
 		write(socket, char_response, strlen(char_response));
 		// close(socket);
 

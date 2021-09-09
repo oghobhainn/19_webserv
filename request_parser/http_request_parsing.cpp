@@ -27,9 +27,19 @@ std::string	check_parsed_request(t_http_request &http_req_struct)
 			http_req_struct.error = true;
 		return std::string("method not allowed");
 	}
-	// else if{
-		// 
-	// }
+	////////////////////////////////////////////////////
+	else if (http_req_struct.firstline.method == "GET" && _serv_config->get_method() == false)
+	{
+		return std::string("method GET not allowed");
+	}
+	else if (http_req_struct.firstline.method == "POST" && _serv_config->post_method() == false)
+	{
+		return std::string("method POST not allowed");
+	}
+	else if (http_req_struct.firstline.method == "DELETE" && _serv_config->delete_method() == false)
+	{
+		return std::string("method DELETE not allowed");
+	}
 	http_req_struct.status_code = 200;
 	return std::string("check parsing ok!");
 }

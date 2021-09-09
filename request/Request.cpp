@@ -19,6 +19,7 @@ Request::Request(const std::string& str, Server serv) :
 	this->resetHeaders();
 	this->_env_for_cgi.clear();
 	this->parse(str);
+	this->_serv_config = serv;
 	_port = stoi(serv.getPort());
 
 	if (this->_ret != 200)

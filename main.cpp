@@ -213,20 +213,20 @@ int main(int argc, char **argv)
     serv_list = parseConfig(argv[1]);
     
     ///////////////////// Print results /////////////////////////
-    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    {
-        std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
-        std::cout << "Port: " << it->getPort() << std::endl;
-        std::cout << "Host: " << it->getHost() << std::endl;
-        std::cout << "Root: " << it->getRoot() << std::endl;
-        std::cout << "Ser Name: " << it->getServerName() << std::endl;
-        std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
-        std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
-        std::cout << "CGI param : " << it->getCgiParam() << std::endl;
-        std::cout << "Autoindex : " << it->getAutoIndex() << std::endl;
- 		it->getLocations();
-        std::cout << "---------------------- END --------------------------------" << std::endl;
-    }
+    // for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    // {
+    //     std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
+    //     std::cout << "Port: " << it->getPort() << std::endl;
+    //     std::cout << "Host: " << it->getHost() << std::endl;
+    //     std::cout << "Root: " << it->getRoot() << std::endl;
+    //     std::cout << "Ser Name: " << it->getServerName() << std::endl;
+    //     std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
+    //     std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
+    //     std::cout << "CGI param : " << it->getCgiParam() << std::endl;
+    //     std::cout << "Autoindex : " << it->getAutoIndex() << std::endl;
+ 	// 	it->getLocations();
+    //     std::cout << "---------------------- END --------------------------------" << std::endl;
+    // }
 
     ////////////////////// Server ////////////////////////////////
     Cluster	cluster(serv_list);
@@ -238,6 +238,28 @@ int main(int argc, char **argv)
     // ft_exit(serv_list);
     return 0;
 }
+
+
+// TO DO
+
+// - host name ??? (On a tjs 127.0.0.1, je comprends pas ce qu'on doit faire)
+// - status code ??? (A chequer quand on inspect la page sur le browser, le status doit etre bon)
+// - lier les routes (locations) du .conf aux requetes
+// - proteger si les method (Get, Post, Delete) dans les routes ne sont pas authorisees
+// - default file if you look for a directory (A voir si la requete demande un dossier)
+// - wrong url protection
+// - upload a file and get it back
+// - limit client body (ca ne doit pas fonctionner si le body size est plus petit que le size du fichier a uploader)
+// - Leaks
+
+
+
+
+
+
+
+
+
 
 
 

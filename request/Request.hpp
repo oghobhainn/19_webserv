@@ -55,6 +55,7 @@ class Request
 			std::string									_query;
 			std::list<std::pair<std::string, float> >	_lang;
 			const std::string&							_raw;
+			Server										_serv_config;
 
 			/*** PARSING ***/
 			int			readFirstLine(const std::string& line);

@@ -47,6 +47,9 @@ int		Cluster::setup(void)
 	FD_ZERO(&_fd_set);
 	_max_fd = 0;
     unsigned int nb_server = 0;
+	// int *ports_lst = NULL;
+	// int i = 0;
+	// int port;
 
     for (std::list<Server>::iterator it = _serv_list.begin(); it != _serv_list.end(); ++it)
         nb_server++;
@@ -65,6 +68,8 @@ int		Cluster::setup(void)
 				_max_fd = fd;
 			std::cout << it2->getHost() << ":" << it2->getPort() << " is setup" << std::endl;
 		}
+		else 
+			return (-1);
 	}
     if (_max_fd == 0)
     {
