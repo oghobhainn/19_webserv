@@ -82,6 +82,8 @@ Server& Server::operator=(Server const& copy)
         this->socket_client = copy.socket_client;
         this->_socket = copy._socket;
         this->content_location = copy.content_location;
+		/////////////
+		
 	}
 	return *this;
 }

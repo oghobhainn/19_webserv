@@ -30,8 +30,15 @@ void			Response::call(Request & request, Server & server)
 	_port = server.getPort();
 	//_path = server.getPath(); // TODO
 	// _path = "html/index_example.html"; // en attendant... //TODO
-	_path = "./default/default.html";
-
+	_path = request.getPath();
+	if (_path == "/")
+		_path = "./default/default.html";
+	else if (_path == "/upload.html")
+		_path = "./default/upload.html";
+	std::cout << _path << std::endl;
+	std::cout << "++++++++++++++++++++++" << std::endl;
+	// server.getLocations();
+	std::cout << "++++++++++++++++++++++" << std::endl;
 	std::set<std::string> allowedTODO;
 	allowedTODO.insert("GET");
 	allowedTODO.insert("POST");

@@ -243,14 +243,27 @@ int main(int argc, char **argv)
 // TO DO
 
 // - host name ??? (On a tjs 127.0.0.1, je comprends pas ce qu'on doit faire)
+//          => a voir
 // - status code ??? (A chequer quand on inspect la page sur le browser, le status doit etre bon)
+//        => details mais en gros ok (Charlie)
 // - lier les routes (locations) du .conf aux requetes
+//         => Henry
 // - proteger si les method (Get, Post, Delete) dans les routes ne sont pas authorisees
+//          => Charlie a priori ok mais a voir parsing .conf Henry
 // - default file if you look for a directory (A voir si la requete demande un dossier)
+//          => Henry
 // - wrong url protection
+//          => Evrard
 // - upload a file and get it back
+//           => checker exceptions (Charlie)
 // - limit client body (ca ne doit pas fonctionner si le body size est plus petit que le size du fichier a uploader)
+//           => Charly
+// - BAcker 2em socket
+//          => Evrard
 // - Leaks
+//          => Evrard
+// - Tester
+//          => Henry, Evrard
 
 
 
