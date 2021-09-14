@@ -27,18 +27,56 @@ void			Response::call(Request & request, Server & server)
 	_error = server.getDefaultErrorPage();
 	_code = request.getRet();
 	_host = server.getHost();
+
 	_port = server.getPort();
-	//_path = server.getPath(); // TODO
-	// _path = "html/index_example.html"; // en attendant... //TODO
 	_path = request.getPath();
-	if (_path == "/")
+	if (server.getRoot().size() > 0)
+	{
+		_path = server.getRoot();
+		if (server.getIndex().size() > 0)
+			_path = _path + "/" + server.getIndex();
+	}
+	else if (_path == "/")
+	{
 		_path = "./default/default.html";
+		if (server.getIndex().size() > 0)
+			_path = "./default/" + server.getIndex();
+	}
 	else if (_path == "/upload.html")
 		_path = "./default/upload.html";
-	std::cout << _path << std::endl;
-	std::cout << "++++++++++++++++++++++" << std::endl;
-	// server.getLocations();
-	std::cout << "++++++++++++++++++++++" << std::endl;
+	// else 
+	// {
+	// 	std::cout << "Wrong URL" << std::endl;
+	// 	_path = "./default/404.html";
+	// 	return ;
+	// }
+	for (int i = 0; i < server.getNbLoc(); i++)
+	{
+		std::cout << "++++++++++++++++++++++" << std::endl;
+		std::cout << "loc:" << server.locations[i].extension << std::endl;
+		std::cout << "_path:" << _path << std::endl;
+		if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
+		{
+			std::cout << "innnnn location" << std::endl;
+			// _path = "./default" + server.locations[i].extension;
+
+			// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
+
+			// if (server.locations[i].get_method == true)
+			// 	allowedTODO.insert("GET");
+			if (server.locations[i].root.size() > 0)
+			{
+				_path = server.locations[i].root + "/";
+				if (server.locations[i].index.size() > 0)
+					_path = _path + server.locations[i].index;
+					// ne trouve pas le youpi.bad_extension, pourquoi ??
+			}
+
+		}
+		std::cout << "---------------------" << std::endl;
+	}
+	std::cout << "_path end:" << _path << std::endl;
+
 	std::set<std::string> allowedTODO;
 	allowedTODO.insert("GET");
 	allowedTODO.insert("POST");

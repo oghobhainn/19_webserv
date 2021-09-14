@@ -79,6 +79,7 @@ void parse_loc(std::list<class Server> &serv_list)
             it->locations[j].full_str = str_location; 
             found = str_location.find("{");
             file_ext = str_location.substr(0, found);
+            it->locations[j].extension = file_ext;
             it->locations[j].file_extensions = split_lst(file_ext, '/');
             if (str_location.find("root") != std::string::npos)
             {
@@ -184,6 +185,8 @@ std::list<class Server> parseConfig(std::string const path)
                 it2->setCgiParam(it3->substr(9, it3->size() - 9));
             else if (it3->find("autoindex") != std::string::npos)
                 it2->setAutoIndex(it3->substr(9, it3->size() - 9));
+            else if (it3->find("index") != std::string::npos)
+                it2->setIndex(it3->substr(5, it3->size() - 5));
         }
     }
     return serv_list;
@@ -213,20 +216,21 @@ int main(int argc, char **argv)
     serv_list = parseConfig(argv[1]);
     
     ///////////////////// Print results /////////////////////////
-    // for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    // {
-    //     std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
-    //     std::cout << "Port: " << it->getPort() << std::endl;
-    //     std::cout << "Host: " << it->getHost() << std::endl;
-    //     std::cout << "Root: " << it->getRoot() << std::endl;
-    //     std::cout << "Ser Name: " << it->getServerName() << std::endl;
-    //     std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
-    //     std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
-    //     std::cout << "CGI param : " << it->getCgiParam() << std::endl;
-    //     std::cout << "Autoindex : " << it->getAutoIndex() << std::endl;
- 	// 	it->getLocations();
-    //     std::cout << "---------------------- END --------------------------------" << std::endl;
-    // }
+    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    {
+        std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
+        std::cout << "Port: " << it->getPort() << std::endl;
+        std::cout << "Host: " << it->getHost() << std::endl;
+        std::cout << "Root: " << it->getRoot() << std::endl;
+        std::cout << "Ser Name: " << it->getServerName() << std::endl;
+        std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
+        std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
+        std::cout << "CGI param : " << it->getCgiParam() << std::endl;
+        std::cout << "Autoindex : " << it->getAutoIndex() << std::endl;
+        std::cout << "Index : " << it->getIndex() << std::endl;
+ 		it->getLocations();
+        std::cout << "---------------------- END --------------------------------" << std::endl;
+    }
 
     ////////////////////// Server ////////////////////////////////
     Cluster	cluster(serv_list);
