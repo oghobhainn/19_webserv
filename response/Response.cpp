@@ -27,54 +27,65 @@ void			Response::call(Request & request, Server & server)
 	_error = server.getDefaultErrorPage();
 	_code = request.getRet();
 	_host = server.getHost();
-
 	_port = server.getPort();
 	_path = request.getPath();
+	std::cout << "_path begin:" << _path << std::endl;
+	// Case: root at the beginning
 	if (server.getRoot().size() > 0)
 	{
 		_path = server.getRoot();
+		// Case: index at the beginning
 		if (server.getIndex().size() > 0)
 			_path = _path + "/" + server.getIndex();
 	}
+	// Case: normal path without root
 	else if (_path == "/")
 	{
 		_path = "./default/default.html";
+		// Case: index at the beginning
 		if (server.getIndex().size() > 0)
 			_path = "./default/" + server.getIndex();
 	}
+	// Case: upload a file
 	else if (_path == "/upload.html")
 		_path = "./default/upload.html";
-	// else 
-	// {
-	// 	std::cout << "Wrong URL" << std::endl;
-	// 	_path = "./default/404.html";
-	// 	return ;
-	// }
+	// Case: delete ?
+	// else if (_path == "/delete/example.html")
+	// 	_path = "DELETE /frontend/example.html HTTP/1.1" ??
+	// Case: check if there is a loc in the url
 	for (int i = 0; i < server.getNbLoc(); i++)
 	{
 		std::cout << "++++++++++++++++++++++" << std::endl;
 		std::cout << "loc:" << server.locations[i].extension << std::endl;
-		std::cout << "_path:" << _path << std::endl;
+		std::cout << "path:" << _path << std::endl;
 		if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
 		{
 			std::cout << "innnnn location" << std::endl;
-			// _path = "./default" + server.locations[i].extension;
-
 			// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
-
-			// if (server.locations[i].get_method == true)
-			// 	allowedTODO.insert("GET");
+			if (server.locations[i].get_method == false && request.getMethod() == "GET")
+				_code = 405;
+			if (server.locations[i].post_method == false && request.getMethod() == "POST")
+				_code = 405;
+			if (server.locations[i].delete_method == false && request.getMethod() == "DELETE")
+				_code = 405;
+			// A VOIR: changer le dossier ou sera uploadé le fichier 
+			//if (request.getMethod() == "POST" && server.locations[i].file_upload_location != "./default/")
 			if (server.locations[i].root.size() > 0)
 			{
 				_path = server.locations[i].root + "/";
 				if (server.locations[i].index.size() > 0)
 					_path = _path + server.locations[i].index;
-					// ne trouve pas le youpi.bad_extension, pourquoi ??
 			}
-
 		}
 		std::cout << "---------------------" << std::endl;
 	}
+	// Case: wrong url / pas encore la bonne methode de faire comme ca
+		// else 
+	// {
+	// 	std::cout << "Wrong URL" << std::endl;
+	// 	_path = "./default/404.html";
+	// 	return ;
+	// }
 	std::cout << "_path end:" << _path << std::endl;
 
 	std::set<std::string> allowedTODO;
@@ -82,26 +93,21 @@ void			Response::call(Request & request, Server & server)
 	allowedTODO.insert("POST");
 	allowedTODO.insert("DELETE");
 
-	// if (server.getAllowedMethods().find(request.getMethod()) == server.getAllowedMethods().end())
-	// {
-	// 	_code = 405;
-	// }
 	if (allowedTODO.find(request.getMethod()) == allowedTODO.end())
-	{
 		_code = 405;
-	}
 	else if (server.getClientBodySize() < request.getBody().size())
-	{
 		_code = 413;
-	}
 	if (_code == 405 || _code == 413)
 	{
 		ResponseHeader	head;
-
 		// _response = head.notAllowed(server.getAllowedMethods(), server.getLocations(), _code, server.getLang() + "\r\n";
 		_response = head.notAllowed(server.getAllowedMethods(), server.getContentLocation(), _code, "\r\n");
 		return ;
 	}
+	// if (server.getAllowedMethods().find(request.getMethod()) == server.getAllowedMethods().end())
+	// {
+	// 	_code = 405;
+	// }
 	(this->*Response::_method[request.getMethod()])(request, server);
 }
 

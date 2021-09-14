@@ -77,7 +77,7 @@ class Location : public CGI
         bool                    autoindex;
         std::set<std::string>   _allowed_methods;
         std::string             redirection;
-        std::string             directory_listing;
+        std::string             file_upload_location;
         std::string             default_file_if_request_directory;
         CGI                     _CGI;
 };
