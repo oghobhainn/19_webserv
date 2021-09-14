@@ -111,11 +111,11 @@ void parse_loc(std::list<class Server> &serv_list)
                 end = str_location.find(";", beg);
                 it->locations[j].redirection = str_location.substr(beg + 11, len(str_location) - beg - 11 - (len(str_location) - end));
             }
-            if (str_location.find("directory_list") != std::string::npos)
+            if (str_location.find("file_upload_location") != std::string::npos)
             {
-                beg = str_location.find("directory_list");
+                beg = str_location.find("file_upload_location");
                 end = str_location.find(";", beg);
-                it->locations[j].directory_listing = str_location.substr(beg + 14, len(str_location) - beg - 14 - (len(str_location) - end));
+                it->locations[j].file_upload_location = str_location.substr(beg + 20, len(str_location) - beg - 20 - (len(str_location) - end));
             }
             if (str_location.find("default_file") != std::string::npos)
             {
@@ -216,21 +216,21 @@ int main(int argc, char **argv)
     serv_list = parseConfig(argv[1]);
     
     ///////////////////// Print results /////////////////////////
-    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    {
-        std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
-        std::cout << "Port: " << it->getPort() << std::endl;
-        std::cout << "Host: " << it->getHost() << std::endl;
-        std::cout << "Root: " << it->getRoot() << std::endl;
-        std::cout << "Ser Name: " << it->getServerName() << std::endl;
-        std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
-        std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
-        std::cout << "CGI param : " << it->getCgiParam() << std::endl;
-        std::cout << "Autoindex : " << it->getAutoIndex() << std::endl;
-        std::cout << "Index : " << it->getIndex() << std::endl;
- 		it->getLocations();
-        std::cout << "---------------------- END --------------------------------" << std::endl;
-    }
+    // for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    // {
+    //     std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
+    //     std::cout << "Port: " << it->getPort() << std::endl;
+    //     std::cout << "Host: " << it->getHost() << std::endl;
+    //     std::cout << "Root: " << it->getRoot() << std::endl;
+    //     std::cout << "Ser Name: " << it->getServerName() << std::endl;
+    //     std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
+    //     std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
+    //     std::cout << "CGI param : " << it->getCgiParam() << std::endl;
+    //     std::cout << "Autoindex : " << it->getAutoIndex() << std::endl;
+    //     std::cout << "Index : " << it->getIndex() << std::endl;
+ 	// 	it->getLocations();
+    //     std::cout << "---------------------- END --------------------------------" << std::endl;
+    // }
 
     ////////////////////// Server ////////////////////////////////
     Cluster	cluster(serv_list);
@@ -246,28 +246,40 @@ int main(int argc, char **argv)
 
 // TO DO
 
-// - host name ??? (On a tjs 127.0.0.1, je comprends pas ce qu'on doit faire)
-//          => a voir
-// - status code ??? (A chequer quand on inspect la page sur le browser, le status doit etre bon)
-//        => details mais en gros ok (Charlie)
-// - lier les routes (locations) du .conf aux requetes
-//         => Henry
+// - status code ? (A chequer quand on inspect la page sur le browser, le status doit etre bon)
+//        => details mais en gros ok 
+//        => Charlie
 // - proteger si les method (Get, Post, Delete) dans les routes ne sont pas authorisees
-//          => Charlie a priori ok mais a voir parsing .conf Henry
-// - default file if you look for a directory (A voir si la requete demande un dossier)
-//          => Henry
-// - wrong url protection
-//          => Evrard
+//          => Ok (voir Response.cpp ligne 62)
+//          => a verifier par Charlie (surtout POST et DELETE)
 // - upload a file and get it back
-//           => checker exceptions (Charlie)
+//           => voir dans quel dossier il s'upload, si un str est precisé dans une location (file_upload_location), changer le dossier (voir Response.cpp ligne 71)
+//           => Le default.html propose un lien pour uploader, le lien va bien vers une page html qui propose de selectionner un fichier. Le save ne marche pas encore
+//           => Charlie
 // - limit client body (ca ne doit pas fonctionner si le body size est plus petit que le size du fichier a uploader)
-//           => Charly
+//           => Charlie
+// - si tu as le temps, j'imagine que mettre un lien pour le delete dans le default.html ne devrait pas etre compliqué (voir Response.cpp ligne 52)
+
+
+
+// - lier les routes (locations) du .conf aux requetes (voir Response.cpp ligne 22)
+//         => Encore a faire:
+//              - location /            (un peu tricky car .find le trouve à chaque iteration dans la boucle for)
+//              - location ~ \.bla$     (a voir ce qu'ils demandent exactement en lancant le tester)
+//        => Evrard
+// - wrong url protection + default file if you look for a directory (A voir si la requete demande un dossier)
+//          => Evrard
 // - BAcker 2em socket
 //          => Evrard
-// - Leaks
-//          => Evrard
 // - Tester
-//          => Henry, Evrard
+//          => Evrard
+
+
+
+// Si on a encore le temps:
+// - host name ? (On a tjs 127.0.0.1, je comprends pas ce qu'on doit faire)
+// - Leaks
+// - autoindex
 
 
 
