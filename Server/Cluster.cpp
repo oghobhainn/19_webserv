@@ -81,8 +81,6 @@ int		Cluster::setup(void)
 
 void	Cluster::run(void)
 {
-	int	n = 0;
-
 	while (true)
 	{
 		fd_set		reading_set;
@@ -101,8 +99,6 @@ void	Cluster::run(void)
 				std::cout << "---------- add socket writing : " << *it << std::endl;
 			}
 			std::cout << "Waiting on a connection" << std::endl;
-			if (n == 3)
-				n = 0;
 			ret = select(_max_fd + 1, &reading_set, &writing_set, NULL, &timeout);
 		}
 		// if ret > 0 : select a trouvé une socket active
@@ -129,7 +125,7 @@ void	Cluster::run(void)
 					break;
 		 		}
 		 	}
-			// lit les informations de la requetes
+			// lit les informations de la requete
 		 	for (std::map<long, ActiveServer *>::iterator it = _sockets.begin(); ret && it != _sockets.end(); it++)
 		 	{
 		 		long	socket = it->first;
@@ -190,7 +186,6 @@ void	Cluster::run(void)
 				FD_SET(it->first, &_fd_set);
 		}
 		std::cout << "-- END --" << std::endl;
-		n = 0;
 	}
 }
 

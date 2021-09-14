@@ -67,6 +67,7 @@ class Location : public CGI
 		bool					active;
 		std::string				full_str;
 		std::list<std::string>	file_extensions;
+        std::string             extension;
 		size_t					max_body;
 		std::string				root;
 		std::string				index;
@@ -94,6 +95,7 @@ class Server : public Location
         std::string             cgi_param;
         std::string             cgi_pass;
         std::string             path;
+        std::string             index;
         int				        client_body_size;
 		int 					nb_loc;
         ListeningSocket         *_socket;
@@ -130,6 +132,7 @@ class Server : public Location
 
         void addSocketClient(int socket);
         void removeSocketClient(int socket);
+
         fd_set getSocketClient();
         void setSocketClient(fd_set socket_client);
 
@@ -162,6 +165,9 @@ class Server : public Location
 
         void setAutoIndex(std::string const str);
         bool getAutoIndex();
+
+        void setIndex(std::string const str);
+        std::string getIndex()const;
 };
 
 

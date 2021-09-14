@@ -82,8 +82,8 @@ Server& Server::operator=(Server const& copy)
         this->socket_client = copy.socket_client;
         this->_socket = copy._socket;
         this->content_location = copy.content_location;
-		/////////////
-		
+		this->index = copy.index;
+		this->locations = copy.locations;
 	}
 	return *this;
 }
@@ -316,6 +316,16 @@ void Server::setAutoIndex(std::string const str)
 bool Server::getAutoIndex()
 {
 	return this->autoindex;
+}
+
+void Server::setIndex(std::string const str)
+{
+	this->index = str;
+}
+
+std::string Server::getIndex() const
+{
+	return this->index;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
