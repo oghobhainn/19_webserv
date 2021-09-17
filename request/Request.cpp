@@ -13,14 +13,12 @@ std::vector<std::string>		Request::initMethods()
 
 std::vector<std::string>	Request::methods = Request::initMethods();
 
-Request::Request(const std::string& str, Server serv) :
-	_method (""), _version(""), _ret(200), _body(""), _port(0), _path(""), _query(""), _raw(str)
+Request::Request(const std::string& str) :
+	_method (""), _version(""), _ret(200), _body(""), _port(80), _path(""), _query(""), _raw(str)
 {
 	this->resetHeaders();
 	this->_env_for_cgi.clear();
 	this->parse(str);
-	this->_serv_config = serv;
-	_port = stoi(serv.getPort());
 
 	if (this->_ret != 200)
 		PE("Parse error : " + std::to_string(this->_ret));

@@ -7,8 +7,6 @@
 #include <map>
 #include <vector>
 
-#include "../ConfigParsing/Config.hpp"
-
 #ifdef DEBUG
 # define PRINT 1
 #else
@@ -55,7 +53,6 @@ class Request
 			std::string									_query;
 			std::list<std::pair<std::string, float> >	_lang;
 			const std::string&							_raw;
-			Server										_serv_config;
 
 			/*** PARSING ***/
 			int			readFirstLine(const std::string& line);
@@ -77,7 +74,7 @@ class Request
 			Request(const Request&);
 
 		public:
-			Request(const std::string& str, Server serv);
+			Request(const std::string& str);
 			~Request();
 			Request&	operator=(const Request&);
 
