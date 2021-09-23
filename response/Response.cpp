@@ -51,8 +51,8 @@ void			Response::call(Request & request, Server & server)
 	else if (_path == "/upload.html")
 		_path = "./default/upload.html";
 	// Case: delete ?
-	// else if (_path == "/delete/example.html")
-	// 	_path = "DELETE /frontend/example.html HTTP/1.1"; ??
+	else if (_path == "/delete/example.html")
+		_path = "DELETE /frontend/example.html HTTP/1.1";
 	// Case: check if there is a loc in the url
 	for (int i = 0; i < server.getNbLoc(); i++)
 	{
