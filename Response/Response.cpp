@@ -21,6 +21,7 @@ std::map<std::string, void (Response::*)(Request &, Server &)> Response::_method
 
 void			Response::call(Request & request, Server & server)
 {
+	bool location_found = false;
 	// _errorMap = server.getErrorPage();
 	// _isAutoIndex = server.getAutoIndex(); //TODO
 	// _isAutoIndex = server.getAutoIndex();
@@ -51,16 +52,28 @@ void			Response::call(Request & request, Server & server)
 		_path = "./default/upload.html";
 	// Case: delete ?
 	// else if (_path == "/delete/example.html")
-	// 	_path = "DELETE /frontend/example.html HTTP/1.1" ??
+	// 	_path = "DELETE /frontend/example.html HTTP/1.1"; ??
 	// Case: check if there is a loc in the url
 	for (int i = 0; i < server.getNbLoc(); i++)
 	{
 		std::cout << "++++++++++++++++++++++" << std::endl;
 		std::cout << "loc:" << server.locations[i].extension << std::endl;
 		std::cout << "path:" << _path << std::endl;
-		if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
+		if (server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
+		{
+			std::cout << "=========================================== !!found!! ===========================================" << std::endl;
+			location_found = true;
+			if (server.locations[i].root.size() > 0)
+			{
+				_path = server.locations[i].root + "/";
+				if (server.locations[i].index.size() > 0)
+					_path = _path + server.locations[i].index;
+			}
+		}
+		else if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
 		{
 			std::cout << "innnnn location" << std::endl;
+			location_found = true;
 			// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
 			if (server.locations[i].get_method == false && request.getMethod() == "GET")
 				_code = 405;
@@ -77,15 +90,20 @@ void			Response::call(Request & request, Server & server)
 					_path = _path + server.locations[i].index;
 			}
 		}
-		std::cout << "---------------------" << std::endl;
+		// std::cout << "---------------------" << std::endl;
 	}
 	// Case: wrong url / pas encore la bonne methode de faire comme ca
-		// else 
-	// {
-	// 	std::cout << "Wrong URL" << std::endl;
-	// 	_path = "./default/404.html";
-	// 	return ;
-	// }
+	
+
+	// necessaire? car deja le cas ...
+	if (location_found == false)
+	{
+		_code = 404;
+		std::cout << "Wrong URL" << std::endl;
+		_path = "./default/404.html";
+		return ; // necessaire?
+	}
+
 	std::cout << "_path end:" << _path << std::endl;
 
 	std::set<std::string> allowedTODO;
