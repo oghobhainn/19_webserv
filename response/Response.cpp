@@ -58,7 +58,13 @@ void			Response::call(Request & request, Server & server)
 		std::cout << "++++++++++++++++++++++" << std::endl;
 		std::cout << "loc:" << server.locations[i].extension << std::endl;
 		std::cout << "path:" << _path << std::endl;
-		if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
+		if (server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
+		{
+			std::cout << "loc:" << server.locations[i].extension << std::endl;
+			std::cout << "path:" << _path << std::endl;
+			std::cout << "=========================================== !!found!! ===========================================" << std::endl;
+		}
+		else if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
 		{
 			std::cout << "innnnn location" << std::endl;
 			// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
