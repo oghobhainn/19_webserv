@@ -2,11 +2,6 @@ NAME = webserv
 SRCS = main.cpp \
 		Utils/parsing.cpp \
 		ConfigParsing/Config.cpp \
-		Networking/Server/TestServer.cpp \
-		Networking/Sockets/BindingSocket.cpp \
-		Networking/Sockets/ConnectingSocket.cpp \
-		Networking/Sockets/ListeningSocket.cpp \
-		Networking/Sockets/SimpleSocket.cpp \
 		Request/Request.cpp \
 		Request/RequestMembers.cpp \
 		Request/RequestUtils.cpp \

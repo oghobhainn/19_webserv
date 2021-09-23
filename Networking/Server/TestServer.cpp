@@ -97,7 +97,7 @@ int TestServer::accepter(int socket, std::list<class Server> *serv_list)
 
 void TestServer::handler(int socket, Server serv)
 {
-    Request     req(_buffer, serv);
+    Request     req(_buffer);
 
     std::cout << "=============================================================================================" << std::endl;
     PY("request : ");

@@ -89,7 +89,7 @@ void		ActiveServer::process(long socket, std::list<Server> &serv_list)
 
  	if (_requests[socket] != "")
  	{
-		Request     req(_requests[socket], _listen);
+		Request     req(_requests[socket]);
 
 		std::cout << "=============================================================================================" << std::endl;
 		PY("request : ");
