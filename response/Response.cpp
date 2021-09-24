@@ -22,6 +22,7 @@ std::map<std::string, void (Response::*)(Request &, Server &)> Response::_method
 void			Response::call(Request & request, Server & server)
 {
 	bool location_found = false;
+	bool default_root = false;
 	// _errorMap = server.getErrorPage();
 	// _isAutoIndex = server.getAutoIndex(); //TODO
 	// _isAutoIndex = server.getAutoIndex();
@@ -40,8 +41,9 @@ void			Response::call(Request & request, Server & server)
 			_path = _path + "/" + server.getIndex();
 	}
 	// Case: normal path without root
-	else if (_path == "/")
+	else if (_path.size() == 1 && _path == "/")
 	{
+		default_root = true;
 		_path = "./default/default.html";
 		// Case: index at the beginning
 		if (server.getIndex().size() > 0)
@@ -54,12 +56,14 @@ void			Response::call(Request & request, Server & server)
 	else if (_path == "/delete/example.html")
 		_path = "DELETE /frontend/example.html HTTP/1.1";
 	// Case: check if there is a loc in the url
+	std::cout << "_path begin:" << _path << std::endl;
 	for (int i = 0; i < server.getNbLoc(); i++)
 	{
 		std::cout << "++++++++++++++++++++++" << std::endl;
 		std::cout << "loc:" << server.locations[i].extension << std::endl;
 		std::cout << "path:" << _path << std::endl;
-		if (server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
+		std::cout << "size = " << server.locations[i].extension.size() << std::endl;
+		if (default_root == true && server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
 		{
 			std::cout << "=========================================== !!found!! ===========================================" << std::endl;
 			location_found = true;
