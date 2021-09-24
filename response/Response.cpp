@@ -21,8 +21,8 @@ std::map<std::string, void (Response::*)(Request &, Server &)> Response::_method
 
 void			Response::call(Request & request, Server & server)
 {
-	bool location_found = false;
-	bool default_root = false;
+	bool location_found = false; // si il rentre dans une loc, devient true
+	bool default_root = false; // pour gerer si path = "/" et eviter que le .find le trouve tout le temps
 	// _errorMap = server.getErrorPage();
 	// _isAutoIndex = server.getAutoIndex(); //TODO
 	// _isAutoIndex = server.getAutoIndex();
