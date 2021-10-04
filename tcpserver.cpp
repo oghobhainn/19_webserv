@@ -20,7 +20,7 @@ int setup_server()
 	int					new_socket;
 	struct sockaddr_in	address;
 	int					addrlen = sizeof(address);
-	const int			PORT = 80;
+	const int			PORT = 82;
 
 
 	/* 1. - Creating the socket*/

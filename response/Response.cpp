@@ -162,9 +162,19 @@ void			Response::getMethod(Request & request, Server & server)
 	else if  (_code == 200)
 		_code = readContent();
 	else
-		_response = this->readHtml("html/error/" + to_string(_code) + ".html");
+	{
+		if (server.getDefaultErrorPage().size() > 0)
+			_response = this->readHtml("default/" + server.getDefaultErrorPage());
+		else
+			_response = this->readHtml("default/" + to_string(_code) + ".html");
+	}
 	if (_code == 500)
-		_response = this->readHtml("html/error/" + to_string(_code) + ".html");
+	{
+		if (server.getDefaultErrorPage().size() > 0)
+			_response = this->readHtml("default/" + server.getDefaultErrorPage());
+		else
+			_response = this->readHtml("default/" + to_string(_code) + ".html");
+	}
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), server.getLang()) + "\r\n" + _response;
 	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
 	std::string body = _response;
@@ -227,6 +237,7 @@ void			Response::deleteMethod(Request & request, Server & server)
 
 	if (pathIsFile(_path))
 	{
+		std::cout << "---------------------------------------------------------------- ok --------------------------" << std::endl;
 		if (remove(_path.c_str()) == 0)
 		{
 			PY(_path + " DELETED");
@@ -251,6 +262,7 @@ Response		Response::buildResponse(Request & req, Server & serv)
     // {
     //     PY(*it);
     // }
+	std::cout << "get_methode == " << req.getMethod() << std::endl;
 	if (req.getMethod() == "GET") //if its allowed, TODO : gotta use setMethodsAllowed in the parsing of .conf 
 		Response::getMethod(req, serv);
 	if (req.getMethod() == "POST")
@@ -337,6 +349,7 @@ std::string		Response::readHtml(const std::string& path)
 {
 	std::ofstream		file;
 	std::stringstream	buffer;
+	std::cout << "path = " << path << std::endl;
 	if (pathIsFile(path))
 	{
 		file.open(path.c_str(), std::ifstream::in);
