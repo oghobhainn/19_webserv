@@ -100,12 +100,12 @@ void			Response::call(Request & request, Server & server)
 	
 
 	// necessaire? car deja le cas ...
-	if (location_found == false)
+	if (location_found == false && default_root == false)
 	{
 		_code = 404;
 		std::cout << "Wrong URL" << std::endl;
 		_path = "./default/404.html";
-		return ; // necessaire?
+		// return ; // necessaire?
 	}
 
 	std::cout << "_path end:" << _path << std::endl;
