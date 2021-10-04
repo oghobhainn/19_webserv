@@ -23,6 +23,7 @@ void			Response::call(Request & request, Server & server)
 {
 	bool location_found = false; // si il rentre dans une loc, devient true
 	bool default_root = false; // pour gerer si path = "/" et eviter que le .find le trouve tout le temps
+	bool file_exists = false;
 	// _errorMap = server.getErrorPage();
 	// _isAutoIndex = server.getAutoIndex(); //TODO
 	// _isAutoIndex = server.getAutoIndex();
@@ -31,82 +32,121 @@ void			Response::call(Request & request, Server & server)
 	_host = server.getHost();
 	_port = server.getPort();
 	_path = request.getPath();
+
 	std::cout << "_path begin:" << _path << std::endl;
-	// Case: root at the beginning
-	if (server.getRoot().size() > 0)
+	if (_path.size() > 1)
 	{
-		_path = server.getRoot();
-		// Case: index at the beginning
-		if (server.getIndex().size() > 0)
-			_path = _path + "/" + server.getIndex();
+		std::ifstream		file;
+
+		// if (pathIsFile(_path))
+		// {
+		std::string tmp_path = "./default" + _path;
+		file.open(tmp_path.c_str(), std::ifstream::in);
+		if (file.is_open() == true)
+		{
+			PY("ON EST LAA");
+			_path = "./default" + _path;
+			PY(_path);
+			file_exists = true;
+		}
+		// }
 	}
-	// Case: normal path without root
-	else if (_path.size() == 1 && _path == "/")
+	if (_path.size() == 1 && _path == "/" && file_exists == false)
 	{
 		default_root = true;
 		_path = "./default/default.html";
-		// Case: index at the beginning
 		if (server.getIndex().size() > 0)
+		{
 			_path = "./default/" + server.getIndex();
+		}
+		// Case: index at the beginning	
 	}
-	// Case: upload a file
-	else if (_path == "/upload.html")
-		_path = "./default/upload.html";
-	// Case: delete ?
-	else if (_path == "/delete/example.html")
-		_path = "DELETE /frontend/example.html HTTP/1.1";
-	// Case: check if there is a loc in the url
-	std::cout << "_path begin:" << _path << std::endl;
-	for (int i = 0; i < server.getNbLoc(); i++)
+	else if (file_exists == false)
 	{
-		std::cout << "++++++++++++++++++++++" << std::endl;
-		std::cout << "loc:" << server.locations[i].extension << std::endl;
-		std::cout << "path:" << _path << std::endl;
-		std::cout << "size = " << server.locations[i].extension.size() << std::endl;
-		if (default_root == true && server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
+		// if (server.getIndex().size() > 0)
+		// {
+		// 	_path = "./default/" + server.getIndex();
+		// }
+		// Case: root at the beginning
+		if (server.getRoot().size() > 0)
 		{
-			std::cout << "=========================================== !!found!! ===========================================" << std::endl;
-			location_found = true;
-			if (server.locations[i].root.size() > 0)
-			{
-				_path = server.locations[i].root + "/";
-				if (server.locations[i].index.size() > 0)
-					_path = _path + server.locations[i].index;
-			}
+			_path = server.getRoot();
+			// Case: index at the beginning
+			if (server.getIndex().size() > 0)
+				_path = _path + "/" + server.getIndex();
 		}
-		else if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
-		{
-			std::cout << "innnnn location" << std::endl;
-			location_found = true;
-			// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
-			if (server.locations[i].get_method == false && request.getMethod() == "GET")
-				_code = 405;
-			if (server.locations[i].post_method == false && request.getMethod() == "POST")
-				_code = 405;
-			if (server.locations[i].delete_method == false && request.getMethod() == "DELETE")
-				_code = 405;
-			// A VOIR: changer le dossier ou sera uploadé le fichier 
-			//if (request.getMethod() == "POST" && server.locations[i].file_upload_location != "./default/")
-			if (server.locations[i].root.size() > 0)
-			{
-				_path = server.locations[i].root + "/";
-				if (server.locations[i].index.size() > 0)
-					_path = _path + server.locations[i].index;
-			}
-		}
-		// std::cout << "---------------------" << std::endl;
-	}
-	// Case: wrong url / pas encore la bonne methode de faire comme ca
+	// Case: normal path without root
 	
-
+		// Case: upload a file
+		
+		// else if (_path == "/upload.html")
+		// {
+		// 	PY("UPLOAD HTML");
+		// 	_path = "./default/upload.html";
+		// }
+		
+		// Case: delete ?
+		// Case: check if there is a loc in the url
+		// std::cout << "_path begin:" << _path << std::endl;
+		else
+		{
+			for (int i = 0; i < server.getNbLoc(); i++)
+			{
+				std::cout << "++++++++++++++++++++++" << std::endl;
+				std::cout << "loc:" << server.locations[i].extension << std::endl;
+				std::cout << "path:" << _path << std::endl;
+				std::cout << "size = " << server.locations[i].extension.size() << std::endl;
+				if (default_root == true && server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
+				{
+					std::cout << "=========================================== !!found!! ===========================================" << std::endl;
+					location_found = true;
+					if (server.locations[i].root.size() > 0)
+					{
+						_path = server.locations[i].root + "/";
+						if (server.locations[i].index.size() > 0)
+							_path = _path + server.locations[i].index;
+					}
+				}
+				else if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
+				{
+					std::cout << "innnnn location" << std::endl;
+					location_found = true;
+					// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
+					if (server.locations[i].get_method == false && request.getMethod() == "GET")
+						_code = 405;
+					if (server.locations[i].post_method == false && request.getMethod() == "POST")
+						_code = 405;
+					if (server.locations[i].delete_method == false && request.getMethod() == "DELETE")
+						_code = 405;
+					// A VOIR: changer le dossier ou sera uploadé le fichier 
+					//if (request.getMethod() == "POST" && server.locations[i].file_upload_location != "./default/")
+					if (server.locations[i].root.size() > 0)
+					{
+						_path = server.locations[i].root + "/";
+						if (server.locations[i].index.size() > 0)
+							_path = _path + server.locations[i].index;
+					}
+				}
+			// std::cout << "---------------------" << std::endl;
+			}	
+		}
+	
+	
 	// necessaire? car deja le cas ...
-	if (location_found == false && default_root == false)
+	if (location_found == false && default_root == false && file_exists == false)
 	{
+		PY(location_found);
+		PY(default_root);
 		_code = 404;
 		std::cout << "Wrong URL" << std::endl;
 		_path = "./default/404.html";
 		// return ; // necessaire?
 	}
+	}
+	// Case: wrong url / pas encore la bonne methode de faire comme ca
+	
+
+	
 
 	std::cout << "_path end:" << _path << std::endl;
 
@@ -186,6 +226,7 @@ void			Response::postMethod(Request & request, Server & server)
 {
 	ResponseHeader	head;
 
+	PY("HERE WE ARE");
 	if (server.getCgiPass() != "")
 	{
 		CgiHandler	cgi(request, server);
@@ -354,7 +395,8 @@ std::string		Response::readHtml(const std::string& path)
 	{
 		file.open(path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
-			return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
+			return ("<!DOCTYPE html>\n<html><title>404</title><body>404 ! There was an error finding your error page</body></html>\n");
+			//TODO
 
 		buffer << file.rdbuf();
 		file.close();
@@ -363,7 +405,7 @@ std::string		Response::readHtml(const std::string& path)
 		return (buffer.str());
 	}
 	else
-		return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
+		return ("<!DOCTYPE html>\n<html><title>404</title><body>404 ! There was an error finding your error page</body></html>\n");
 }
 
 std::string		Response::getResponse(void) { return (_response); }
