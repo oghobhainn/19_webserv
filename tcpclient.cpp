@@ -64,11 +64,13 @@ int main(int argc, char const *argv[])
         return -1;
     }
     send(sock , hello , strlen(hello) , 0 );
+    printf("Socket is [%d]\n", sock);
+    printf("message is [\n%s]\n", hello);
     printf("-- Hello message sent --\n");
     printf("Answer from server : \n");
     fflush(stdout);
     valread = read( sock , buffer, 4096);
-    printf("%s\n",buffer );
+    printf("hello\n%s\n",buffer );
     fflush(stdout);
     return 0;
 }

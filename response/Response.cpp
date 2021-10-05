@@ -112,6 +112,7 @@ void			Response::call(Request & request, Server & server)
 					std::cout << "innnnn location" << std::endl;
 					location_found = true;
 					// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
+					//TODO CHARLIE: pourquoi mettre ca ici ?? je crois que c'est a degager
 					if (server.locations[i].get_method == false && request.getMethod() == "GET")
 						_code = 405;
 					if (server.locations[i].post_method == false && request.getMethod() == "POST")
@@ -135,8 +136,6 @@ void			Response::call(Request & request, Server & server)
 	// necessaire? car deja le cas ...
 	if (location_found == false && default_root == false && file_exists == false)
 	{
-		PY(location_found);
-		PY(default_root);
 		_code = 404;
 		std::cout << "Wrong URL" << std::endl;
 		_path = "./default/404.html";
@@ -154,7 +153,9 @@ void			Response::call(Request & request, Server & server)
 	allowedTODO.insert("GET");
 	allowedTODO.insert("POST");
 	allowedTODO.insert("DELETE");
-
+//TODO CHARLIE
+// a la place de allowedTODO, on veut le membre _allowed_methods de config.hpp, et la ca devrait marcher
+// pour savoir si la methode est authorisee ou non
 	if (allowedTODO.find(request.getMethod()) == allowedTODO.end())
 		_code = 405;
 	else if (server.getClientBodySize() < request.getBody().size())

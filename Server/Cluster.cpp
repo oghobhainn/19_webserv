@@ -133,8 +133,7 @@ void	Cluster::run(void)
 		 		if (FD_ISSET(socket, &reading_set))
 				{
 					std::cout << "---------- read socket : " << socket << std::endl;
-		 			long	ret = it->second->recv(socket);
-
+					long	ret = it->second->recv(socket);
 		 			if (ret == 0)
 		 			{
 		 				it->second->process(socket, _serv_list);

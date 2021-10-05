@@ -86,7 +86,6 @@ void		ActiveServer::process(long socket, std::list<Server> &serv_list)
 	std::list<Server> test;
 	std::string		recvd = "";
 	test = serv_list;
-
  	if (_requests[socket] != "")
  	{
 		Request     req(_requests[socket]);
@@ -119,6 +118,8 @@ int			ActiveServer::recv(long socket)
 
  	ret = ::recv(socket, buffer, 10000, 0);
 
+	printf("buffer: %s\n", buffer);//TODO - here we receive the buffer
+
  	if (ret == 0 || ret == -1)
  	{
  		this->close(socket);
@@ -130,6 +131,7 @@ int			ActiveServer::recv(long socket)
  	}
  	_requests[socket] += std::string(buffer);
  	size_t	i = _requests[socket].find("\r\n\r\n");
+
  	if (i != std::string::npos)
  	{
  		if (_requests[socket].find("Content-Length: ") == std::string::npos)
