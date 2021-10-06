@@ -147,18 +147,19 @@ void			Response::call(Request & request, Server & server)
 
 	
 
-	std::cout << "_path end:" << _path << std::endl;
+// 	std::cout << "_path end:" << _path << std::endl;
 
-	std::set<std::string> allowedTODO;
-	allowedTODO.insert("GET");
-	allowedTODO.insert("POST");
-	allowedTODO.insert("DELETE");
-//TODO CHARLIE
-// a la place de allowedTODO, on veut le membre _allowed_methods de config.hpp, et la ca devrait marcher
-// pour savoir si la methode est authorisee ou non
-	if (allowedTODO.find(request.getMethod()) == allowedTODO.end())
-		_code = 405;
-	else if (server.getClientBodySize() < request.getBody().size())
+// 	std::set<std::string> allowedTODO;
+// 	allowedTODO.insert("GET");
+// 	allowedTODO.insert("POST");
+// 	allowedTODO.insert("DELETE");
+// //TODO CHARLIE
+// // a la place de allowedTODO, on veut le membre _allowed_methods de config.hpp, et la ca devrait marcher
+// // pour savoir si la methode est authorisee ou non
+// 	if (allowedTODO.find(request.getMethod()) == allowedTODO.end())
+// 		_code = 405;
+// 	else
+	if (server.getClientBodySize() < request.getBody().size())
 		_code = 413;
 	if (_code == 405 || _code == 413)
 	{
