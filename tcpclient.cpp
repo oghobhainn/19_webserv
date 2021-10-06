@@ -10,7 +10,7 @@
 #include <fstream>
 #include <sstream>
 
-#define PORT 80
+#define PORT 82
 
 std::string readFileIntoString(const std::string& path) {
 	std::ifstream input_file(path);
@@ -70,7 +70,7 @@ int main(int argc, char const *argv[])
     printf("Answer from server : \n");
     fflush(stdout);
     valread = read( sock , buffer, 4096);
-    printf("hello\n%s\n",buffer );
+    printf("hello\n%s\nyyyy",buffer );
     fflush(stdout);
     return 0;
 }

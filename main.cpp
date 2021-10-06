@@ -187,6 +187,21 @@ std::list<class Server> parseConfig(std::string const path)
                 it2->setAutoIndex(it3->substr(9, it3->size() - 9));
             else if (it3->find("index") != std::string::npos)
                 it2->setIndex(it3->substr(5, it3->size() - 5));
+            // else if (it3->find("http_methods") != std::string::npos)
+            // {
+            //     int beg = 0;
+            //     int end = 0;
+            //     beg = str_location.find("http_methods");
+            //     end = str_location.find(";", beg);
+            //     str_methods = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
+            //     if (str_methods.find("GET") != std::string::npos)
+            //         it->locations[j].get_method = true;
+            //     if (str_methods.find("POST") != std::string::npos)
+            //         it->locations[j].post_method = true;
+            //     if (str_methods.find("DELETE") != std::string::npos)
+            //         it->locations[j].delete_method = true;
+            // }
+            //     it2->setMethods(it3->substr(13, it3->size() - 13));
         }
     }
     return serv_list;

@@ -1,4 +1,4 @@
-DELETE /default/index_example.html HTTP/1.1
+DELETE /default/to_be_deleted.html HTTP/1.1
 User-Agent: custom-client
 Host: webserv
 Accept-Language: en-US

@@ -130,6 +130,7 @@ int			ActiveServer::recv(long socket)
  		return (-1);
  	}
  	_requests[socket] += std::string(buffer);
+	 
  	size_t	i = _requests[socket].find("\r\n\r\n");
 
  	if (i != std::string::npos)

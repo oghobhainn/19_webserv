@@ -275,27 +275,6 @@ void Server::setSocketClient(fd_set socket)
 	socket_client = socket;
 }
 
-void	Server::setAllowedMethods()
-{
-	if (get_method == true)
-	{
-		_allowed_methods.insert("GET");
-	}
-	if (post_method == true)
-	{
-		_allowed_methods.insert("POST");
-	}
-	if (delete_method == true)
-	{
-		_allowed_methods.insert("DELETE");
-	}
-}
-
-std::set<std::string>	Server::getAllowedMethods() const
-{
-	return _allowed_methods;
-}
-
 void	Server::setContentLocation(const std::string &path)
 {
 	this->content_location = path;
@@ -329,6 +308,15 @@ std::string Server::getIndex() const
 	return this->index;
 }
 
+void Server::setMethods(std::string const str)
+{
+	this->index = str;
+}
+
+std::string Server::getMethods() const
+{
+	return this->index;
+}
 //////////////////////////////////////////////////////////////////////////////////////////
 
 std::ostream& operator<<(std::ostream& os, const Server& item)

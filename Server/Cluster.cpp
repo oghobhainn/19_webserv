@@ -110,6 +110,7 @@ void	Cluster::run(void)
 		 		if (FD_ISSET(*it, &writing_set))
 		 		{
 					std::cout << "---------- start writing : " << *it << std::endl;
+					
 					long	ret = _sockets[*it]->send(*it);
 
 					if (ret == 0)

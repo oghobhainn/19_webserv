@@ -44,7 +44,6 @@ void			Response::call(Request & request, Server & server)
 		file.open(tmp_path.c_str(), std::ifstream::in);
 		if (file.is_open() == true)
 		{
-			PY("ON EST LAA");
 			_path = "./default" + _path;
 			PY(_path);
 			file_exists = true;
@@ -90,6 +89,7 @@ void			Response::call(Request & request, Server & server)
 		// std::cout << "_path begin:" << _path << std::endl;
 		else
 		{
+
 			for (int i = 0; i < server.getNbLoc(); i++)
 			{
 				std::cout << "++++++++++++++++++++++" << std::endl;
@@ -100,6 +100,12 @@ void			Response::call(Request & request, Server & server)
 				{
 					std::cout << "=========================================== !!found!! ===========================================" << std::endl;
 					location_found = true;
+					if (server.locations[i].get_method == false && request.getMethod() == "GET")
+						_code = 405;
+					if (server.locations[i].post_method == false && request.getMethod() == "POST")
+						_code = 405;
+					if (server.locations[i].delete_method == false && request.getMethod() == "DELETE")
+						_code = 405;
 					if (server.locations[i].root.size() > 0)
 					{
 						_path = server.locations[i].root + "/";
@@ -109,10 +115,8 @@ void			Response::call(Request & request, Server & server)
 				}
 				else if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
 				{
-					std::cout << "innnnn location" << std::endl;
 					location_found = true;
 					// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
-					//TODO CHARLIE: pourquoi mettre ca ici ?? je crois que c'est a degager
 					if (server.locations[i].get_method == false && request.getMethod() == "GET")
 						_code = 405;
 					if (server.locations[i].post_method == false && request.getMethod() == "POST")
@@ -137,41 +141,15 @@ void			Response::call(Request & request, Server & server)
 	if (location_found == false && default_root == false && file_exists == false)
 	{
 		_code = 404;
-		std::cout << "Wrong URL" << std::endl;
+		PY("WRONG URL");
 		_path = "./default/404.html";
 		// return ; // necessaire?
 	}
 	}
 	// Case: wrong url / pas encore la bonne methode de faire comme ca
-	
 
-	
-
-// 	std::cout << "_path end:" << _path << std::endl;
-
-// 	std::set<std::string> allowedTODO;
-// 	allowedTODO.insert("GET");
-// 	allowedTODO.insert("POST");
-// 	allowedTODO.insert("DELETE");
-// //TODO CHARLIE
-// // a la place de allowedTODO, on veut le membre _allowed_methods de config.hpp, et la ca devrait marcher
-// // pour savoir si la methode est authorisee ou non
-// 	if (allowedTODO.find(request.getMethod()) == allowedTODO.end())
-// 		_code = 405;
-// 	else
 	if (server.getClientBodySize() < request.getBody().size())
 		_code = 413;
-	if (_code == 405 || _code == 413)
-	{
-		ResponseHeader	head;
-		// _response = head.notAllowed(server.getAllowedMethods(), server.getLocations(), _code, server.getLang() + "\r\n";
-		_response = head.notAllowed(server.getAllowedMethods(), server.getContentLocation(), _code, "\r\n");
-		return ;
-	}
-	// if (server.getAllowedMethods().find(request.getMethod()) == server.getAllowedMethods().end())
-	// {
-	// 	_code = 405;
-	// }
 	(this->*Response::_method[request.getMethod()])(request, server);
 }
 
@@ -217,8 +195,6 @@ void			Response::getMethod(Request & request, Server & server)
 		else
 			_response = this->readHtml("default/" + to_string(_code) + ".html");
 	}
-	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), server.getLang()) + "\r\n" + _response;
-	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
 	std::string body = _response;
 	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
 	_response += "\r\n" + body;
@@ -228,7 +204,6 @@ void			Response::postMethod(Request & request, Server & server)
 {
 	ResponseHeader	head;
 
-	PY("HERE WE ARE");
 	if (server.getCgiPass() != "")
 	{
 		CgiHandler	cgi(request, server);
