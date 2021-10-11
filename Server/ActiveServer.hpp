@@ -20,11 +20,11 @@ class ActiveServer
 
         int		setup(void);
         void	setAddr(void);
-        long	accept(void);
-        void	process(long socket, std::list<Server> &serv_list);
+        long	accept_connection(void);
+        void	handle_connection(long socket, std::list<Server> &serv_list);
         // void	processChunk(long socket);
-        int		recv(long socket);
-        int		send(long socket);
+        int		receive_connection(long socket);
+        int		send_response(long socket);
         void	close(int socket);
         void	clean(void);
 

@@ -111,7 +111,7 @@ void	Cluster::run(void)
 		 		{
 					std::cout << "---------- start writing : " << *it << std::endl;
 					
-					long	ret = _sockets[*it]->send(*it);
+					long	ret = _sockets[*it]->send_response(*it);
 
 					if (ret == 0)
 						_ready.erase(it);
@@ -134,10 +134,10 @@ void	Cluster::run(void)
 		 		if (FD_ISSET(socket, &reading_set))
 				{
 					std::cout << "---------- read socket : " << socket << std::endl;
-					long	ret = it->second->recv(socket);
+					long	ret = it->second->receive_connection(socket);
 		 			if (ret == 0)
 		 			{
-		 				it->second->process(socket, _serv_list);
+		 				it->second->handle_connection(socket, _serv_list);
 						_ready.push_back(socket);
 						
 		 			}
@@ -159,7 +159,7 @@ void	Cluster::run(void)
 
 			 	if (FD_ISSET(fd, &reading_set))
 			 	{
-			 		long	socket = it->second.accept();
+			 		long	socket = it->second.accept_connection();
 					std::cout << "---------- socket created : " << socket << " for the port : " << fd << std::endl;
 			 		if (socket != -1)
 			 		{
