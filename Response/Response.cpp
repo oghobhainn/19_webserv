@@ -32,6 +32,7 @@ void			Response::check_method(Request & request, Server & server)
 
 void			Response::call(Request & request, Server & server)
 {
+	std::string tmp_path;
 	bool location_found = false; // si il rentre dans une loc, devient true
 	bool default_root = false; // pour gerer si path = "/" et eviter que le .find le trouve tout le temps
 	bool file_exists = false;
@@ -43,7 +44,7 @@ void			Response::call(Request & request, Server & server)
 	_host = server.getHost();
 	_port = server.getPort();
 	_path = request.getPath();
-
+	tmp_path = _path;
 	std::cout << "_path begin:" << _path << std::endl;
 	if (_path.size() > 1)
 	{
@@ -107,18 +108,18 @@ void			Response::call(Request & request, Server & server)
 		// Case: delete ?
 		// Case: check if there is a loc in the url
 		// std::cout << "_path begin:" << _path << std::endl;
-		else
-		{
-
+		// else
+		// {
+			PY(_path);
 			for (int i = 0; i < server.getNbLoc(); i++)
 			{
-				// std::cout << "++++++++++++++++++++++" << std::endl;
-				// std::cout << "loc:" << server.locations[i].extension << std::endl;
-				// std::cout << "path:" << _path << std::endl;
-				// std::cout << "size = " << server.locations[i].extension.size() << std::endl;
+				std::cout << "++++++++++++++++++++++" << std::endl;
+				std::cout << "loc:" << server.locations[i].extension << std::endl;
+				std::cout << "path:" << _path << std::endl;
+				std::cout << "size = " << server.locations[i].extension.size() << std::endl;
 				if (default_root == true && server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
 				{
-					// std::cout << "=========================================== !!found!! ===========================================" << std::endl;
+					std::cout << "=========================================== !!found!! ===========================================" << std::endl;
 					location_found = true;
 					check_method(request, server);
 					if (server.locations[i].root.size() > 0)
@@ -128,8 +129,9 @@ void			Response::call(Request & request, Server & server)
 							_path = _path + server.locations[i].index;
 					}
 				}
-				else if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
+				else if (tmp_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
 				{
+					PY("On est la!!")
 					location_found = true;
 					check_method(request, server);
 					// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
@@ -144,7 +146,7 @@ void			Response::call(Request & request, Server & server)
 				}
 			// std::cout << "---------------------" << std::endl;
 			}
-		}
+		// }
 		// necessaire? car deja le cas ...
 		if (location_found == false && default_root == false && file_exists == false)
 		{
@@ -157,7 +159,8 @@ void			Response::call(Request & request, Server & server)
 	// Case: wrong url / pas encore la bonne methode de faire comme ca
 	if (server.getClientBodySize() < request.getBody().size())
 		_code = 413;
-	(this->*Response::_method[request.getMethod()])(request, server);
+	// (this->*Response::_method[request.getMethod()])(request, server);
+	std::cout << "_path end:" << _path << std::endl;
 }
 
 // Methods
