@@ -98,13 +98,13 @@ void			Response::call(Request & request, Server & server)
 
 			for (int i = 0; i < server.getNbLoc(); i++)
 			{
-				std::cout << "++++++++++++++++++++++" << std::endl;
-				std::cout << "loc:" << server.locations[i].extension << std::endl;
-				std::cout << "path:" << _path << std::endl;
-				std::cout << "size = " << server.locations[i].extension.size() << std::endl;
+				// std::cout << "++++++++++++++++++++++" << std::endl;
+				// std::cout << "loc:" << server.locations[i].extension << std::endl;
+				// std::cout << "path:" << _path << std::endl;
+				// std::cout << "size = " << server.locations[i].extension.size() << std::endl;
 				if (default_root == true && server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
 				{
-					std::cout << "=========================================== !!found!! ===========================================" << std::endl;
+					// std::cout << "=========================================== !!found!! ===========================================" << std::endl;
 					location_found = true;
 					if (server.locations[i].get_method == false && request.getMethod() == "GET")
 						_code = 405;
@@ -139,21 +139,18 @@ void			Response::call(Request & request, Server & server)
 					}
 				}
 			// std::cout << "---------------------" << std::endl;
-			}	
+			}
 		}
-	
-	
-	// necessaire? car deja le cas ...
-	if (location_found == false && default_root == false && file_exists == false)
-	{
-		_code = 404;
-		PY("WRONG URL");
-		_path = "./default/404.html";
-		// return ; // necessaire?
-	}
+		// necessaire? car deja le cas ...
+		if (location_found == false && default_root == false && file_exists == false)
+		{
+			_code = 404;
+			// PY("WRONG URL");
+			_path = "./default/404.html";
+			// return ; // necessaire?
+		}
 	}
 	// Case: wrong url / pas encore la bonne methode de faire comme ca
-
 	if (server.getClientBodySize() < request.getBody().size())
 		_code = 413;
 	(this->*Response::_method[request.getMethod()])(request, server);
@@ -261,7 +258,7 @@ void			Response::deleteMethod(Request & request, Server & server)
 
 	if (pathIsFile(_path))
 	{
-		std::cout << "---------------------------------------------------------------- ok --------------------------" << std::endl;
+		// std::cout << "---------------------------------------------------------------- ok --------------------------" << std::endl;
 		if (remove(_path.c_str()) == 0)
 		{
 			PY(_path + " DELETED");
