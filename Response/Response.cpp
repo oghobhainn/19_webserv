@@ -19,6 +19,8 @@ std::map<std::string, void (Response::*)(Request &, Server &)> Response::_method
 
 // Member functions
 
+// void			Response::check_method();
+
 void			Response::call(Request & request, Server & server)
 {
 	bool location_found = false; // si il rentre dans une loc, devient true
@@ -62,6 +64,12 @@ void			Response::call(Request & request, Server & server)
 				file_exists = true;
 			}
 		}
+		if (server.getGetMethod() == false && request.getMethod() == "GET")
+			_code = 405;
+		if (server.getPostMethod() == false && request.getMethod() == "POST")
+			_code = 405;
+		if (server.getDeleteMethod() == false && request.getMethod() == "DELETE")
+			_code = 405;
 	}
 	if (_path.size() == 1 && _path == "/" && file_exists == false)
 	{
@@ -71,6 +79,12 @@ void			Response::call(Request & request, Server & server)
 		{
 			_path = "./default/" + server.getIndex();
 		}
+		if (server.getGetMethod() == false && request.getMethod() == "GET")
+			_code = 405;
+		if (server.getPostMethod() == false && request.getMethod() == "POST")
+			_code = 405;
+		if (server.getDeleteMethod() == false && request.getMethod() == "DELETE")
+			_code = 405;
 		// Case: index at the beginning	
 	}
 	else if (file_exists == false)
@@ -86,6 +100,12 @@ void			Response::call(Request & request, Server & server)
 			// Case: index at the beginning
 			if (server.getIndex().size() > 0)
 				_path = _path + "/" + server.getIndex();
+			if (server.getGetMethod() == false && request.getMethod() == "GET")
+				_code = 405;
+			if (server.getPostMethod() == false && request.getMethod() == "POST")
+				_code = 405;
+			if (server.getDeleteMethod() == false && request.getMethod() == "DELETE")
+				_code = 405;
 		}
 	// Case: normal path without root
 	

@@ -25,6 +25,7 @@ public:
 
 	void			call(Request & request, Server & server);
 
+	// void			check_method(void);
 
 	void			getMethod(Request & request, Server & server);
 	void			postMethod(Request & request, Server & server);
