@@ -50,22 +50,14 @@ void			Response::call(Request & request, Server & server)
 	{
 		std::ifstream		file;
 
-		std::string tmp_path = "./default" + _path;
+		std::string tmp_path = "./default/" + _path;
 		file.open(tmp_path.c_str(), std::ifstream::in);
-		if (file.is_open() == true)
+		if (file.is_open() == true || request.getMethod() == "POST")
 		{
-			_path = "./default" + _path;
+			_path = "./default/" + _path;
 			PY(_path);
 			file_exists = true;
-		}
-		else
-		{
-			file.open(_path.c_str(), std::ifstream::in);
-			if (file.is_open() == true)
-			{
-				PY(_path);
-				file_exists = true;
-			}
+			PY("HELLO WORLD!!")
 		}
 		check_method(request, server);
 	}
