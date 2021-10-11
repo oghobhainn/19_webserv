@@ -23,6 +23,7 @@ void			Response::call(Request & request, Server & server)
 {
 	bool location_found = false; // si il rentre dans une loc, devient true
 	bool default_root = false; // pour gerer si path = "/" et eviter que le .find le trouve tout le temps
+	bool file_exists = false;
 	// _errorMap = server.getErrorPage();
 	// _isAutoIndex = server.getAutoIndex(); //TODO
 	// _isAutoIndex = server.getAutoIndex();
@@ -31,105 +32,127 @@ void			Response::call(Request & request, Server & server)
 	_host = server.getHost();
 	_port = server.getPort();
 	_path = request.getPath();
+
 	std::cout << "_path begin:" << _path << std::endl;
-	// Case: root at the beginning
-	if (server.getRoot().size() > 0)
+	if (_path.size() > 1)
 	{
-		_path = server.getRoot();
-		// Case: index at the beginning
-		if (server.getIndex().size() > 0)
-			_path = _path + "/" + server.getIndex();
+		std::ifstream		file;
+
+		std::string tmp_path = "./default" + _path;
+		file.open(tmp_path.c_str(), std::ifstream::in);
+		if (file.is_open() == true)
+		{
+			_path = "./default" + _path;
+			PY(_path);
+			file_exists = true;
+		}
+		else
+		{
+			file.open(_path.c_str(), std::ifstream::in);
+			if (file.is_open() == true)
+			{
+				PY(_path);
+				file_exists = true;
+			}
+		}
 	}
-	// Case: normal path without root
-	else if (_path.size() == 1 && _path == "/")
+	if (_path.size() == 1 && _path == "/" && file_exists == false)
 	{
 		default_root = true;
 		_path = "./default/default.html";
-		// Case: index at the beginning
 		if (server.getIndex().size() > 0)
+		{
 			_path = "./default/" + server.getIndex();
+		}
+		// Case: index at the beginning	
 	}
-	// Case: upload a file
-	else if (_path == "/upload.html")
-		_path = "./default/upload.html";
-	// Case: delete ?
-	else if (_path == "/delete/example.html")
-		_path = "DELETE /frontend/example.html HTTP/1.1";
-	// Case: check if there is a loc in the url
-	std::cout << "_path begin:" << _path << std::endl;
-	for (int i = 0; i < server.getNbLoc(); i++)
+	else if (file_exists == false)
 	{
-		std::cout << "++++++++++++++++++++++" << std::endl;
-		std::cout << "loc:" << server.locations[i].extension << std::endl;
-		std::cout << "path:" << _path << std::endl;
-		std::cout << "size = " << server.locations[i].extension.size() << std::endl;
-		if (default_root == true && server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
+		// if (server.getIndex().size() > 0)
+		// {
+		// 	_path = "./default/" + server.getIndex();
+		// }
+		// Case: root at the beginning
+		if (server.getRoot().size() > 0)
 		{
-			std::cout << "=========================================== !!found!! ===========================================" << std::endl;
-			location_found = true;
-			if (server.locations[i].root.size() > 0)
+			_path = server.getRoot();
+			// Case: index at the beginning
+			if (server.getIndex().size() > 0)
+				_path = _path + "/" + server.getIndex();
+		}
+	// Case: normal path without root
+	
+		// Case: upload a file
+		
+		// else if (_path == "/upload.html")
+		// {
+		// 	PY("UPLOAD HTML");
+		// 	_path = "./default/upload.html";
+		// }
+		
+		// Case: delete ?
+		// Case: check if there is a loc in the url
+		// std::cout << "_path begin:" << _path << std::endl;
+		else
+		{
+
+			for (int i = 0; i < server.getNbLoc(); i++)
 			{
-				_path = server.locations[i].root + "/";
-				if (server.locations[i].index.size() > 0)
-					_path = _path + server.locations[i].index;
+				// std::cout << "++++++++++++++++++++++" << std::endl;
+				// std::cout << "loc:" << server.locations[i].extension << std::endl;
+				// std::cout << "path:" << _path << std::endl;
+				// std::cout << "size = " << server.locations[i].extension.size() << std::endl;
+				if (default_root == true && server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
+				{
+					// std::cout << "=========================================== !!found!! ===========================================" << std::endl;
+					location_found = true;
+					if (server.locations[i].get_method == false && request.getMethod() == "GET")
+						_code = 405;
+					if (server.locations[i].post_method == false && request.getMethod() == "POST")
+						_code = 405;
+					if (server.locations[i].delete_method == false && request.getMethod() == "DELETE")
+						_code = 405;
+					if (server.locations[i].root.size() > 0)
+					{
+						_path = server.locations[i].root + "/";
+						if (server.locations[i].index.size() > 0)
+							_path = _path + server.locations[i].index;
+					}
+				}
+				else if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
+				{
+					location_found = true;
+					// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
+					if (server.locations[i].get_method == false && request.getMethod() == "GET")
+						_code = 405;
+					if (server.locations[i].post_method == false && request.getMethod() == "POST")
+						_code = 405;
+					if (server.locations[i].delete_method == false && request.getMethod() == "DELETE")
+						_code = 405;
+					// A VOIR: changer le dossier ou sera uploadé le fichier 
+					//if (request.getMethod() == "POST" && server.locations[i].file_upload_location != "./default/")
+					if (server.locations[i].root.size() > 0)
+					{
+						_path = server.locations[i].root + "/";
+						if (server.locations[i].index.size() > 0)
+							_path = _path + server.locations[i].index;
+					}
+				}
+			// std::cout << "---------------------" << std::endl;
 			}
 		}
-		else if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
+		// necessaire? car deja le cas ...
+		if (location_found == false && default_root == false && file_exists == false)
 		{
-			std::cout << "innnnn location" << std::endl;
-			location_found = true;
-			// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
-			if (server.locations[i].get_method == false && request.getMethod() == "GET")
-				_code = 405;
-			if (server.locations[i].post_method == false && request.getMethod() == "POST")
-				_code = 405;
-			if (server.locations[i].delete_method == false && request.getMethod() == "DELETE")
-				_code = 405;
-			// A VOIR: changer le dossier ou sera uploadé le fichier 
-			//if (request.getMethod() == "POST" && server.locations[i].file_upload_location != "./default/")
-			if (server.locations[i].root.size() > 0)
-			{
-				_path = server.locations[i].root + "/";
-				if (server.locations[i].index.size() > 0)
-					_path = _path + server.locations[i].index;
-			}
+			_code = 404;
+			// PY("WRONG URL");
+			_path = "./default/404.html";
+			// return ; // necessaire?
 		}
-		// std::cout << "---------------------" << std::endl;
 	}
 	// Case: wrong url / pas encore la bonne methode de faire comme ca
-	
-
-	// necessaire? car deja le cas ...
-	if (location_found == false)
-	{
-		_code = 404;
-		std::cout << "Wrong URL" << std::endl;
-		_path = "./default/404.html";
-		return ; // necessaire?
-	}
-
-	std::cout << "_path end:" << _path << std::endl;
-
-	std::set<std::string> allowedTODO;
-	allowedTODO.insert("GET");
-	allowedTODO.insert("POST");
-	allowedTODO.insert("DELETE");
-
-	if (allowedTODO.find(request.getMethod()) == allowedTODO.end())
-		_code = 405;
-	else if (server.getClientBodySize() < request.getBody().size())
+	if (server.getClientBodySize() < request.getBody().size())
 		_code = 413;
-	if (_code == 405 || _code == 413)
-	{
-		ResponseHeader	head;
-		// _response = head.notAllowed(server.getAllowedMethods(), server.getLocations(), _code, server.getLang() + "\r\n";
-		_response = head.notAllowed(server.getAllowedMethods(), server.getContentLocation(), _code, "\r\n");
-		return ;
-	}
-	// if (server.getAllowedMethods().find(request.getMethod()) == server.getAllowedMethods().end())
-	// {
-	// 	_code = 405;
-	// }
 	(this->*Response::_method[request.getMethod()])(request, server);
 }
 
@@ -162,11 +185,19 @@ void			Response::getMethod(Request & request, Server & server)
 	else if  (_code == 200)
 		_code = readContent();
 	else
-		_response = this->readHtml("html/error/" + to_string(_code) + ".html");
+	{
+		if (server.getDefaultErrorPage().size() > 0)
+			_response = this->readHtml("default/" + server.getDefaultErrorPage());
+		else
+			_response = this->readHtml("default/" + to_string(_code) + ".html");
+	}
 	if (_code == 500)
-		_response = this->readHtml("html/error/" + to_string(_code) + ".html");
-	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), server.getLang()) + "\r\n" + _response;
-	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
+	{
+		if (server.getDefaultErrorPage().size() > 0)
+			_response = this->readHtml("default/" + server.getDefaultErrorPage());
+		else
+			_response = this->readHtml("default/" + to_string(_code) + ".html");
+	}
 	std::string body = _response;
 	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
 	_response += "\r\n" + body;
@@ -227,6 +258,7 @@ void			Response::deleteMethod(Request & request, Server & server)
 
 	if (pathIsFile(_path))
 	{
+		// std::cout << "---------------------------------------------------------------- ok --------------------------" << std::endl;
 		if (remove(_path.c_str()) == 0)
 		{
 			PY(_path + " DELETED");
@@ -251,6 +283,7 @@ Response		Response::buildResponse(Request & req, Server & serv)
     // {
     //     PY(*it);
     // }
+	std::cout << "get_methode == " << req.getMethod() << std::endl;
 	if (req.getMethod() == "GET") //if its allowed, TODO : gotta use setMethodsAllowed in the parsing of .conf 
 		Response::getMethod(req, serv);
 	if (req.getMethod() == "POST")
@@ -337,11 +370,13 @@ std::string		Response::readHtml(const std::string& path)
 {
 	std::ofstream		file;
 	std::stringstream	buffer;
+	std::cout << "path = " << path << std::endl;
 	if (pathIsFile(path))
 	{
 		file.open(path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
-			return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
+			return ("<!DOCTYPE html>\n<html><title>404</title><body>404 ! There was an error finding your error page</body></html>\n");
+			//TODO
 
 		buffer << file.rdbuf();
 		file.close();
@@ -350,7 +385,7 @@ std::string		Response::readHtml(const std::string& path)
 		return (buffer.str());
 	}
 	else
-		return ("<!DOCTYPE html>\n<html><title>40404</title><body>There was an error finding your error page</body></html>\n");
+		return ("<!DOCTYPE html>\n<html><title>404</title><body>404 ! There was an error finding your error page</body></html>\n");
 }
 
 std::string		Response::getResponse(void) { return (_response); }

@@ -66,11 +66,11 @@ void ActiveServer::setAddr(void)
 	_addr.sin_port = htons(port);
 }
 
-long		ActiveServer::accept(void)
+long		ActiveServer::accept_connection(void)
 {
 	long	socket;
 
-	socket = ::accept(_fd, NULL, NULL);
+	socket = accept(_fd, NULL, NULL);
 	if (socket == -1)
 		std::cerr << RED << "Could not create socket. " << strerror(errno) << std::endl;
 	else
@@ -81,7 +81,7 @@ long		ActiveServer::accept(void)
 	return (socket);
 }
 
-void		ActiveServer::process(long socket, std::list<Server> &serv_list)
+void		ActiveServer::handle_connection(long socket, std::list<Server> &serv_list)
 {
 	std::list<Server> test;
 	std::string		recvd = "";
@@ -111,12 +111,12 @@ void		ActiveServer::process(long socket, std::list<Server> &serv_list)
  	}
 }
 
-int			ActiveServer::recv(long socket)
+int			ActiveServer::receive_connection(long socket)
 {
  	char	buffer[10000] = {0};
  	int		ret;
 
- 	ret = ::recv(socket, buffer, 10000, 0);
+ 	ret = recv(socket, buffer, 10000, 0);
 
 	printf("buffer: %s\n", buffer);//TODO - here we receive the buffer
 
@@ -150,16 +150,20 @@ int			ActiveServer::recv(long socket)
 			else
  				return (0);
  		}
+		// else
+		// 	return (0);
  		// size_t	len = std::atoi(_requests[socket].substr(_requests[socket].find("Content-Length: ") + 16, 10).c_str());
 		// 		if (_requests[socket].size() >= len + i + 4)
 		// 			return (0);
 		// 		else
 		// 			return (1);
  	}
+	else
+		return (0);
  	return (1);
 }
 
-int			ActiveServer::send(long socket)
+int			ActiveServer::send_response(long socket)
 {
 	static std::map<long, size_t>	sent;
 
@@ -167,7 +171,7 @@ int			ActiveServer::send(long socket)
 		sent[socket] = 0;
 
 	std::string	str = _requests[socket].substr(sent[socket], 10000);
- 	int	ret = ::send(socket, str.c_str(), str.size(), 0);
+ 	int	ret = send(socket, str.c_str(), str.size(), 0);
 	if (ret == -1)
 	{
 		this->close(socket);
