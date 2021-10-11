@@ -38,8 +38,6 @@ void			Response::call(Request & request, Server & server)
 	{
 		std::ifstream		file;
 
-		// if (pathIsFile(_path))
-		// {
 		std::string tmp_path = "./default" + _path;
 		file.open(tmp_path.c_str(), std::ifstream::in);
 		if (file.is_open() == true)
@@ -48,7 +46,15 @@ void			Response::call(Request & request, Server & server)
 			PY(_path);
 			file_exists = true;
 		}
-		// }
+		else
+		{
+			file.open(_path.c_str(), std::ifstream::in);
+			if (file.is_open() == true)
+			{
+				PY(_path);
+				file_exists = true;
+			}
+		}
 	}
 	if (_path.size() == 1 && _path == "/" && file_exists == false)
 	{
