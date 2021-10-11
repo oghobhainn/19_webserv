@@ -19,7 +19,16 @@ std::map<std::string, void (Response::*)(Request &, Server &)> Response::_method
 
 // Member functions
 
-// void			Response::check_method();
+void			Response::check_method(Request & request, Server & server)
+{
+	if (server.getGetMethod() == false && request.getMethod() == "GET")
+		_code = 405;
+	if (server.getPostMethod() == false && request.getMethod() == "POST")
+		_code = 405;
+	if (server.getDeleteMethod() == false && request.getMethod() == "DELETE")
+		_code = 405;
+}
+
 
 void			Response::call(Request & request, Server & server)
 {
@@ -36,13 +45,6 @@ void			Response::call(Request & request, Server & server)
 	_path = request.getPath();
 
 	std::cout << "_path begin:" << _path << std::endl;
-	///////////////////////// A RAJOUTER //////////////////////////////////////
-    // if (server.getGetMethod() == false && request.getMethod() == "GET")
-    //  _code = 405;
-    // if (server.getPostMethod() == false && request.getMethod() == "POST")
-    //  _code = 405;
-    // if (server.getDeleteMethod() == false && request.getMethod() == "DELETE")
-    //  _code = 405;
 	if (_path.size() > 1)
 	{
 		std::ifstream		file;
@@ -64,12 +66,7 @@ void			Response::call(Request & request, Server & server)
 				file_exists = true;
 			}
 		}
-		if (server.getGetMethod() == false && request.getMethod() == "GET")
-			_code = 405;
-		if (server.getPostMethod() == false && request.getMethod() == "POST")
-			_code = 405;
-		if (server.getDeleteMethod() == false && request.getMethod() == "DELETE")
-			_code = 405;
+		check_method(request, server);
 	}
 	if (_path.size() == 1 && _path == "/" && file_exists == false)
 	{
@@ -79,12 +76,7 @@ void			Response::call(Request & request, Server & server)
 		{
 			_path = "./default/" + server.getIndex();
 		}
-		if (server.getGetMethod() == false && request.getMethod() == "GET")
-			_code = 405;
-		if (server.getPostMethod() == false && request.getMethod() == "POST")
-			_code = 405;
-		if (server.getDeleteMethod() == false && request.getMethod() == "DELETE")
-			_code = 405;
+		check_method(request, server);
 		// Case: index at the beginning	
 	}
 	else if (file_exists == false)
@@ -100,12 +92,7 @@ void			Response::call(Request & request, Server & server)
 			// Case: index at the beginning
 			if (server.getIndex().size() > 0)
 				_path = _path + "/" + server.getIndex();
-			if (server.getGetMethod() == false && request.getMethod() == "GET")
-				_code = 405;
-			if (server.getPostMethod() == false && request.getMethod() == "POST")
-				_code = 405;
-			if (server.getDeleteMethod() == false && request.getMethod() == "DELETE")
-				_code = 405;
+			check_method(request, server);
 		}
 	// Case: normal path without root
 	
@@ -133,12 +120,7 @@ void			Response::call(Request & request, Server & server)
 				{
 					// std::cout << "=========================================== !!found!! ===========================================" << std::endl;
 					location_found = true;
-					if (server.locations[i].get_method == false && request.getMethod() == "GET")
-						_code = 405;
-					if (server.locations[i].post_method == false && request.getMethod() == "POST")
-						_code = 405;
-					if (server.locations[i].delete_method == false && request.getMethod() == "DELETE")
-						_code = 405;
+					check_method(request, server);
 					if (server.locations[i].root.size() > 0)
 					{
 						_path = server.locations[i].root + "/";
@@ -149,13 +131,8 @@ void			Response::call(Request & request, Server & server)
 				else if (_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
 				{
 					location_found = true;
+					check_method(request, server);
 					// A METTRE ICI TOUTES LES CONTRAINTES LIEES AUX LOCS :
-					if (server.locations[i].get_method == false && request.getMethod() == "GET")
-						_code = 405;
-					if (server.locations[i].post_method == false && request.getMethod() == "POST")
-						_code = 405;
-					if (server.locations[i].delete_method == false && request.getMethod() == "DELETE")
-						_code = 405;
 					// A VOIR: changer le dossier ou sera uploadé le fichier 
 					//if (request.getMethod() == "POST" && server.locations[i].file_upload_location != "./default/")
 					if (server.locations[i].root.size() > 0)
