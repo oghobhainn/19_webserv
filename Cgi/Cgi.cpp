@@ -1,6 +1,6 @@
 #include "Cgi.hpp"
 
-Cgi::Cgi(Request &request, Server &serv): _request(request.getBody())
+Cgi::Cgi(Request &request, Server &serv): _resp(request.getBody())
 {
 	this->_initEnv(request, serv);
 }
@@ -9,7 +9,7 @@ Cgi::Cgi(Cgi const &src)
 {
 	if (this != &src) 
 	{
-		this->_request = src._request;
+		this->_resp = src._resp;
 		this->_env = src._env;
 	}
 }
@@ -22,7 +22,7 @@ Cgi	&Cgi::operator=(Cgi const &src)
 {
 	if (this != &src) 
 	{
-		this->_request = src._request;
+		this->_resp = src._resp;
 		this->_env = src._env;
 	}
 	return *this;
@@ -39,7 +39,7 @@ void		Cgi::_initEnv(Request &request, Server &serv)
 	this->_env["SCRIPT_NAME"] = serv.getPath();
 	this->_env["SCRIPT_FILENAME"] = serv.getPath();
 	this->_env["REQUEST_METHOD"] = request.getMethod();
-	this->_env["CONTENT_LENGTH"] = std::to_string(this->_request.length());
+	this->_env["CONTENT_LENGTH"] = std::to_string(this->_resp.length());
 	this->_env["CONTENT_TYPE"] = headers["Content-Type"];
 	this->_env["PATH_INFO"] = request.getPath();
 	this->_env["PATH_TRANSLATED"] = request.getPath();
@@ -55,8 +55,6 @@ void		Cgi::_initEnv(Request &request, Server &serv)
 	this->_env["SERVER_PORT"] = serv.getPort();
 	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
-
-	//this->_env.insert(serv.getCgiParam().begin(), serv.getCgiParam().end()); //TODO
 }
 
 char	**Cgi::_getEnvAsList() const 
@@ -81,7 +79,7 @@ std::string		Cgi::handleCgi(const std::string& scriptName)
 	char		**env;
 	int			stdin_tmp;
 	int			stdout_tmp;
-	std::string	new_request;
+	std::string	new_resp;
 
 	try
 	{
@@ -98,13 +96,11 @@ std::string		Cgi::handleCgi(const std::string& scriptName)
 	long	fd_In = fileno(file_In);
 	long	fd_Out = fileno(file_Out);
 	int		ret = 1;
-	write(fd_In, _request.c_str(), _request.size());
+	write(fd_In, _resp.c_str(), _resp.size());
 	lseek(fd_In, 0, SEEK_SET);
 	pid = fork();
 	if (pid == 0)
 	{
-		// char * const * nll = NULL;
-
 		dup2(fd_In, 0);
 		dup2(fd_Out, 1);
 		execve(scriptName.c_str(), NULL, env);
@@ -127,7 +123,7 @@ std::string		Cgi::handleCgi(const std::string& scriptName)
 		{
 			memset(buffer, 0, CGI_BUFSIZE);
 			ret = read(fd_Out, buffer, CGI_BUFSIZE - 1);
-			new_request += buffer;
+			new_resp += buffer;
 		}
 	}
 	dup2(stdin_tmp, STDIN_FILENO);
@@ -143,6 +139,5 @@ std::string		Cgi::handleCgi(const std::string& scriptName)
 	delete[] env;
 	if (!pid)
 		exit(0);
-	return (new_request);
+	return (new_resp);
 }
-

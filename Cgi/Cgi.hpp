@@ -17,14 +17,15 @@ class Cgi {
 
 		Cgi   	&operator=(Cgi const &src);
 		std::string		handleCgi(const std::string &scriptName);	// executes cgi and returns body
+
 	private:
 		Cgi(void);
+		std::map<std::string, std::string>	_env;
+		std::string							_resp;
 		void								_initEnv(Request &request, Server &server);
 		char								**_getEnvAsList() const;
 		int									_getSocket(unsigned int port);
 		int									_connectSocket(unsigned int port);
-		std::map<std::string, std::string>	_env;
-		std::string							_request;
 };
 
 #endif
