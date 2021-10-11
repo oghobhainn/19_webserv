@@ -3,7 +3,7 @@
 
 # include "../Request/Request.hpp"
 # include "../ConfigParsing/Config.hpp"
-# include "../Cgi/CgiHandler.hpp"
+# include "../Cgi/Cgi.hpp"
 
 class Response {
 public:

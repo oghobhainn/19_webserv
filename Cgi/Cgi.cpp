@@ -1,34 +1,34 @@
-#include "CgiHandler.hpp"
+#include "Cgi.hpp"
 
-CgiHandler::CgiHandler(Request &request, Server &serv): _body(request.getBody())
+Cgi::Cgi(Request &request, Server &serv): _request(request.getBody())
 {
 	this->_initEnv(request, serv);
 }
 
-CgiHandler::CgiHandler(CgiHandler const &src) 
+Cgi::Cgi(Cgi const &src) 
 {
 	if (this != &src) 
 	{
-		this->_body = src._body;
+		this->_request = src._request;
 		this->_env = src._env;
 	}
 }
 
-CgiHandler::~CgiHandler(void) 
+Cgi::~Cgi(void) 
 {
 }
 
-CgiHandler	&CgiHandler::operator=(CgiHandler const &src) 
+Cgi	&Cgi::operator=(Cgi const &src) 
 {
 	if (this != &src) 
 	{
-		this->_body = src._body;
+		this->_request = src._request;
 		this->_env = src._env;
 	}
 	return *this;
 }
 
-void		CgiHandler::_initEnv(Request &request, Server &serv) 
+void		Cgi::_initEnv(Request &request, Server &serv) 
 {
 	std::map<std::string, std::string>	headers = request.getHeaders();
 
@@ -39,7 +39,7 @@ void		CgiHandler::_initEnv(Request &request, Server &serv)
 	this->_env["SCRIPT_NAME"] = serv.getPath();
 	this->_env["SCRIPT_FILENAME"] = serv.getPath();
 	this->_env["REQUEST_METHOD"] = request.getMethod();
-	this->_env["CONTENT_LENGTH"] = std::to_string(this->_body.length());
+	this->_env["CONTENT_LENGTH"] = std::to_string(this->_request.length());
 	this->_env["CONTENT_TYPE"] = headers["Content-Type"];
 	this->_env["PATH_INFO"] = request.getPath();
 	this->_env["PATH_TRANSLATED"] = request.getPath();
@@ -59,7 +59,7 @@ void		CgiHandler::_initEnv(Request &request, Server &serv)
 	//this->_env.insert(serv.getCgiParam().begin(), serv.getCgiParam().end()); //TODO
 }
 
-char	**CgiHandler::_getEnvAsCstrArray() const 
+char	**Cgi::_getEnvAsList() const 
 {
 	char	**env = new char*[this->_env.size() + 1];
 	int	j = 0;
@@ -75,72 +75,74 @@ char	**CgiHandler::_getEnvAsCstrArray() const
 	return env;
 }
 
-std::string		CgiHandler::executeCgi(const std::string& scriptName) 
+std::string		Cgi::handleCgi(const std::string& scriptName) 
 {
 	pid_t		pid;
-	int			saveStdin;
-	int			saveStdout;
 	char		**env;
-	std::string	newBody;
+	int			stdin_tmp;
+	int			stdout_tmp;
+	std::string	new_request;
 
-	try {
-		env = this->_getEnvAsCstrArray();
+	try
+	{
+		env = this->_getEnvAsList();
 	}
-	catch (std::bad_alloc &e) {
+	catch (std::bad_alloc &e)
+	{
 		PE(e.what())
 	}
-	saveStdin = dup(STDIN_FILENO);
-	saveStdout = dup(STDOUT_FILENO);
-	FILE	*fIn = tmpfile();
-	FILE	*fOut = tmpfile();
-	long	fdIn = fileno(fIn);
-	long	fdOut = fileno(fOut);
+	stdin_tmp = dup(STDIN_FILENO);
+	stdout_tmp = dup(STDOUT_FILENO);
+	FILE	*file_In = tmpfile();
+	FILE	*file_Out = tmpfile();
+	long	fd_In = fileno(file_In);
+	long	fd_Out = fileno(file_Out);
 	int		ret = 1;
-	write(fdIn, _body.c_str(), _body.size());
-	lseek(fdIn, 0, SEEK_SET);
+	write(fd_In, _request.c_str(), _request.size());
+	lseek(fd_In, 0, SEEK_SET);
 	pid = fork();
-	if (pid == -1)
+	if (pid == 0)
 	{
-		PE("Fork didn't work");
-		return ("Status: 500\r\n\r\n");
-	}
-	else if (!pid)
-	{
-		char * const * nll = NULL;
+		// char * const * nll = NULL;
 
-		dup2(fdIn, 0);
-		dup2(fdOut, 1);
-		execve(scriptName.c_str(), nll, env);
-		PE("Execve didn't work");
+		dup2(fd_In, 0);
+		dup2(fd_Out, 1);
+		execve(scriptName.c_str(), NULL, env);
+		PE("Error: Exceve in CGI");
 		write(1, "Status: 500\r\n\r\n", 15);
+	}
+	else if (pid == -1)
+	{
+		PE("Error: Fork in CGI");
+		return ("Status: 500\r\n\r\n");
 	}
 	else
 	{
 		char	buffer[CGI_BUFSIZE] = {0};
 
 		waitpid(-1, NULL, 0);
-		lseek(fdOut, 0, SEEK_SET);
+		lseek(fd_Out, 0, SEEK_SET);
 		ret = 1;
 		while (ret > 0)
 		{
 			memset(buffer, 0, CGI_BUFSIZE);
-			ret = read(fdOut, buffer, CGI_BUFSIZE - 1);
-			newBody += buffer;
+			ret = read(fd_Out, buffer, CGI_BUFSIZE - 1);
+			new_request += buffer;
 		}
 	}
-	dup2(saveStdin, STDIN_FILENO);
-	dup2(saveStdout, STDOUT_FILENO);
-	fclose(fIn);
-	fclose(fOut);
-	close(fdIn);
-	close(fdOut);
-	close(saveStdin);
-	close(saveStdout);
+	dup2(stdin_tmp, STDIN_FILENO);
+	dup2(stdout_tmp, STDOUT_FILENO);
+	fclose(file_In);
+	fclose(file_Out);
+	close(fd_In);
+	close(fd_Out);
+	close(stdin_tmp);
+	close(stdout_tmp);
 	for (size_t i = 0; env[i]; i++)
 		delete[] env[i];
 	delete[] env;
 	if (!pid)
 		exit(0);
-	return (newBody);
+	return (new_request);
 }
 
