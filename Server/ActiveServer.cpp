@@ -150,12 +150,16 @@ int			ActiveServer::recv(long socket)
 			else
  				return (0);
  		}
+		// else
+		// 	return (0);
  		// size_t	len = std::atoi(_requests[socket].substr(_requests[socket].find("Content-Length: ") + 16, 10).c_str());
 		// 		if (_requests[socket].size() >= len + i + 4)
 		// 			return (0);
 		// 		else
 		// 			return (1);
  	}
+	else
+		return (0);
  	return (1);
 }
 
