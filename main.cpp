@@ -153,6 +153,7 @@ std::list<class Server> parseConfig(std::string const path)
     std::string					full_str;
     std::string             	str_location;
     std::string             	str_without_loc;
+    std::string                 str_methods;
     std::list<class Server> 	serv_list;
 	std::vector<std::string>	data;
 
@@ -187,6 +188,15 @@ std::list<class Server> parseConfig(std::string const path)
                 it2->setAutoIndex(it3->substr(9, it3->size() - 9));
             else if (it3->find("index") != std::string::npos)
                 it2->setIndex(it3->substr(5, it3->size() - 5));
+            else if (it3->find("http_methods") != std::string::npos)
+            {
+                if (it3->find("GET") != std::string::npos)
+                    it2->setGetMethod(true);
+                if (it3->find("POST") != std::string::npos)
+                    it2->setPostMethod(true);
+                if (it3->find("DELETE") != std::string::npos)
+                    it2->setDeleteMethod(true);
+            }
         }
     }
     return serv_list;
@@ -213,6 +223,7 @@ int main(int argc, char **argv)
         std::cout << "ERROR: Wrong Arguments" << std::endl;
         return 1;
     }
+    std::cout << "BEGIN" << std::endl;
     serv_list = parseConfig(argv[1]);
     
     ///////////////////// Print results /////////////////////////
@@ -228,6 +239,9 @@ int main(int argc, char **argv)
     //     std::cout << "CGI param : " << it->getCgiParam() << std::endl;
     //     std::cout << "Autoindex : " << it->getAutoIndex() << std::endl;
     //     std::cout << "Index : " << it->getIndex() << std::endl;
+    //     std::cout << "Get : " << it->getGetMethod() << std::endl;
+    //     std::cout << "Post : " << it->getPostMethod() << std::endl;
+    //     std::cout << "Delete : " << it->getDeleteMethod() << std::endl;
  	// 	it->getLocations();
     //     std::cout << "---------------------- END --------------------------------" << std::endl;
     // }

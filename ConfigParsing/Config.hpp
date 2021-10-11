@@ -96,6 +96,9 @@ class Server : public Location
         std::string             cgi_pass;
         std::string             path;
         std::string             index;
+        bool                    get_method;
+		bool					post_method;
+		bool					delete_method;
         int				        client_body_size;
 		int 					nb_loc;
         ListeningSocket         *_socket;
@@ -168,6 +171,15 @@ class Server : public Location
 
         void setIndex(std::string const str);
         std::string getIndex()const;
+
+        void setGetMethod(bool x);
+        bool getGetMethod();
+
+        void setPostMethod(bool x);
+        bool getPostMethod();
+
+        void setDeleteMethod(bool x);
+        bool getDeleteMethod();
 };
 
 

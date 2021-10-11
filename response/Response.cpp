@@ -50,6 +50,14 @@ void			Response::call(Request & request, Server & server)
 			file_exists = true;
 		}
 		// }
+
+		///////////////////////// A RAJOUTER //////////////////////////////////////
+		// if (server.getGetMethod() == false && request.getMethod() == "GET")
+		// 	_code = 405;
+		// if (server.getPostMethod() == false && request.getMethod() == "POST")
+		// 	_code = 405;
+		// if (server.getDeleteMethod() == false && request.getMethod() == "DELETE")
+		// 	_code = 405;
 	}
 	if (_path.size() == 1 && _path == "/" && file_exists == false)
 	{
