@@ -7,7 +7,7 @@ SRCS = main.cpp \
 		Request/RequestUtils.cpp \
 		Response/Response.cpp \
 		Response/ResponseHeader.cpp \
-		Cgi/CgiHandler.cpp \
+		Cgi/Cgi.cpp \
 		utils/utils.cpp \
 		Server/Cluster.cpp \
 		Server/ActiveServer.cpp \

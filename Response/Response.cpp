@@ -164,11 +164,11 @@ void			Response::getMethod(Request & request, Server & server)
 
 	if (server.getCgiPass() != "")
 	{
-		CgiHandler	cgi(request, server);
+		Cgi	cgi(request, server);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
-		_response = cgi.executeCgi(server.getCgiPass());
+		_response = cgi.handleCgi(server.getCgiPass());
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
 			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
@@ -209,11 +209,11 @@ void			Response::postMethod(Request & request, Server & server)
 
 	if (server.getCgiPass() != "")
 	{
-		CgiHandler	cgi(request, server);
+		Cgi	cgi(request, server);
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
-		_response = cgi.executeCgi(server.getCgiPass()); //magic happens here TODO
+		_response = cgi.handleCgi(server.getCgiPass()); //magic happens here TODO
 
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{

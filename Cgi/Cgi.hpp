@@ -9,22 +9,22 @@
 
 # include <map>
 
-class CgiHandler {
+class Cgi {
 	public:
-		CgiHandler(Request &request, Server &server); // sets up env according to the request
-		CgiHandler(CgiHandler const &src);
-		virtual ~CgiHandler(void);
+		Cgi(Request &request, Server &server); // sets up env according to the request
+		Cgi(Cgi const &src);
+		virtual ~Cgi(void);
 
-		CgiHandler   	&operator=(CgiHandler const &src);
-		std::string		executeCgi(const std::string &scriptName);	// executes cgi and returns body
+		Cgi   	&operator=(Cgi const &src);
+		std::string		handleCgi(const std::string &scriptName);	// executes cgi and returns body
 	private:
-		CgiHandler(void);
+		Cgi(void);
 		void								_initEnv(Request &request, Server &server);
-		char								**_getEnvAsCstrArray() const;
+		char								**_getEnvAsList() const;
 		int									_getSocket(unsigned int port);
 		int									_connectSocket(unsigned int port);
 		std::map<std::string, std::string>	_env;
-		std::string							_body;
+		std::string							_request;
 };
 
 #endif

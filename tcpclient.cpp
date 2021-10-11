@@ -70,7 +70,7 @@ int main(int argc, char const *argv[])
     printf("Answer from server : \n");
     fflush(stdout);
     valread = read( sock , buffer, 4096);
-    printf("hello\n%s\nyyyy",buffer );
+    printf("\nbegin : \n\n%s\ndone",buffer );
     fflush(stdout);
     return 0;
 }
