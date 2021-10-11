@@ -58,6 +58,9 @@ Server::Server()
 	this->client_body_size = 30000;
 	this->host = "127.0.0.1";
 	this->default_error_page = "./default/404.html";
+	this->get_method = false;
+    this->post_method = false;
+    this->delete_method = false;
 }
 
 Server::~Server()
@@ -85,6 +88,9 @@ Server& Server::operator=(Server const& copy)
         this->content_location = copy.content_location;
 		this->index = copy.index;
 		this->locations = copy.locations;
+		this->get_method = copy.get_method;
+        this->post_method = copy.post_method;
+        this->delete_method = copy.delete_method;
 	}
 	return *this;
 }
@@ -308,15 +314,34 @@ std::string Server::getIndex() const
 	return this->index;
 }
 
-void Server::setMethods(std::string const str)
+void Server::setGetMethod(bool x)
 {
-	this->index = str;
+    if (x == true)
+        this->get_method = true;
+}
+bool Server::getGetMethod()
+{
+    return this->get_method;
+}
+void Server::setPostMethod(bool x)
+{
+    if (x == true)
+        this->post_method = true;
+}
+bool Server::getPostMethod()
+{
+    return this->post_method;
+}
+void Server::setDeleteMethod(bool x)
+{
+    if (x == true)
+        this->delete_method = true;
+}
+bool Server::getDeleteMethod()
+{
+    return this->delete_method;
 }
 
-std::string Server::getMethods() const
-{
-	return this->index;
-}
 //////////////////////////////////////////////////////////////////////////////////////////
 
 std::ostream& operator<<(std::ostream& os, const Server& item)

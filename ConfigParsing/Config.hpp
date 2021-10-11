@@ -104,6 +104,7 @@ class Server : public Location
         ListeningSocket         *_socket;
         std::string             content_location;
 
+
     public:
         fd_set                  socket_client;
         Server();
@@ -169,8 +170,14 @@ class Server : public Location
         void setIndex(std::string const str);
         std::string getIndex()const;
 
-        void setMethods(std::string const str);
-        std::string getMethods()const;
+        void setGetMethod(bool x);
+        bool getGetMethod();
+
+        void setPostMethod(bool x);
+        bool getPostMethod();
+        
+        void setDeleteMethod(bool x);
+        bool getDeleteMethod();
 };
 
 

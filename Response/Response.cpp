@@ -34,6 +34,13 @@ void			Response::call(Request & request, Server & server)
 	_path = request.getPath();
 
 	std::cout << "_path begin:" << _path << std::endl;
+	///////////////////////// A RAJOUTER //////////////////////////////////////
+    // if (server.getGetMethod() == false && request.getMethod() == "GET")
+    //  _code = 405;
+    // if (server.getPostMethod() == false && request.getMethod() == "POST")
+    //  _code = 405;
+    // if (server.getDeleteMethod() == false && request.getMethod() == "DELETE")
+    //  _code = 405;
 	if (_path.size() > 1)
 	{
 		std::ifstream		file;
@@ -414,4 +421,6 @@ Response::Response(const Response & src)
 Response::~Response(void)
 {
 }
+
+
 

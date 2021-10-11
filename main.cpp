@@ -187,21 +187,15 @@ std::list<class Server> parseConfig(std::string const path)
                 it2->setAutoIndex(it3->substr(9, it3->size() - 9));
             else if (it3->find("index") != std::string::npos)
                 it2->setIndex(it3->substr(5, it3->size() - 5));
-            // else if (it3->find("http_methods") != std::string::npos)
-            // {
-            //     int beg = 0;
-            //     int end = 0;
-            //     beg = str_location.find("http_methods");
-            //     end = str_location.find(";", beg);
-            //     str_methods = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
-            //     if (str_methods.find("GET") != std::string::npos)
-            //         it->locations[j].get_method = true;
-            //     if (str_methods.find("POST") != std::string::npos)
-            //         it->locations[j].post_method = true;
-            //     if (str_methods.find("DELETE") != std::string::npos)
-            //         it->locations[j].delete_method = true;
-            // }
-            //     it2->setMethods(it3->substr(13, it3->size() - 13));
+            else if (it3->find("http_methods") != std::string::npos)
+            {
+                if (it3->find("GET") != std::string::npos)
+                    it2->setGetMethod(true);
+                if (it3->find("POST") != std::string::npos)
+                    it2->setPostMethod(true);
+                if (it3->find("DELETE") != std::string::npos)
+                    it2->setDeleteMethod(true);
+            }
         }
     }
     return serv_list;
@@ -230,22 +224,25 @@ int main(int argc, char **argv)
     }
     serv_list = parseConfig(argv[1]);
     
-    ///////////////////// Print results /////////////////////////
-    // for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    // {
-    //     std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
-    //     std::cout << "Port: " << it->getPort() << std::endl;
-    //     std::cout << "Host: " << it->getHost() << std::endl;
-    //     std::cout << "Root: " << it->getRoot() << std::endl;
-    //     std::cout << "Ser Name: " << it->getServerName() << std::endl;
-    //     std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
-    //     std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
-    //     std::cout << "CGI param : " << it->getCgiParam() << std::endl;
-    //     std::cout << "Autoindex : " << it->getAutoIndex() << std::endl;
-    //     std::cout << "Index : " << it->getIndex() << std::endl;
- 	// 	it->getLocations();
-    //     std::cout << "---------------------- END --------------------------------" << std::endl;
-    // }
+    /////////////////// Print results /////////////////////////
+    for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
+    {
+        std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
+        std::cout << "Port: " << it->getPort() << std::endl;
+        std::cout << "Host: " << it->getHost() << std::endl;
+        std::cout << "Root: " << it->getRoot() << std::endl;
+        std::cout << "Ser Name: " << it->getServerName() << std::endl;
+        std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
+        std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
+        std::cout << "CGI param : " << it->getCgiParam() << std::endl;
+        std::cout << "Autoindex : " << it->getAutoIndex() << std::endl;
+        std::cout << "Index : " << it->getIndex() << std::endl;
+        std::cout << "Get : " << it->getGetMethod() << std::endl;
+        std::cout << "Post : " << it->getPostMethod() << std::endl;
+        std::cout << "Delete : " << it->getDeleteMethod() << std::endl;
+ 		it->getLocations();
+        std::cout << "---------------------- END --------------------------------" << std::endl;
+    }
 
     ////////////////////// Server ////////////////////////////////
     Cluster	cluster(serv_list);
