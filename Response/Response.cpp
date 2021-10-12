@@ -36,7 +36,7 @@ void			Response::call(Request & request, Server & server)
 	_port = server.getPort();
 	_path = request.getPath();
 	tmp_path = _path;
-	std::cout << "_path begin:" << _path << std::endl;
+	std::cout << "_path begin:" << _path << std::endl; ///////////
 	if (_path.size() > 1)
 	{
 		std::ifstream		file;
@@ -48,7 +48,6 @@ void			Response::call(Request & request, Server & server)
 			_path = "./default/" + _path;
 			file_exists = true;
 		}
-		// check_method(request, server);
 	}
 	if (_path.size() == 1 && _path == "/" && file_exists == false)
 	{
@@ -84,7 +83,6 @@ void			Response::call(Request & request, Server & server)
 				}
 			}
 		}
-		// check_method(request, server);
 	}
 	else if (file_exists == false)
 	{
@@ -93,7 +91,6 @@ void			Response::call(Request & request, Server & server)
 			_path = server.getRoot();
 			if (server.getIndex().size() > 0)
 				_path = _path + "/" + server.getIndex();
-			// check_method(request, server);
 		}
 		for (int i = 0; i < server.getNbLoc(); i++)
 		{
@@ -121,17 +118,17 @@ void			Response::call(Request & request, Server & server)
 				}
 			}
 		}
-		if (location_found == false)
-			check_method(request, server);
 		if (location_found == false && file_exists == false)
 		{
 			_code = 404;
 			_path = "./default/404.html";
 		}
 	}
+	if (location_found == false)
+		check_method(request, server);
 	if (server.getClientBodySize() < request.getBody().size())
 		_code = 413;
-	std::cout << "_path end:" << _path << std::endl;
+	std::cout << "_path end:" << _path << std::endl; ///////////////
 }
 
 void			Response::getMethod(Request & request, Server & server)
@@ -144,7 +141,7 @@ void			Response::getMethod(Request & request, Server & server)
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
-		_response = cgi.handleCgi(server.getCgiPass());
+		// _response = cgi.handleCgi(server.getCgiPass());
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
 			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
@@ -183,34 +180,34 @@ void			Response::postMethod(Request & request, Server & server)
 {
 	ResponseHeader	head;
 
-	if (server.getCgiPass() != "")
-	{
-		Cgi	cgi(request, server);
-		size_t		i = 0;
-		size_t		j = _response.size() - 2;
+	// if (server.getCgiPass() != "")
+	// {
+	// 	Cgi	cgi(request, server);
+	// 	size_t		i = 0;
+	// 	size_t		j = _response.size() - 2;
 
-		_response = cgi.handleCgi(server.getCgiPass());
-		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
-		{
-			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
-			if (str.find("Status: ") == 0)
-				_code = std::atoi(str.substr(8, 3).c_str());
-			else if (str.find("Content-Type: ") == 0)
-				_type = str.substr(14, str.size());
-			i += str.size() + 2;
-		}
-		while (_response.find("\r\n", j) == j)
-			j -= 2;
+	// 	_response = cgi.handleCgi(server.getCgiPass());
+	// 	while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
+	// 	{
+	// 		std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
+	// 		if (str.find("Status: ") == 0)
+	// 			_code = std::atoi(str.substr(8, 3).c_str());
+	// 		else if (str.find("Content-Type: ") == 0)
+	// 			_type = str.substr(14, str.size());
+	// 		i += str.size() + 2;
+	// 	}
+	// 	while (_response.find("\r\n", j) == j)
+	// 		j -= 2;
 
-		_response = _response.substr(i, j - i);
-	}
-	else
-	{
+	// 	_response = _response.substr(i, j - i);
+	// }
+	// else
+	// {
 		_code = writeContent(request.getBody());
 		_response = "";
-	}
+	// }
 	if (_code == 500)
-		_response = this->readHtml("html/error"+ to_string(_code) + ".html");
+		_response = this->readHtml("default/"+ to_string(_code) + ".html");
 	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
 	_response += "\r\n";
 }
