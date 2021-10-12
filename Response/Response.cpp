@@ -28,7 +28,6 @@ void			Response::call(Request & request, Server & server)
 {
 	std::string tmp_path;
 	bool location_found = false;
-	bool default_root = false;
 	bool file_exists = false;
 
 	_error = server.getDefaultErrorPage();
@@ -49,20 +48,34 @@ void			Response::call(Request & request, Server & server)
 			_path = "./default/" + _path;
 			file_exists = true;
 		}
-		check_method(request, server);
+		// check_method(request, server);
 	}
 	if (_path.size() == 1 && _path == "/" && file_exists == false)
 	{
-		default_root = true;
-		_path = "./default/default.html";
-		if (server.getIndex().size() > 0)
-			_path = "./default/" + server.getIndex();
+		if (server.getRoot().size() > 0)
+		{
+			_path = server.getRoot();
+			if (server.getIndex().size() > 0)
+				_path = _path + "/" + server.getIndex();
+		}
+		else
+		{
+			if (server.getIndex().size() > 0)
+				_path = "./default/" + server.getIndex();
+			else
+				_path = "./default/default.html";
+		}
 		for (int i = 0; i < server.getNbLoc(); i++)
 		{
-			if (default_root == true && server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
+			if (server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
 			{
 				location_found = true;
-				check_method(request, server);
+				if (server.locations[i].get_method == false && request.getMethod() == "GET")
+					_code = 405;
+				if (server.locations[i].post_method == false && request.getMethod() == "POST")
+					_code = 405;
+				if (server.locations[i].delete_method == false && request.getMethod() == "DELETE")
+					_code = 405;
 				if (server.locations[i].root.size() > 0)
 				{
 					_path = server.locations[i].root + "/";
@@ -71,7 +84,7 @@ void			Response::call(Request & request, Server & server)
 				}
 			}
 		}
-		check_method(request, server);
+		// check_method(request, server);
 	}
 	else if (file_exists == false)
 	{
@@ -80,26 +93,19 @@ void			Response::call(Request & request, Server & server)
 			_path = server.getRoot();
 			if (server.getIndex().size() > 0)
 				_path = _path + "/" + server.getIndex();
-			check_method(request, server);
+			// check_method(request, server);
 		}
 		for (int i = 0; i < server.getNbLoc(); i++)
 		{
-			// if (default_root == true && server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
-			// {
-			// 	location_found = true;
-			// 	check_method(request, server);
-			// 	if (server.locations[i].root.size() > 0)
-			// 	{
-			// 		_path = server.locations[i].root + "/";
-			// 		if (server.locations[i].index.size() > 0)
-			// 			_path = _path + server.locations[i].index;
-			// 	}
-			// }
-			// else 
 			if (tmp_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
 			{
 				location_found = true;
-				check_method(request, server);
+				if (server.locations[i].get_method == false && request.getMethod() == "GET")
+					_code = 405;
+				if (server.locations[i].post_method == false && request.getMethod() == "POST")
+					_code = 405;
+				if (server.locations[i].delete_method == false && request.getMethod() == "DELETE")
+					_code = 405;
 				if (server.locations[i].root.size() > 0)
 				{
 					_path = server.locations[i].root + "/";
@@ -115,7 +121,9 @@ void			Response::call(Request & request, Server & server)
 				}
 			}
 		}
-		if (location_found == false && default_root == false && file_exists == false)
+		if (location_found == false)
+			check_method(request, server);
+		if (location_found == false && file_exists == false)
 		{
 			_code = 404;
 			_path = "./default/404.html";
@@ -181,8 +189,7 @@ void			Response::postMethod(Request & request, Server & server)
 		size_t		i = 0;
 		size_t		j = _response.size() - 2;
 
-		_response = cgi.handleCgi(server.getCgiPass()); //magic happens here TODO
-
+		_response = cgi.handleCgi(server.getCgiPass());
 		while (_response.find("\r\n\r\n", i) != std::string::npos || _response.find("\r\n", i) == i)
 		{
 			std::string	str = _response.substr(i, _response.find("\r\n", i) - i);
@@ -204,20 +211,10 @@ void			Response::postMethod(Request & request, Server & server)
 	}
 	if (_code == 500)
 		_response = this->readHtml("html/error"+ to_string(_code) + ".html");
-	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
 	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
 	_response += "\r\n";
 }
 
-// Un code de statut 202 (Accepted) si l'action est en passe de réussir mais n'a pas encore été confirmée.
-// Un code de statut 204 (No Content) si l'action a été confirmée et qu'aucune information supplémentaire n'est à fournir.
-// Un code de statut 200 (OK) si l'action a été confirmée et que le message de réponse inclut une représentation décrivant le statut.
-// <html>
-//   <body>
-	// <h1>File deleted.</h1>
-//   </body>
-// </html>
-	
 void			Response::deleteMethod(Request & request, Server & server)
 {
 	ResponseHeader	head;
@@ -226,7 +223,6 @@ void			Response::deleteMethod(Request & request, Server & server)
 
 	if (pathIsFile(_path))
 	{
-		// std::cout << "---------------------------------------------------------------- ok --------------------------" << std::endl;
 		if (remove(_path.c_str()) == 0)
 		{
 			PY(_path + " DELETED");
@@ -240,17 +236,11 @@ void			Response::deleteMethod(Request & request, Server & server)
 	if (_code == 403 || _code == 404)
 		_response = this->readHtml("html/error"+ to_string(_code) + ".html");
 	_response = head.getHeader(_response.size(), _path, _code, _type, server.getContentLocation(), "\r\n" + _response);
-	// _response = head.getHeader(_response.size(), _path, _code, _type, server.getLocations(), server.getLang()) + "\r\n" + _response;
 	_response += "\r\n";
 }
 
 Response		Response::buildResponse(Request & req, Server & serv)
 {
-	// PY("Allowed Methods: ");
-	// for(std::set<std::string>::iterator it = serv.getAllowedMethods().begin(); it != serv.getAllowedMethods().end(); it++)
-    // {
-    //     PY(*it);
-    // }
 	std::cout << "get_methode == " << req.getMethod() << std::endl;
 	if (req.getMethod() == "GET") //if its allowed, TODO : gotta use setMethodsAllowed in the parsing of .conf 
 		Response::getMethod(req, serv);
