@@ -31,7 +31,7 @@ public:
 	void			postMethod(Request & request, Server & server);
 	void			deleteMethod(Request & request, Server & server);
 
-	int				readContent(void);
+	int				readContent(Server & server);
 	int				writeContent(std::string content);
 	int				fileExists(std::string path);
 	std::string		readHtml(const std::string& path);

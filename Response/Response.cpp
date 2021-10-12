@@ -57,17 +57,6 @@ void			Response::call(Request & request, Server & server)
 		_path = "./default/default.html";
 		if (server.getIndex().size() > 0)
 			_path = "./default/" + server.getIndex();
-		check_method(request, server);
-	}
-	else if (file_exists == false)
-	{
-		if (server.getRoot().size() > 0)
-		{
-			_path = server.getRoot();
-			if (server.getIndex().size() > 0)
-				_path = _path + "/" + server.getIndex();
-			check_method(request, server);
-		}
 		for (int i = 0; i < server.getNbLoc(); i++)
 		{
 			if (default_root == true && server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
@@ -81,7 +70,33 @@ void			Response::call(Request & request, Server & server)
 						_path = _path + server.locations[i].index;
 				}
 			}
-			else if (tmp_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
+		}
+		check_method(request, server);
+	}
+	else if (file_exists == false)
+	{
+		if (server.getRoot().size() > 0)
+		{
+			_path = server.getRoot();
+			if (server.getIndex().size() > 0)
+				_path = _path + "/" + server.getIndex();
+			check_method(request, server);
+		}
+		for (int i = 0; i < server.getNbLoc(); i++)
+		{
+			// if (default_root == true && server.locations[i].extension.size() == 1 && server.locations[i].extension == "/")
+			// {
+			// 	location_found = true;
+			// 	check_method(request, server);
+			// 	if (server.locations[i].root.size() > 0)
+			// 	{
+			// 		_path = server.locations[i].root + "/";
+			// 		if (server.locations[i].index.size() > 0)
+			// 			_path = _path + server.locations[i].index;
+			// 	}
+			// }
+			// else 
+			if (tmp_path.find(server.locations[i].extension) != std::string::npos && server.locations[i].extension != "/")
 			{
 				location_found = true;
 				check_method(request, server);
@@ -90,6 +105,13 @@ void			Response::call(Request & request, Server & server)
 					_path = server.locations[i].root + "/";
 					if (server.locations[i].index.size() > 0)
 						_path = _path + server.locations[i].index;
+				}
+				else if (server.locations[i].index.size() > 0)
+				{
+					if (server.getRoot().size() > 1)
+						_path = server.getRoot() + "/" + server.locations[i].index;
+					else
+						_path =  "default/" + server.locations[i].index;
 				}
 			}
 		}
@@ -129,7 +151,7 @@ void			Response::getMethod(Request & request, Server & server)
 		_response = _response.substr(i, j - i);
 	}
 	else if  (_code == 200)
-		_code = readContent();
+		_code = readContent(server);
 	else
 	{
 		if (server.getDefaultErrorPage().size() > 0)
@@ -257,7 +279,7 @@ int             pathIsFile(const std::string& path)
 			return 0;
 }
 
-int				Response::readContent(void)
+int				Response::readContent(Server & server)
 {
 	std::ifstream		file;
 	std::stringstream	buffer;
@@ -268,22 +290,26 @@ int				Response::readContent(void)
 		file.open(_path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 		{
-			_response = this->readHtml("html/error/403.html");
+			if (server.getDefaultErrorPage().size() > 0 && pathIsFile("default/" + server.getDefaultErrorPage()))
+			{
+				_response = this->readHtml("default/" + server.getDefaultErrorPage());
+				return(403);
+			}
+			_response = this->readHtml("default/403.html");
 			return (403);
 		}
 		buffer << file.rdbuf();
 		_response = buffer.str();
 		file.close();
 	}
-	// else if (_isAutoIndex) {
-		// buffer << AutoIndexGenerator::getPage(_path.c_str(),\
-			// to_string(_hostPort.host), _hostPort.port);
-		// _response = buffer.str();
-		// _type = "text/html";
-	// }
 	else
 	{
-		_response = this->readHtml("html/error/404.html");
+		if (server.getDefaultErrorPage().size() > 0 && pathIsFile("default/" + server.getDefaultErrorPage()))
+		{
+			_response = this->readHtml("default/" + server.getDefaultErrorPage());
+			return(404);
+		}
+		_response = this->readHtml("default/404.html");
 		return (404);
 	}
 	return (200);
@@ -322,12 +348,9 @@ std::string		Response::readHtml(const std::string& path)
 		file.open(path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
 			return ("<!DOCTYPE html>\n<html><title>404</title><body>404 ! There was an error finding your error page</body></html>\n");
-			//TODO
-
 		buffer << file.rdbuf();
 		file.close();
 		_type = "text/html";
-
 		return (buffer.str());
 	}
 	else
