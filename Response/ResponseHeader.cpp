@@ -8,10 +8,8 @@ std::string		ResponseHeader::getHeader(size_t size, const std::string& path, int
 
 	resetValues();
 	setValues(size, path, code, type, contentLocation, lang);
-
 	header = "HTTP/1.1 " + to_string(code) + " " + getStatusMessage(code) + "\r\n";
 	header += writeHeader();
-
 	return (header);
 }
 
@@ -22,13 +20,11 @@ std::string		ResponseHeader::notAllowed(std::set<std::string> methods, const std
 	resetValues();
 	setValues(0, path, code, "", path, lang);
 	setAllow(methods);
-
 	if (code == 405)
 		header = "HTTP/1.1 405 Method Not Allowed\r\n";
 	else if (code == 413)
 		header = "HTTP/1.1 413 Payload Too Large\r\n";
 	header += writeHeader();
-
 	return (header);
 }
 
@@ -60,8 +56,6 @@ std::string		ResponseHeader::writeHeader(void)
 		header += "Transfer-Encoding: " + _transferEncoding + "\r\n";
 	if (_wwwAuthenticate != "")
 		header += "WWW-Authenticate: " + _wwwAuthenticate + "\r\n";
-	// header += "\r\n";
-
 	return (header);
 }
 
@@ -88,7 +82,7 @@ void			ResponseHeader::initErrorMap()
 
 void			ResponseHeader::setValues(size_t size, const std::string& path, int code, std::string type, const std::string& contentLocation, const std::string& lang)
 {
-	if (lang == "salut TODOTODO")
+	if (lang == "")
 		setContentLanguage(lang);
 	setAllow();
 	setContentLength(size);
@@ -120,8 +114,6 @@ void			ResponseHeader::resetValues(void)
 	initErrorMap();
 }
 
-// Setter functions
-
 void			ResponseHeader::setAllow(std::set<std::string> methods)
 {
 	std::set<std::string>::iterator it = methods.begin();
@@ -129,7 +121,6 @@ void			ResponseHeader::setAllow(std::set<std::string> methods)
 	while (it != methods.end())
 	{
 		_allow += *(it++);
-
 		if (it != methods.end())
 			_allow += ", ";
 	}
@@ -153,8 +144,7 @@ void			ResponseHeader::setContentLength(size_t size)
 void			ResponseHeader::setContentLocation(const std::string& path, int code)
 {
 	(void)code;
-	// if (code != 404)
-		_contentLocation = path;
+	_contentLocation = path;
 }
 
 void			ResponseHeader::setContentType(std::string type, std::string path)
@@ -191,19 +181,7 @@ void			ResponseHeader::setDate( void )
 
 	this->_date = std::string("Date: ") + std::string(buf);
 }
-/*
-void			ResponseHeader::setDate(void)
-{
-	char			buffer[100];
-	struct timeval	tv;
-	struct tm		*tm;
 
-	gettimeofday(&tv, NULL);
-	tm = gmtime(&tv.tv_sec);
-	strftime(buffer, 100, "%a, %d %b %Y %H:%M:%S GMT", tm);
-	_date = std::string(buffer);
-}
-*/
 void			ResponseHeader::setLastModified(const std::string& path)
 {
 	char			buffer[100];
@@ -252,15 +230,11 @@ void			ResponseHeader::setWwwAuthenticate(int code)
 	}
 }
 
-// Overloaders
-
 ResponseHeader & ResponseHeader::operator=(const ResponseHeader & src)
 {
 	(void)src;
 	return (*this);
 }
-
-// Constructors and destructors
 
 ResponseHeader::ResponseHeader(void)
 {

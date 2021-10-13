@@ -14,10 +14,8 @@ class Cluster
         Cluster(const Cluster & src);
         Cluster(std::list<Server> serv_list);
         ~Cluster(void);
-
         Cluster & operator=(const Cluster & src);
 
-        // void	config(std::string fileconf);
         int		setup(void);
         void	run(void);
         void	clean(void);

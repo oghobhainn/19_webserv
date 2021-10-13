@@ -10,7 +10,7 @@
 #include <fstream>
 #include <sstream>
 
-#define PORT 83
+#define PORT 84
 
 std::string readFileIntoString(const std::string& path) {
 	std::ifstream input_file(path);

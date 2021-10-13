@@ -3,7 +3,7 @@
 
 int     countSubstr(const std::string& str, const std::string& sub)
 {
-        int                                             n = 0;
+        int                     n = 0;
         std::string::size_type  pos = 0;
 
         while ((pos = str.find(sub, pos)) != std::string::npos)
@@ -11,7 +11,6 @@ int     countSubstr(const std::string& str, const std::string& sub)
                 n++;
                 pos += sub.length();
         }
-
         return (n);
 }
 
@@ -154,11 +153,10 @@ std::string     to_string(size_t n)
         std::stringstream tmp;
 
         tmp << n;
-
         return tmp.str();
 }
 
 bool compare_langs(const std::pair<std::string, float> first, const std::pair<std::string, float> second)
 {
-  return ( first.second > second.second );
+        return ( first.second > second.second );
 }

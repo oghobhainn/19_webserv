@@ -8,11 +8,8 @@ std::map<std::string, void (Response::*)(Request &, Server &)>	Response::initMet
 	map["GET"] = &Response::getMethod;
 	map["POST"] = &Response::postMethod;
 	map["DELETE"] = &Response::deleteMethod;
-
 	return map;
 }
-
-// std::map<std::string, void (Response::*)(Request &, Server &)> Response::_method = Response::initMethods();
 
 void			Response::check_method(Request & request, Server & server)
 {
@@ -36,7 +33,7 @@ void			Response::call(Request & request, Server & server)
 	_port = server.getPort();
 	_path = request.getPath();
 	tmp_path = _path;
-	std::cout << "_path begin:" << _path << std::endl; ///////////
+	// std::cout << "_path begin:" << _path << std::endl; ///////////
 	if (_path.size() > 1)
 	{
 		std::ifstream		file;
@@ -128,7 +125,7 @@ void			Response::call(Request & request, Server & server)
 		check_method(request, server);
 	if (server.getClientBodySize() < request.getBody().size())
 		_code = 413;
-	std::cout << "_path end:" << _path << std::endl; ///////////////
+	// std::cout << "_path end:" << _path << std::endl; ///////////////
 }
 
 void			Response::getMethod(Request & request, Server & server)
@@ -213,7 +210,7 @@ void			Response::deleteMethod(Request & request, Server & server)
 Response		Response::buildResponse(Request & req, Server & serv)
 {
 	std::cout << "get_methode == " << req.getMethod() << std::endl;
-	if (req.getMethod() == "GET") //if its allowed, TODO : gotta use setMethodsAllowed in the parsing of .conf 
+	if (req.getMethod() == "GET")
 		Response::getMethod(req, serv);
 	if (req.getMethod() == "POST")
 		Response::postMethod(req, serv);
@@ -221,7 +218,6 @@ Response		Response::buildResponse(Request & req, Server & serv)
 		Response::deleteMethod(req, serv);
 	return	*this;
 }
-// Utils
 
 int             pathIsFile(const std::string& path)
 {
@@ -237,7 +233,7 @@ int             pathIsFile(const std::string& path)
 			return 0;
 	}
 	else
-			return 0;
+		return 0;
 }
 
 int				Response::readContent(Server & server)
@@ -308,19 +304,17 @@ std::string		Response::readHtml(const std::string& path)
 	{
 		file.open(path.c_str(), std::ifstream::in);
 		if (file.is_open() == false)
-			return ("<!DOCTYPE html>\n<html><title>404</title><body>404 ! There was an error finding your error page</body></html>\n");
+			return ("<!DOCTYPE html>\n<html><title>404</title><body>Error 404: Ressource not found</body></html>\n");
 		buffer << file.rdbuf();
 		file.close();
 		_type = "text/html";
 		return (buffer.str());
 	}
 	else
-		return ("<!DOCTYPE html>\n<html><title>404</title><body>404 ! There was an error finding your error page</body></html>\n");
+		return ("<!DOCTYPE html>\n<html><title>404</title><body>Error 404: Ressource not found</body></html>\n");
 }
 
 std::string		Response::getResponse(void) { return (_response); }
-
-// Overloaders
 
 Response & Response::operator=(const Response & src)
 {
@@ -329,8 +323,6 @@ Response & Response::operator=(const Response & src)
 	_code = src._code;
 	return (*this);
 }
-
-// Constructors and destructors
 
 Response::Response(void)
 {

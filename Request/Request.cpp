@@ -16,13 +16,9 @@ std::vector<std::string>	Request::methods = Request::initMethods();
 Request::Request(const std::string& str) :
 	_method (""), _version(""), _ret(200), _body(""), _port(80), _path(""), _query(""), _raw(str)
 {
-	// PY("ICI ON ESSAYE DE CHEATER");
-	//std::string str_test = "GET ./default/405.html HTTP/1.1\nUser-Agent: custom-client\nHost: webserv\nAccept-Language: fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5\nConnection: Keep-Alive";
-	// std::string str_test = "DELETE /default/to_be_deleted.html HTTP/1.1\nUser-Agent: custom-client\nHost: webserv\nAccept-Language: en-US\nConnection: Keep-Alive\n\n";
-
 	this->resetHeaders();
 	this->_env_for_cgi.clear();
-	this->parse(str);//TODO !!!! here it is only an exemple
+	this->parse(str);
 
 	if (this->_ret != 200)
 		PE("Parse error : " + std::to_string(this->_ret));

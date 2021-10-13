@@ -1,9 +1,4 @@
 #include "ConfigParsing/Config.hpp"
-#include "Networking/Server/TestServer.hpp"
-#include "Networking/Sockets/SimpleSocket.hpp"
-#include "Networking/Sockets/ListeningSocket.hpp"
-#include "Networking/Sockets/ConnectingSocket.hpp"
-#include "Networking/Sockets/BindingSocket.hpp"
 
 #include "main.hpp"
 #include "./Server/Cluster.hpp"
@@ -31,15 +26,6 @@ std::list<class Server> get_serv_list(std::string full_str)
         i++;
     }
     return serv_list;
-}
-
-void set_cgi(Location *it, int beg, int end, std::string str_location)
-{
-    std::string str_without_cgi;
-
-    str_without_cgi = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
-    if (str_without_cgi.find("PATH_INFO") != std::string::npos)
-        it->_CGI.PATH_INFO = str_without_cgi.substr(9, len(str_without_cgi));
 }
 
 void parse_loc(std::list<class Server> &serv_list)
@@ -123,12 +109,6 @@ void parse_loc(std::list<class Server> &serv_list)
                 end = str_location.find(";", beg);
                 it->locations[j].default_file_if_request_directory = str_location.substr(beg + 12, len(str_location) - beg - 12 - (len(str_location) - end));
             }
-            if (str_location.find("fastcgi_pass") != std::string::npos)
-            {
-                beg = str_location.find("fastcgi_pass");
-                end = str_location.find(";", beg);
-                set_cgi(&it->locations[j], beg, end, str_location);
-            }
             if (str_location.find("autoindex") != std::string::npos)
             {
                 beg = str_location.find("autoindex");
@@ -181,8 +161,6 @@ std::list<class Server> parseConfig(std::string const path)
                 it2->setDefaultErrorPage(it3->substr(18, it3->size() - 18));
             else if (it3->find("client_body_size") != std::string::npos)
                 it2->setClientBodySize(it3->substr(16, it3->size() - 16));
-            else if (it3->find("cgi_param") != std::string::npos)
-                it2->setCgiParam(it3->substr(9, it3->size() - 9));
             else if (it3->find("autoindex") != std::string::npos)
                 it2->setAutoIndex(it3->substr(9, it3->size() - 9));
             else if (it3->find("index") != std::string::npos)
@@ -201,17 +179,6 @@ std::list<class Server> parseConfig(std::string const path)
     return serv_list;
 }
 
-// void ft_exit(std::list<Server> serv_list)
-// {
-//     Server tmp;
-// 
-//     for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-//     {
-//         it.getLocations().clear();
-//     }
-//     serv_list.clear();
-// }
-
 int main(int argc, char **argv)
 {
     std::list<Server> serv_list;
@@ -223,150 +190,11 @@ int main(int argc, char **argv)
         return 1;
     }
     serv_list = parseConfig(argv[1]);
-    
-    /////////////////// Print results /////////////////////////
-    // for (std::list<Server>::iterator it = serv_list.begin(); it != serv_list.end(); ++it)
-    // {
-    //     std::cout << "---------------------- BEGIN ----------------------------" << std::endl;
-    //     std::cout << "Port: " << it->getPort() << std::endl;
-    //     std::cout << "Host: " << it->getHost() << std::endl;
-    //     std::cout << "Root: " << it->getRoot() << std::endl;
-    //     std::cout << "Ser Name: " << it->getServerName() << std::endl;
-    //     std::cout << "Def err page: " << it->getDefaultErrorPage() << std::endl;
-    //     std::cout << "Client body size: " << it->getClientBodySize() << std::endl;
-    //     std::cout << "CGI param : " << it->getCgiParam() << std::endl;
-    //     std::cout << "Autoindex : " << it->getAutoIndex() << std::endl;
-    //     std::cout << "Index : " << it->getIndex() << std::endl;
-    //     std::cout << "Get : " << it->getGetMethod() << std::endl;
-    //     std::cout << "Post : " << it->getPostMethod() << std::endl;
-    //     std::cout << "Delete : " << it->getDeleteMethod() << std::endl;
- 	// 	it->getLocations();
-    //     std::cout << "---------------------- END --------------------------------" << std::endl;
-    // }
-
-    ////////////////////// Server ////////////////////////////////
     Cluster	cluster(serv_list);
 
     if (cluster.setup() == -1)
 		return (1);
 	cluster.run();
     cluster.clean();
-    // ft_exit(serv_list);
     return 0;
 }
-
-
-// TO DO
-
-// - status code ? (A chequer quand on inspect la page sur le browser, le status doit etre bon)
-//        => details mais en gros ok 
-//        => Charlie
-// - proteger si les method (Get, Post, Delete) dans les routes ne sont pas authorisees
-//          => Ok (voir Response.cpp ligne 62)
-//          => a verifier par Charlie (surtout POST et DELETE)
-// - upload a file and get it back
-//           => voir dans quel dossier il s'upload, si un str est precisé dans une location (file_upload_location), changer le dossier (voir Response.cpp ligne 71)
-//           => Le default.html propose un lien pour uploader, le lien va bien vers une page html qui propose de selectionner un fichier. Le save ne marche pas encore
-//           => Charlie
-// - limit client body (ca ne doit pas fonctionner si le body size est plus petit que le size du fichier a uploader)
-//           => Charlie
-// - si tu as le temps, j'imagine que mettre un lien pour le delete dans le default.html ne devrait pas etre compliqué (voir Response.cpp ligne 52)
-
-
-
-// - lier les routes (locations) du .conf aux requetes (voir Response.cpp ligne 22)
-//         => Encore a faire:
-//              - location /            (un peu tricky car .find le trouve à chaque iteration dans la boucle for)
-//              - location ~ \.bla$     (a voir ce qu'ils demandent exactement en lancant le tester)
-//        => Evrard
-// - wrong url protection + default file if you look for a directory (A voir si la requete demande un dossier)
-//          => Evrard
-// - BAcker 2em socket
-//          => Evrard
-// - Tester
-//          => Evrard
-
-
-
-// Si on a encore le temps:
-// - host name ? (On a tjs 127.0.0.1, je comprends pas ce qu'on doit faire)
-// - Leaks
-// - autoindex
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////
-
-// RFC : Request for Comments => publication from the Internet Society engineers 
-
-// https://www.ionos.fr/digitalguide/serveur/know-how/nginx-vs-apache/#:~:text=Les%20serveurs%20Web%20open%20source,traitement%20bas%C3%A9%20sur%20les%20%C3%A9v%C3%A8nements.
-// https://www.notion.so/Documentation-Webserv-320727979ffd4176a7dd5ba41aaadf46#fdbd4b3f5b42480d898f8838f474ef09
-// https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa
-
-// cfr, OSI: Transport Layer of HTTP which is TCP.
-// NGINX is implemented on top of TCP
-// To implement TCP, we have to learn TCP socket programming.
-// A socket is the mechanism that most popular operating systems provide to give programs access to the network. It allows messages to be sent and received between applications (unrelated processes) on different networked machines.
-// to implement HTTP server, we have to read their particular RFC which is RFC 7230, RFC 7231, RFC 7232, RFC 7233, RFC 7234, RFC 7235.
-
-// Apache et NGINX diffèrent essentiellement par la façon dont ils traitent les demandes Client entrantes (requêtes)
-// Alors qu’Apache est basé sur une architecture orientée sur les processus, la gestion des connexions NGINX repose sur un algorithme de traitement basé sur les évènements.
-
-//L’architecture événementielle de NGINX, d’autre part, permet d’obtenir la simultanéité sans avoir besoin d’un processus ou d’un Thread supplémentaire pour chaque nouvelle connexion. 
-//Un seul processus NGINX peut gérer simultanément des milliers de connexions HTTP
-
-// Ceci est réalisé par un mécanisme de boucle, appelé Event-loop (boucle d‘événement). 
-//Ceci permet aux demandes Client d’être traitées de manière asynchrone au sein d’un même thread.
-
-// Contrairement au serveur Web Apache, où le nombre de processus actifs ou de Threads ne peut être limité que par des valeurs minimales et maximales, 
-// NGINX offre un modèle de processus prévisible qui est parfaitement adapté au matériel.
-
-// Tous les processus Worker démarrés via le processus maître NGINX dans le cadre de la configuration partagent un ensemble de Listener Sockets (terminaux de communication). 
-// Au lieu de démarrer un processus ou un Thread séparé pour chaque connexion entrante, chaque processus Worker exécute une boucle d’évènements qui permet à plusieurs 
-// milliers de connexions au sein d’un Thread d’être traitées de manière asynchrone sans bloquer le processus
-
-// Pour ce faire, les processus Worker traitent les Listener-sockets en permanence à la recherche d’événements déclenchés par des connexions entrantes, 
-// les accepte et exécute les processus de lecture et d’écriture sur Socket lors du traitement HTTP.
-
-// Le traitement asynchrone des tâches dans la boucle d’événements est basé sur des notifications d’événements, des fonctions de rappel (Callbacks) et des temporisateurs (Timers).
-// Ces mécanismes permettent à un processus Worker de déléguer une opération après l’autre au système d’exploitation sans attendre le résultat d’une opération ou la réponse des programmes Client
-
-
-// -----Traitement des contenus Web statiques et dynamiques: 
-// NGINX ne fournit que des mécanismes de diffusion de contenu Web statique. La mise à disposition de contenu dynamique est confiée à des serveurs d'application spécialisés. 
-// Dans ce cas, NGINX fonctionne simplement comme un proxy entre le programme client et le serveur Upsteam
-
-// -----Interprétation des requêtes Client
-// NGINX analyse d’abord l’URL de la requête et l’associe aux blocs de server et location dans la configuration du serveur Web
-// Ce n’est qu’ensuite qu’une mise en correspondance avec le système de fichiers et la combinaison avec la racine 
-// (qui correspond à la racine du document du serveur Apache) est effectuée (si nécessaire).
-// L’URL de requête n’est pas comparée avec les blocs de localisation dans un bloc serveur jusqu'à ce que le serveur demandé soit trouvé
-// NGINX lit les blocs d'emplacement listés et recherche l'emplacement qui correspond le mieux à la requête URI. 
-// Chaque bloc d'emplacement contient des instructions spécifiques qui montrent à NGINX comment traiter la requête correspondante.
-
-// https://www.youtube.com/watch?v=N49UyTlUXp4&t=19s&ab_channel=EricOMeehan
-
-
-
-// CGI
-
-// The Common Gateway Interface (CGI) [1] is an interface between your web server and the programs you write
-// 1. The client (a web browser) sends a request to the server for a document. If it can, the server responds to the request directly by sending the document.
-// 2. If the server determines the request isn't for a document it can simply deliver, the server creates a CGI process.
-// 3. The CGI process turns the request information into environment variables. Next, it establishes a current working directory for the child process. Finally, it establishes pipes (data pathways) between the server and an external CGI program.
-// 4. After the external CGI program processes the request, it uses the data pathway to send a response back to the server, which in turn, sends the response back to the client.

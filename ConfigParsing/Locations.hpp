@@ -26,33 +26,10 @@ class internal_server_error_exc : public std::exception
 {
 };
 
-typedef struct s_CGI
+typedef struct s_location
 {
 	bool active;
-	std::string AUTH_TYPE;
-	std::string CONTENT_LENGTH;
-	std::string CONTENT_TYPE;
-	std::string GATEWAY_INTERFACE;
-	std::string PATH_INFO;
-	std::string PATH_TRANSLATED;
-	std::string QUERY_STRING;
-	std::string REMOTE_ADDR;
-	std::string REMOTE_INDENT;
-	std::string REMOTE_USER;
-	std::string REQUEST_METHOD;
-	std::string REQUEST_URI;
-	std::string SCRIPT_NAME;
-	std::string SERVER_NAME;
-	std::string SERVER_PORT;
-	std::string SERVER_PROTOCOL;
-	std::string SERVER_SOFTWARE;
-	std::string SECRET;
-} t_CGI;
-
-typedef struct s_location //Config routes
-{
-	bool active;
-	std::list<std::string> file_extensions; //if  no extensions specified means ALL, besides if extension specified in other location
+	std::list<std::string> file_extensions;
 	std::string directory;
 	std::list<std::string> http_methods;
 	size_t max_body;
@@ -60,7 +37,6 @@ typedef struct s_location //Config routes
 	std::list<std::string> index;
 	std::string  directory_listing;
 	std::string default_file_if_request_directory;
-	t_CGI CGI; //If equal to NULL no CGI server, but http static content server
 	std::string file_upload_location;
 	std::string FOUND_URL;
 } t_location;
@@ -109,13 +85,13 @@ typedef struct s_http_req
 
 typedef struct	s_server
 {
-	int server_socket; //Our server socket, whereby clients can connect to
-	struct sockaddr_in address; //Socket address struct for socket functions
-	int addrlen; //Size in int that can be casted for socket functions
-	int client_socket[200 + 1]; //Remember already connected clients
-	int connected_socket; //New socket connected between server and client
-	std::map<int, t_http_req> requests; //To handle multiple incoming requests and requests that are received in packages
-	std::map<int, std::string>	answer; //To handle answers sent in packages
+	int server_socket;
+	struct sockaddr_in address;
+	int addrlen;
+	int client_socket[200 + 1];
+	int connected_socket;
+	std::map<int, t_http_req> requests;
+	std::map<int, std::string>	answer;
 	unsigned int		fd_max;
 }				t_server;
 
@@ -145,7 +121,6 @@ std::string parse_until(std::string &line, std::string const &until, bool all=fa
 void show_conf(t_config &conf);
 void show_locations(std::list<t_location> &locations);
 void show_http_request(t_http_req &req);
-
 void URL_to_local_path(t_http_req &req, t_config &conf);
 
 #endif

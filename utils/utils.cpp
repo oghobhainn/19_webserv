@@ -8,13 +8,11 @@ void	change_dir(std::string relative_path)
 	{
 		std::cout << "Ërror: getcwd failed" << std::endl;
 		delete [] path_name;
-		//throw internal_server_error_exc(); TODO
 	}
 	if (chdir((std::string(path_name) + relative_path).c_str()) == -1)
 	{
 		std::cout << "Error: chdir failed: " << path_name + relative_path << std::endl;
 		delete [] path_name;
-		//throw internal_server_error_exc(); TODO
 	}
 	delete [] path_name;
 }

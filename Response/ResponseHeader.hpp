@@ -8,10 +8,8 @@ public:
 	ResponseHeader(void);
 	ResponseHeader(const ResponseHeader & src);
 	~ResponseHeader(void);
-
 	ResponseHeader & operator=(const ResponseHeader & src);
 
-	// Setter functions
 	void			setAllow(std::set<std::string> methods);
 	void			setAllow(const std::string& allow = "");
 	void			setContentLanguage(const std::string& lang = "");
@@ -25,8 +23,6 @@ public:
 	void			setServer(void);
 	void			setTransferEncoding(void);
 	void			setWwwAuthenticate(int code);
-
-	// Member functions
 	std::string		getHeader(size_t size, const std::string& path, int code, std::string type, const std::string& Location, const std::string& lang);
 	std::string		notAllowed(std::set<std::string> methods, const std::string& path, int code, const std::string& lang);
 	std::string		writeHeader(void);

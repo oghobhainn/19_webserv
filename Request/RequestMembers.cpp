@@ -138,7 +138,7 @@ std::string			Request::nextLine(const std::string &str, size_t& i)
 	ret = str.substr(i, j - i);
 	if (ret[ret.size() - 1] == '\r')
 		pop(ret);
-	i = (j >= 10000000 ? i + 1 : j); //TODO brouillon, j == std::string::npos ne fonctionne pas // de base: (j == npos) ? j : j + 1;
+	i = (j >= 10000000 ? i + 1 : j);
 	return ret;
 }
 
@@ -168,10 +168,9 @@ int					Request::parse(const std::string& str)
 	}
 	if (this->_headers["Www-Authenticate"] != "")
 		this->_env_for_cgi["Www-Authenticate"] = this->_headers["Www-Authenticate"];
-	//this->setLang();
 	if (i < str.length())
 	{
-		this->setBody(str.substr(i));//, std::string::npos));
+		this->setBody(str.substr(i));
 	}
 
 	this->findQuery();

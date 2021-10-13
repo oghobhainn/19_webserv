@@ -12,23 +12,16 @@
 #include <sys/stat.h>
 #include <fstream>
 #include <sys/select.h>
+#include <stdio.h>
+#include <string.h>
+#include <fcntl.h>
 
 #include "ConfigParsing/Config.hpp"
-#include "Networking/Server/TestServer.hpp"
-#include "Networking/Sockets/SimpleSocket.hpp"
-#include "Networking/Sockets/ListeningSocket.hpp"
-#include "Networking/Sockets/ConnectingSocket.hpp"
-#include "Networking/Sockets/BindingSocket.hpp"
-
-// #include "Request/Request.hpp"
-// #include "Response/Response.hpp"
-// #include "Response/ResponseHeader.hpp"
-// #include "Cgi/CgiHandler.hpp"
-// #include "Utils/utils.hpp"
-
-//#include "request_parser/request.hpp"
-//#include "response_builder/response.hpp"
 #include "Utils/utils.hpp"
+#include "ConfigParsing/Config.hpp"
+#include "Request/Request.hpp"
+#include "Response/Response.hpp"
+#include "Response/ResponseHeader.hpp"
 
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */

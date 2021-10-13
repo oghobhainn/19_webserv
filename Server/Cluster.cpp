@@ -17,8 +17,6 @@ void	*ft_memcpy(void *dst, const void *src, size_t n)
 	return (dst);
 }
 
-// Constructors and destructors
-
 Cluster::Cluster(std::list<Server> serv_list)
 {
     _serv_list = serv_list;
@@ -26,30 +24,19 @@ Cluster::Cluster(std::list<Server> serv_list)
 
 Cluster::Cluster(const Cluster & src)
 {
-	if (this != &src) {
+	if (this != &src)
 		*this = src;
-	}
 }
 
 Cluster::~Cluster(void)
 {
 }
 
-// Member functions
-
-// void	Cluster::config(std::string fileconf)
-// {
-// 	_config.parse(fileconf.c_str());
-// }
-
 int		Cluster::setup(void)
 {
 	FD_ZERO(&_fd_set);
 	_max_fd = 0;
     unsigned int nb_server = 0;
-	// int *ports_lst = NULL;
-	// int i = 0;
-	// int port;
 
     for (std::list<Server>::iterator it = _serv_list.begin(); it != _serv_list.end(); ++it)
         nb_server++;
@@ -88,17 +75,13 @@ void	Cluster::run(void)
 		struct timeval timeout = {2, 0};
 		int				ret = 0;
 
-		// boucle du select: selectione les sockets actives.
 		while (ret == 0)
 		{
 			ft_memcpy(&reading_set, &_fd_set, sizeof(_fd_set));
 			FD_ZERO(&writing_set);
 			for (std::vector<int>::iterator it = _ready.begin() ; it != _ready.end() ; it++)
-			{
 				FD_SET(*it, &writing_set);
-				std::cout << "---------- add socket writing : " << *it << std::endl;
-			}
-			std::cout << "Waiting on a connection" << std::endl;
+			std::cout << "..." << std::endl;
 			ret = select(_max_fd + 1, &reading_set, &writing_set, NULL, &timeout);
 		}
 		// if ret > 0 : select a trouvé une socket active
@@ -109,8 +92,6 @@ void	Cluster::run(void)
 		 	{
 		 		if (FD_ISSET(*it, &writing_set))
 		 		{
-					std::cout << "---------- start writing : " << *it << std::endl;
-					
 					long	ret = _sockets[*it]->send_response(*it);
 
 					if (ret == 0)
@@ -122,7 +103,6 @@ void	Cluster::run(void)
 						_sockets.erase(*it);
 						_ready.erase(it);
 					}
-					// ret = 0;
 					break;
 		 		}
 		 	}
@@ -133,7 +113,6 @@ void	Cluster::run(void)
 
 		 		if (FD_ISSET(socket, &reading_set))
 				{
-					std::cout << "---------- read socket : " << socket << std::endl;
 					long	ret = it->second->receive_connection(socket);
 		 			if (ret == 0)
 		 			{
@@ -160,7 +139,6 @@ void	Cluster::run(void)
 			 	if (FD_ISSET(fd, &reading_set))
 			 	{
 			 		long	socket = it->second.accept_connection();
-					std::cout << "---------- socket created : " << socket << " for the port : " << fd << std::endl;
 			 		if (socket != -1)
 			 		{
 						FD_SET(socket, &_fd_set);
@@ -178,29 +156,24 @@ void	Cluster::run(void)
 		{
 			std::cerr << "Problem with select" << std::endl;
 			for (std::map<long, ActiveServer *>::iterator it = _sockets.begin(); it != _sockets.end(); it++)
-				it->second->close(it->first);
+				it->second->close_socket(it->first);
 			_sockets.clear();
 			_ready.clear();
 			FD_ZERO(&_fd_set);
 			for (std::map<long, ActiveServer>::iterator it = _servers.begin(); it != _servers.end(); it++)
 				FD_SET(it->first, &_fd_set);
 		}
-		std::cout << "-- END --" << std::endl;
 	}
 }
 
 void	Cluster::clean(void)
 {
 	for ( std::map<long, ActiveServer>::iterator it = _servers.begin(); it != _servers.end(); it++)
-		it->second.clean();
+		it->second.clean_server();
 }
-
-// // Overloaders
 
 Cluster & Cluster::operator=(const Cluster & src)
 {
-	// _config = src._config;
-	// _servers = src._servers;
 	_fd_set = src._fd_set;
 	_fd_size = src._fd_size;
 	_max_fd = src._max_fd;
