@@ -1,6 +1,7 @@
 NAME = webserv
 SRCS = main.cpp \
 		Utils/parsing.cpp \
+		Parsing/Parsing.cpp \
 		ConfigParsing/Config.cpp \
 		Request/Request.cpp \
 		Request/RequestMembers.cpp \

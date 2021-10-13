@@ -17,6 +17,9 @@ class Cluster
         Cluster & operator=(const Cluster & src);
 
         int		setup(void);
+        int     sendResponse(int ret, fd_set &reading_set, fd_set &writing_set);
+        int     readRequest(int ret, fd_set &reading_set);
+        int     acceptConnection(int ret, fd_set &reading_set);
         void	run(void);
         void	clean(void);
 

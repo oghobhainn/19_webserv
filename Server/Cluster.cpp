@@ -66,6 +66,81 @@ int		Cluster::setup(void)
     return (0);
 }
 
+int		Cluster::sendResponse(int ret, fd_set &reading_set, fd_set &writing_set)
+{
+	for (std::vector<int>::iterator it = _ready.begin(); ret && it != _ready.end(); it++)
+	{
+		if (FD_ISSET(*it, &writing_set))
+		{
+			long	ret = _sockets[*it]->send_response(*it);
+
+			if (ret == 0)
+				_ready.erase(it);
+			else if (ret == -1)
+			{
+				FD_CLR(*it, &_fd_set);
+				FD_CLR(*it, &reading_set);
+				_sockets.erase(*it);
+				_ready.erase(it);
+			}
+			break;
+		}
+	}
+	return (ret);
+}
+
+int		Cluster::readRequest(int ret, fd_set &reading_set)
+{
+	for (std::map<long, ActiveServer *>::iterator it = _sockets.begin(); ret && it != _sockets.end(); it++)
+	{
+		long	socket = it->first;
+
+		if (FD_ISSET(socket, &reading_set))
+		{
+			long	ret = it->second->receive_connection(socket);
+			if (ret == 0)
+			{
+				it->second->handle_connection(socket, _serv_list);
+				_ready.push_back(socket);
+				
+			}
+			else if (ret == -1)
+			{
+				FD_CLR(socket, &_fd_set);
+				FD_CLR(socket, &reading_set);
+				_sockets.erase(socket);
+				it = _sockets.begin();
+			}
+			ret = 0;
+			break;
+		}
+	}
+	return (ret);
+}
+
+int		Cluster::acceptConnection(int ret, fd_set &reading_set)
+{
+	for (std::map<long, ActiveServer>::iterator it = _servers.begin(); ret && it != _servers.end(); it++)
+	{
+		long	fd = it->first;
+
+		if (FD_ISSET(fd, &reading_set))
+		{
+			long	socket = it->second.accept_connection();
+			if (socket != -1)
+			{
+				FD_SET(socket, &_fd_set);
+				_sockets.insert(std::make_pair(socket, &(it->second)));
+				if (socket > _max_fd)
+					_max_fd = socket;
+			}
+			ret = 0;
+			break;
+		}
+	}
+	return (ret);
+}
+
 void	Cluster::run(void)
 {
 	while (true)
@@ -75,83 +150,23 @@ void	Cluster::run(void)
 		struct timeval timeout = {2, 0};
 		int				ret = 0;
 
+		std::cout << "..." << std::endl;
 		while (ret == 0)
 		{
 			ft_memcpy(&reading_set, &_fd_set, sizeof(_fd_set));
 			FD_ZERO(&writing_set);
 			for (std::vector<int>::iterator it = _ready.begin() ; it != _ready.end() ; it++)
 				FD_SET(*it, &writing_set);
-			std::cout << "..." << std::endl;
 			ret = select(_max_fd + 1, &reading_set, &writing_set, NULL, &timeout);
 		}
-		// if ret > 0 : select a trouvé une socket active
+		// Si le select a trouvé une socket active
 		if (ret > 0)
 		{
-			// boucle du write: envoie les requetes des sockets clients.
-		 	for (std::vector<int>::iterator it = _ready.begin(); ret && it != _ready.end(); it++)
-		 	{
-		 		if (FD_ISSET(*it, &writing_set))
-		 		{
-					long	ret = _sockets[*it]->send_response(*it);
-
-					if (ret == 0)
-						_ready.erase(it);
-					else if (ret == -1)
-					{
-						FD_CLR(*it, &_fd_set);
-						FD_CLR(*it, &reading_set);
-						_sockets.erase(*it);
-						_ready.erase(it);
-					}
-					break;
-		 		}
-		 	}
-			// lit les informations de la requete
-		 	for (std::map<long, ActiveServer *>::iterator it = _sockets.begin(); ret && it != _sockets.end(); it++)
-		 	{
-		 		long	socket = it->first;
-
-		 		if (FD_ISSET(socket, &reading_set))
-				{
-					long	ret = it->second->receive_connection(socket);
-		 			if (ret == 0)
-		 			{
-		 				it->second->handle_connection(socket, _serv_list);
-						_ready.push_back(socket);
-						
-		 			}
-					else if (ret == -1)
-					{
-						FD_CLR(socket, &_fd_set);
-						FD_CLR(socket, &reading_set);
-						_sockets.erase(socket);
-						it = _sockets.begin();
-					}
-					ret = 0;
-					break;
-		 		}
-		 	}
-			// lorsqu'une serveur s'active, on cree une socket cliente pour lire par la suite la requete
-			for (std::map<long, ActiveServer>::iterator it = _servers.begin(); ret && it != _servers.end(); it++)
-			{
-			 	long	fd = it->first;
-
-			 	if (FD_ISSET(fd, &reading_set))
-			 	{
-			 		long	socket = it->second.accept_connection();
-			 		if (socket != -1)
-			 		{
-						FD_SET(socket, &_fd_set);
-						_sockets.insert(std::make_pair(socket, &(it->second)));
-						if (socket > _max_fd)
-							_max_fd = socket;
-			 		}
-			 		ret = 0;
-			 		break;
-			 	}
-			}
+		 	ret = sendResponse(ret, reading_set, writing_set);
+			ret = readRequest(ret, reading_set);
+			ret = acceptConnection(ret, reading_set);
 		}
-		// si le select foire
+		// si le select a foiré
 		else
 		{
 			std::cerr << "Problem with select" << std::endl;
